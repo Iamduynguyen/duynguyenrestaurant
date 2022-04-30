@@ -1,0 +1,59 @@
+.BoxCategory {
+  display: flex;
+  position: relative;
+  align-items: center;
+  width: 100%;
+  min-height: 60px;
+  background-color: #00226d3f;
+  border-radius: 5px;
+  margin: 10px 0;
+  padding-left: 16px;
+  box-shadow: rgba(30, 30, 30, 0.25) 0px 2px 5px -1px,
+    rgba(30, 30, 30, 0.3) 0px 1px 3px -1px;
+  
+}
+
+.IconMenu {
+  color: #fff;
+  position: absolute;
+  right: 16px;
+  cursor: pointer;
+}
+
+.MenuDropdown {
+  position: absolute;
+  right: 0px;
+  top: 50px;
+  z-index: 1000;
+  padding: 2px;
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  overflow: hidden;
+  background-color: #1e1e1e;
+  display: none;
+}
+
+.IconMenu::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 50px;
+  background-color: violet;
+}
+
+.IconMenu:hover + .MenuDropdown {
+  display: flex;
+}
+
+.tableNotAvailable {
+  opacity: 0.4;
+}
+
+.MenuButton {
+  position: absolute;
+  background-color: #555;
+  border-radius: 5px;
+  right: 20px;
+  bottom: -40px;
+  z-index: 100;
+}

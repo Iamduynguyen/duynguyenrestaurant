@@ -1,0 +1,44 @@
+.css-13dbzr3-MuiPaper-root-MuiCard-root {
+  background-color: white;
+  box-shadow: #d4d4d4 -1px 5px 8px 3px;
+  cursor: pointer;
+}
+
+.block_img {
+  height: 230px;
+  overflow: hidden;
+}
+.p__cormorant {
+  color: rgb(94, 92, 92);
+  text-align: center;
+}
+.block_price {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.btn_item {
+  padding: 0 5px;
+}
+.btn_item:hover {
+  /* color: white; */
+  background: #d0d4fa;
+}
+.css-13dbzr3-MuiPaper-root-MuiCard-root {
+  min-height: 430px;
+}
+.swiper-pagination-fraction {
+  bottom: 0;
+}
+
+.headtext__cormorant {
+  font-size: 46px;
+}
+
+.css-1ch3q8c-MuiButtonBase-root-MuiPaginationItem-root {
+  color: black !important;
+}
+.Mui-selected {
+  background: rgb(159, 156, 156) !important;
+  color: white !important;
+}

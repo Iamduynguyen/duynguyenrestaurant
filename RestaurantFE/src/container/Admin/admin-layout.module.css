@@ -1,0 +1,143 @@
+:root {
+  --sidebar-width: 350px;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: max-content;
+  min-height: 100vh;
+  width: var(--sidebar-width);
+  max-width: unset;
+  z-index: 1;
+}
+
+.sidebarInner {
+  min-height: 100vh;
+}
+
+.content {
+  margin-left: var(--sidebar-width) !important;
+  width: calc(100% - var(--sidebar-width));
+  max-width: unset;
+  padding: 20px;
+  background-color: #fff;
+}
+
+.navItem {
+  border: 1px solid var(--color-golden);
+  background-image: none;
+}
+
+.navItem svg {
+  margin-right: 10px;
+}
+
+.navItem:hover {
+  background-image: linear-gradient(45deg, #b982e3, #b982e3, #b982e3);
+}
+
+.navItemActive {
+  background-image: linear-gradient(45deg, #b982e3, #b982e3, #b982e3);
+}
+
+.topnav {
+  width: 100%;
+  height: max-content;
+  padding: 20px;
+  margin-bottom: 1rem;
+  display: flex;
+  height: max-content;
+  align-items: center;
+}
+
+.topnavItemInput {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.topnavItemInput input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #999;
+  padding: 10px 20px;
+  outline: none;
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  padding: 4px;
+  border-radius: 50%;
+  border: 2px solid var(--color-golden);
+  cursor: pointer;
+  transition: 0.4s ease;
+  position: relative;
+}
+
+.userAvatar.show {
+  border-color: red;
+}
+
+.userAvatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.accountAction {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 2;
+  background-color: #e1e1e7;
+  list-style: none;
+  border-radius: 5px;
+  box-shadow: rgba(30, 30, 30, 0.25) 0px 2px 5px -1px;
+  width: 200px;
+  overflow: hidden;
+  display: none;
+}
+
+.accountAction.show {
+  display: block;
+  animation: showAccountAction 0.4s ease-in;
+}
+
+@keyframes showAccountAction {
+  from {
+    transform: translateX(50%) translateY(-50%) scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) translateY(0) scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* .accountAction::after{
+    content: "";
+    position: absolute;
+    top: -10px;
+    right: 0;
+    height: 10px;
+    width: 100px;
+    background-color: green;
+    z-index: 2;
+} */
+
+.accountActionItem {
+  height: 40px;
+  line-height: 40px;
+  transition: 0.4s ease;
+  padding: 5px 5px 5px 20px;
+}
+
+.accountActionItem ~ .accountActionItem {
+  margin-top: 10px;
+}
+
+.accountActionItem:hover {
+  background-color: var(--color-golden);
+}

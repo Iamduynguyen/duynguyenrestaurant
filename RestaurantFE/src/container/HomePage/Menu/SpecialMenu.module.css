@@ -1,0 +1,52 @@
+.CardPreview {
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+  transition: all 0.3s ease-in-out;
+}
+
+.CardPreview_text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+  line-height: 50px;
+}
+
+.CardPreview:hover {
+  opacity: 0.8;
+  transform: scale3d(1.1, 1.1, 1.1);
+}
+
+.IconMenu {
+  position: absolute;
+  bottom: 40px;
+  right: 20px;
+  color: #fff;
+}
+
+.InstagramIcon {
+  position: absolute;
+  color: #fff;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s linear;
+  z-index: 10;
+  opacity: 0;
+}
+
+.listImage:hover {
+  transition: all 0.3s linear;
+  cursor: pointer;
+}
+
+.listImage:hover .InstagramIcon {
+  opacity: 1;
+}
+
+.Swiper {
+  width: 100%;
+  border-radius: 10px;
+}

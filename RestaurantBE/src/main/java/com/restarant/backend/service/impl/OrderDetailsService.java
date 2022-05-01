@@ -58,7 +58,7 @@ public class OrderDetailsService implements IOrderDetailsService {
             throw new InvalidDataExeception("The TableOrderId not found");
         }
         OrderDetails entity = mapper.convertToEntity(dto);
-        entity.setStatus(1);
+        entity.setStatus(0);
         log.info("Someone create table " + dto);
         OrderDetails result = orderDetailsRepository.save(entity);
         return mapper.convertToDto(result);

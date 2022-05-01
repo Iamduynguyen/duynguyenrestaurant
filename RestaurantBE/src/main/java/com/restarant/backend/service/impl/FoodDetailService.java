@@ -49,7 +49,6 @@ public class FoodDetailService implements IFoodDetailService {
         Food food = new Food();
         food.setId(dto.getFoodId());
         entity.setFood(food);
-
         if (dto.getFoodMedias() != null) {
             entity.setFoodMedias(
                     dto.getFoodMedias().stream()

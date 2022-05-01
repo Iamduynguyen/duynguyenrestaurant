@@ -41,6 +41,7 @@ export default function DetailFood() {
   const [openOrderFood, setOpenOrderFood] = useState(false);
   const [addFoodToTable, setAddFoodToTable] = useState([]);
   const [userOrder, setUserOrder] = useState([]);
+  const [status, setStatus] = useState([]);
   const discount = (price, discount) => {
     return (parseInt(price, 10) * (100 - parseInt(discount, 10))) / 100;
   };

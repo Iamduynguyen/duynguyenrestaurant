@@ -43,6 +43,7 @@ export default function Menu() {
       };
       const res = await FoodsApi.getAllFoods(params);
       setFoodsData(res);
+      console.log(res);
       const res1 = await FoodsApi.getPageFoods();
       setNumberPage(Math.floor(res1.totalElement / 6 + 1));
     };

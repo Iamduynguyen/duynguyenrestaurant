@@ -1,0 +1,40 @@
+.ant-table-thead {
+    tr {
+        th {
+            background-color: #b982e3;
+            text-align: center;
+        }
+    }
+}
+
+.ant-table-cell-row-hover {
+    background-color: rgb(185, 130, 227, 0.5) !important;
+}
+
+.action__column {
+    width: 250px;
+
+    &--btn {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+
+        &__edit {
+            background-color: #e0e5ad;
+        }
+
+
+        &__delete {
+            margin-top: 10px;
+        }
+
+
+    }
+}
+
+.index__column {
+    width: 100px;
+    text-align: center;
+}

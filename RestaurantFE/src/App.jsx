@@ -19,6 +19,7 @@ import TableAdmin from "./container/Admin/Table";
 import ConfirmOrder from "./container/Admin/ConfirmOrder";
 import AdminLayout from "./components/layout/LayoutAdmin";
 import ChartAdmin from "./container/Admin/Chart/Chart";
+import DashboardAdmin from "./container/Admin/Dashboard";
 import UserSettings from "./container/User";
 const MuiTheme = createTheme({
   typography: {
@@ -45,7 +46,7 @@ const App = () => (
       <Route path="/user-settings" element={<UserSettings />} />
     </Route>
     <Route path="/admin" element={<AdminLayout />}>
-      <Route index element={<ChartAdmin />} />
+      <Route index element={<DashboardAdmin />} />
       <Route path="categories" element={<CategoriesAdmin />} />
       <Route path="chartAdmin" element={<ChartAdmin />} />
       <Route path="foods" element={<FoodsAdmin />} />

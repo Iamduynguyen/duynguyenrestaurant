@@ -1,0 +1,20 @@
+
+
+
+@import './container/admin/adminLayout.scss';
+@import './container/admin/categories.scss';
+
+
+.my-btn{
+    border-radius: 10px;
+    color: #000;
+    font-size: 1rem;
+    width: max-content;
+    padding: 10px 15px;
+    height: max-content;
+}
+
+.my-btn--primary{
+    background-color:#b982e3;
+    color: #fff;
+}

@@ -1,0 +1,102 @@
+.dashboard {
+    padding: 20px;
+    position: relative;
+}
+
+
+.dashboard__title h2 {
+    text-transform: capitalize;
+    font-size: 1.75rem;
+    color: #b982e3;
+    text-align: center;
+}
+
+.dashboard__overview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.dashboard__widget {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.dashboard__widget--item{
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: rgb(204 204 204) 0px 4px 11px 6px;
+    display: flex;
+}
+
+.dashboard__widget--item__icon{
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard__widget--item__icon svg{
+    font-size: 2rem;
+}
+
+.dashboard__widget--item__content--title{
+    font-size: 1.25rem;
+    text-transform: capitalize;
+    color: #b982e3;
+    font-weight: 600;
+    text-align: center;
+}
+
+.dashboard__widget--item__content--detail{
+    font-size: 1.5rem;
+    text-transform: capitalize;
+    color: #999;
+    margin-top: 10px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.dashboard__table{
+    padding: 20px;
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.dashboard__table--item{
+    text-align: center;
+}
+
+.dashboard__table--item h3{
+    text-transform: capitalize;
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.dashboard__table--item table{
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.dashboard__table--item table th,
+.dashboard__table--item table td{
+    border: 1px solid #999;
+    text-transform: capitalize;
+    padding: 5px;
+}
+
+.dashboard__table--item table tr{
+    cursor: pointer;
+    transition: 0.4s ease;
+}
+
+.dashboard__table--item table tr:hover{
+    background-color: #b982e3;
+}
+

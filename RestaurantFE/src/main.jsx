@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
+import './scss/index.scss';
 import ScrollToTop from './Hook/ScrollToTop';
 
 const container = document.getElementById('root');

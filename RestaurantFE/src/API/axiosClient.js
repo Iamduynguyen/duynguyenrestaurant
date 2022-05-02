@@ -2,7 +2,7 @@ import axios from 'axios';
 import qs from 'qs';
 
 const axiosClient = axios.create({
-  baseURL: 'http://127.0.0.1:8787',
+  baseURL: 'http://viprestaurant.cf:8787',
   headers: {
     'content-type': 'application/json',
   },

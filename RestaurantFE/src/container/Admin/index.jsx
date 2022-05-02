@@ -68,19 +68,19 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    window.addEventListener("click", (e) => {
-      if (
-        e.target === avatarElementRef.current ||
-        e.target.parentNode === avatarElementRef.current
-      ) {
-        accountElementRef.current.classList.toggle(styles.show);
-      } else {
-        accountElementRef.current.classList.remove(styles.show);
-      }
-    });
-    return () => {
-      window.removeEventListener("click");
-    };
+    // window.addEventListener("click", (e) => {
+    //   if (
+    //     e.target === avatarElementRef.current ||
+    //     e.target.parentNode === avatarElementRef.current
+    //   ) {
+    //     accountElementRef.current.classList.toggle(styles.show);
+    //   } else {
+    //     accountElementRef.current.classList.remove(styles.show);
+    //   }
+    // });
+    // return () => {
+    //   window.removeEventListener("click");
+    // };
   }, []);
 
   useEffect(() => {
@@ -107,11 +107,10 @@ export default function AdminPage() {
                 <AccordionSummary
                   aria-controls="panel1a-content"
                   onClick={() => navigate("/admin/chartAdmin")}
-                  className={`${styles.navItem} ${
-                    location.pathname === "/admin/chartAdmin"
+                  className={`${styles.navItem} ${location.pathname === "/admin/chartAdmin"
                       ? styles.navItemActive
                       : ""
-                  }`}
+                    }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography
@@ -134,11 +133,10 @@ export default function AdminPage() {
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel1a-content"
                   onClick={() => navigate("/admin/categories")}
-                  className={`${styles.navItem} ${
-                    location.pathname === "/admin/categories"
+                  className={`${styles.navItem} ${location.pathname === "/admin/categories"
                       ? styles.navItemActive
                       : ""
-                  }`}
+                    }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography
@@ -170,11 +168,10 @@ export default function AdminPage() {
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel2a-content"
                   onClick={() => navigate("/admin/foods")}
-                  className={`${styles.navItem} ${
-                    location.pathname === "/admin/foods"
+                  className={`${styles.navItem} ${location.pathname === "/admin/foods"
                       ? styles.navItemActive
                       : ""
-                  }`}
+                    }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography
@@ -204,11 +201,10 @@ export default function AdminPage() {
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel2a-content"
                   onClick={() => navigate("/admin/tables")}
-                  className={`${styles.navItem} ${
-                    location.pathname === "/admin/tables"
+                  className={`${styles.navItem} ${location.pathname === "/admin/tables"
                       ? styles.navItemActive
                       : ""
-                  }`}
+                    }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography
@@ -241,11 +237,10 @@ export default function AdminPage() {
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel2a-content"
                   onClick={() => navigate("/admin/orders")}
-                  className={`${styles.navItem} ${
-                    location.pathname === "/admin/orders"
+                  className={`${styles.navItem} ${location.pathname === "/admin/orders"
                       ? styles.navItemActive
                       : ""
-                  }`}
+                    }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography
@@ -270,9 +265,11 @@ export default function AdminPage() {
           style={{ boxShadow: "#CCCCCC 0px 4px 11px 6px" }}
         >
           <div className="flex items-center justify-center  w-[23.1%] ">
-            <span className="text-[#8836c5] text-[32px] font-bold">
-              GERICHT
-            </span>
+            <Link to="/">
+              <span className="text-[#8836c5] text-[32px] font-bold">
+                GERICHT
+              </span>
+            </Link>
           </div>
           <div className="w-[76.9%] px-[20px] flex justify-between px-[50px] py-[20px]">
             <div className="w-full relative mr-[30px]">

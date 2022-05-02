@@ -36,6 +36,7 @@ export default function FoodsAdmin() {
     const fetchData = async () => {
       const res = await FoodsAPI.getAllFoods();
       setFoodsData(res);
+      console.log(res)
     };
     fetchData();
   }, [resetData]);
@@ -68,7 +69,7 @@ export default function FoodsAdmin() {
       </div>
       <div className="w-full ">
         {FoodsData?.map((item, index) => (
-          <div className="w-full px-[30px]  grid grid-cols-[0.5fr,2fr,2fr,2fr,3fr] py-[15px] border-b border-gray-300">
+          <div className="w-full px-[30px]  grid grid-cols-[0.5fr,2fr,2fr,2fr,3fr] py-[15px] border-b border-gray-300" key={index}>
             <div className="">{index + 1}</div>
             <div className="">{item.name}</div>
             <div className=""><img style={{height: 100}} src={item.avtUrl} alt="" /></div>

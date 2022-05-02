@@ -27,7 +27,6 @@
 
 
         &__delete {
-            margin-top: 10px;
         }
 
 
@@ -37,4 +36,11 @@
 .index__column {
     width: 100px;
     text-align: center;
+}
+
+.name__filter{
+    width: 300px;
+    input{
+        width: 100%;
+    }
 }

@@ -9,13 +9,14 @@ import {
   Stack,
   TextField,
   Typography,
-  useMediaQuery,
+  useMediaQuery
+
 } from '@mui/material';
 import { Row, Table, Button as AntdButton, Modal, Input, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import CategoryAPI from '../../../API/CategoriesAPI';
 import styles from './Categories.module.css';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, FileSearchOutlined } from '@ant-design/icons';
 
 
 export default function CategoriesAdmin() {
@@ -98,14 +99,14 @@ export default function CategoriesAdmin() {
           setNewCategory('');
           setIsCreate(false);
           setSelect(null)
-          const newData = tableData.map((item,index) => {
-            if(item.id === res.id){
+          const newData = tableData.map((item, index) => {
+            if (item.id === res.id) {
               return {
                 ...res,
-                key:item.id,
+                key: item.id,
                 stt: select.stt
               }
-            }else{
+            } else {
               return item
             }
           })
@@ -233,11 +234,54 @@ export default function CategoriesAdmin() {
 
       {/* antd  */}
       <Row className={styles.content}>
+        <div className="adm-section">
+          <h2>Quản lý thể loại</h2>
+        </div>
         <AntdButton className='my-btn my-btn--primary' onClick={() => { setIsCreate(true) }}>Thêm thể loại</AntdButton>
-        <Table dataSource={tableData} bordered={true} className={styles.table}>
-          <Table.Column title='STT' dataIndex="stt" key="stt"  className='index__column'/>
-          <Table.Column title='ID' dataIndex="id" key="id" />
-          <Table.Column title='Name' dataIndex="name" key="name"/>
+        <Table
+          dataSource={tableData}
+          bordered={true}
+          className={styles.table}
+          size={'small'}
+          pagination={true}
+        >
+          <Table.Column title='STT' dataIndex="stt" key="stt" className='index__column' />
+          <Table.Column
+            title='ID'
+            dataIndex="id"
+            key="id"
+            sorter={(record1, record2) => {
+              return record1.id > record2.id
+            }}
+          />
+          <Table.Column
+            title='Name'
+            dataIndex="name"
+            key="name"
+            filterIcon={<FileSearchOutlined />}
+            filterDropdown={({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => {
+              return (
+                <div className="name__filter">
+                  <Input
+                    placeholder='Nhập tên thể loại cần tìm...'
+                    autoFocus
+                    value={selectedKeys[0]}
+                    onChange={(e) => { setSelectedKeys(e.target.value ? [e.target.value] : []) }}
+                    onPressEnter={() => { confirm() }}
+                    onBlur={() => { confirm() }}
+                  ></Input>
+                  <div className="name__filter--action">
+                    <Button onClick={() => {confirm()}}>Tìm kiếm</Button>
+                    <Button onClick={() => {clearFilters(); confirm()}}>Xóa bộ lọc</Button>
+                  </div>
+                </div>
+
+              )
+            }}
+            onFilter={(value, record) => {
+              return record.name.toLowerCase().includes(value.toLowerCase())
+            }}
+          />
           <Table.Column title='Action' className='action__column' key="action" render={(text, record) => (
             <>
               <div className="action__column--btn">

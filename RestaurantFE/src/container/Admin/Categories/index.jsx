@@ -12,7 +12,7 @@ import {
   useMediaQuery
 
 } from '@mui/material';
-import { Row, Table, Button as AntdButton, Modal, Input, message } from 'antd';
+import { Row, Table, Button as AntdButton, Modal, Input, message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import CategoryAPI from '../../../API/CategoriesAPI';
 import styles from './Categories.module.css';
@@ -21,6 +21,7 @@ import { EditOutlined, DeleteOutlined, FileSearchOutlined } from '@ant-design/ic
 
 export default function CategoriesAdmin() {
   const [tableData, setTableData] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
   const [isConfirm, setIsConfirm] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [confirmText, setConfirmText] = useState("Bạn có thực sự muốn xóa không ?!?");
@@ -161,6 +162,7 @@ export default function CategoriesAdmin() {
           stt: index + 1
         }
       )))
+      setDataLoading(false);
     };
     fetchData();
   }, []);
@@ -244,6 +246,7 @@ export default function CategoriesAdmin() {
           className={styles.table}
           size={'small'}
           pagination={true}
+          loading={dataLoading}
         >
           <Table.Column title='STT' dataIndex="stt" key="stt" className='index__column' />
           <Table.Column

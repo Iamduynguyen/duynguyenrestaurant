@@ -23,10 +23,26 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import React, { useEffect, useState } from 'react';
 import ImageUploading from 'react-images-uploading';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import FoodsAPI from '../../../../API/FoodsAPI';
+import CategoryAPI from '../../../../API/CategoriesAPI';
+import { message, Row, Col, Form, Input, Button as AntdButton, Modal, Select } from 'antd';
+import { useForm } from "antd/lib/form/Form";
 
 export default function FixFoods() {
+
+  const [form] = useForm();
+  const [foodEditing, setFoodEditing] = useState({})
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteStatus, setDeleteStatus] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const [foodDetail, setFoodDetail] = useState('');
   const [FoodName, setFoodName] = useState('');
   const [FoodTitle, setFoodTitle] = useState('');
@@ -52,7 +68,6 @@ export default function FixFoods() {
     setImages(imageList);
   };
   const confirmAddDetail = async () => {
-    setOpenDLAddDetail(false);
     const detail = {
       foodSize: size,
       discount: discount,
@@ -71,6 +86,8 @@ export default function FixFoods() {
     };
     const res = await FoodsAPI.createFoodDetail(detail);
     console.log(res);
+    setOpenDLAddDetail(false);
+    message.success('Thêm size thành công!');
     handleResetData();
   };
 
@@ -83,257 +100,469 @@ export default function FixFoods() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  useEffect(() => {
-    const fetchFoodById = async () => {
-      const res = await FoodsAPI.getFoodById(id);
-      setFoodDetail(res);
-      setFoodName(res.name);
-      setFoodTitle(res.title);
-    };
-    fetchFoodById();
-  }, [resetData]);
+
+
   const confirmUpdateFood = async () => {
     const food = {
       title: FoodTitle,
       name: FoodName,
       notes: '1',
       category: {
-        id: foodDetail.category.id,
+        id: 3508,
       },
     };
     const res = await FoodsAPI.updateFood(id, food);
     console.log(res);
     handleResetData();
   };
+
+
+  const handleUpdateFood = async () => {
+    setUpdateLoading(true);
+    setUpdateStatus('Đang cập nhật !!!');
+    const food = form.getFieldsValue();
+    console.log(food);
+    const newFood = {
+      title: food.title,
+      name: food.name,
+      note: food.note ? food.note : '',
+      category: {
+        id: food.categoryId
+      }
+    }
+    console.log(newFood)
+    const res = await FoodsAPI.updateFood(id, newFood);
+    console.log(res);
+    handleResetData();
+    setUpdateLoading(false);
+    setUpdateStatus('');
+    setIsUpdating(false);
+    message.success('Cập nhật thành công!');
+  }
+
+
+  const handleDeleteFood = async () => {
+    const res = await FoodsAPI.deleteFood(foodEditing.id);
+    console.log(res)
+    if (res == 'Delete success!') {
+      message.success('Xóa món ăn thành công !');
+      navigate('/admin/foods');
+    } else {
+      message.error('Xóa không thành công !');
+    }
+  }
+
+  useEffect(() => {
+    const fetchFoodById = async () => {
+      const res = await FoodsAPI.getFoodById(id);
+      setFoodEditing({ ...res, categoryId: res.category ? res.category.id : 7102 });
+      setFoodDetail(res);
+      setFoodName(res.name);
+      setFoodTitle(res.title);
+      console.log(res)
+    };
+    fetchFoodById();
+    const fetchCategoriesData = async () => {
+      const res = await CategoryAPI.getAllCategories();
+      setCategories(res);
+    };
+    fetchCategoriesData();
+  }, [resetData]);
+
+
+  useEffect(() => {
+    if (foodEditing) {
+      form.resetFields();
+    }
+  }, [foodEditing])
   return (
-    <Container>
-      <Grid container>
-        <Grid
-          item
-          xs={12}
-          my={5}
-          display='flex'
-          flexDirection='column'
-          alignItems='center'
-        >
-          <Typography variant='h5' textAlign='center' mb={2}>
-            Chỉnh sửa thông tin món {foodDetail?.name}
-          </Typography>
-          {foodDetail && (
-            <Grid container>
-              <Grid item sm={6} xs={12}>
-                <img
-                  style={{ width: '100%' }}
-                  src={foodDetail?.foodDetails[0]?.foodMedias[0]?.foodUrl}
-                />
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                display='flex'
-                flexDirection='column'
-                justifyContent='center'
-              >
-                <TextField
-                  sx={{ m: 3, width: 310 }}
-                  label='Tên món ăn:'
-                  variant='standard'
-                  defaultValue={foodDetail.name}
-                  onChange={(e) => setFoodName(e.target.value)}
-                />
-                <TextField
-                  sx={{ m: 3, width: 310 }}
-                  label='Tiêu đề món ăn:'
-                  variant='standard'
-                  defaultValue={foodDetail.title}
-                  onChange={(e) => setFoodTitle(e.target.value)}
-                />
-              </Grid>
-              <Box
-                sx={{
-                  position: 'fixed',
-                  height: 330,
-                  transform: 'translateZ(0px)',
-                  flexGrow: 1,
-                  right: 50,
-                  bottom: 50,
-                  zIndex: 10,
-                }}
-              >
-                <Backdrop open={open} />
-                <SpeedDial
-                  ariaLabel='SpeedDial'
-                  sx={{ position: 'absolute', bottom: 16, right: 16 }}
-                  icon={<SpeedDialIcon />}
-                  onClose={handleClose}
-                  onOpen={handleOpen}
-                  open={open}
-                >
-                  <SpeedDialAction
-                    icon={
-                      <AddRoundedIcon
-                        onClick={() => handleClickOpenAddDetail(foodDetail)}
-                      />
-                    }
-                    tooltipTitle='Thêm_Size_mới'
-                    tooltipOpen
-                    onClick={handleClose}
-                  />
-                </SpeedDial>
-              </Box>
-            </Grid>
-          )}
-          <Box width='100%' display='flex' justifyContent='center'>
-            <Button
-              variant='contained'
-              sx={{ my: 2 }}
-              onClick={confirmUpdateFood}
+    <>
+      {false && (
+        <Container>
+          <Grid container>
+            <Grid
+              item
+              xs={12}
+              my={5}
+              display='flex'
+              flexDirection='column'
+              alignItems='center'
             >
-              Xác nhận
-            </Button>
-          </Box>
-          <Stack spacing={2} width='100%'>
-            <TabContext value={value}>
-              <Box
-                sx={{ borderBottom: 1, borderColor: 'divider', color: 'white' }}
-              >
-                <Tabs
-                  value={`${value}`}
-                  onChange={handleChange}
-                  variant='scrollable'
-                  scrollButtons='auto'
-                  aria-label='scrollable auto tabs example'
-                >
-                  {foodDetail.foodDetails?.map((item, index) => (
-                    <Tab
-                      key={index}
-                      label={`Size ${item.foodSize}`}
-                      value={`${index}`}
+              <Typography variant='h5' textAlign='center' mb={2}>
+                Chỉnh sửa thông tin món {foodDetail?.name}
+              </Typography>
+              {foodDetail && (
+                <Grid container>
+                  <Grid item sm={6} xs={12}>
+                    <img
+                      style={{ width: '100%' }}
+                      src={foodDetail?.foodDetails[0]?.foodMedias[0]?.foodUrl}
                     />
-                  ))}
-                </Tabs>
-                {foodDetail.foodDetails?.map((item, index) => (
-                  <TabPanelCustom
-                    key={index}
-                    value={`${index}`}
-                    item={item}
-                    foodId={id}
-                    resetData={handleResetData}
-                  />
-                ))}
-              </Box>
-            </TabContext>
-          </Stack>
-        </Grid>
-      </Grid>
-      <Dialog open={openDLAddDetail} onClose={() => setOpenDLAddDetail(false)}>
-        <DialogTitle>{'Thêm chi tiết cho món ăn: ' + select.name}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            <Stack spacing={2}>
-              <TextField
-                label='Size'
-                variant='standard'
-                onChange={(e) => setSize(e.target.value)}
-              />
-              <TextField
-                label='Giảm giá'
-                variant='standard'
-                onChange={(e) => setAmount(e.target.value)}
-              />
-              <TextField
-                label='Số lượng'
-                variant='standard'
-                onChange={(e) => setDiscount(e.target.value)}
-              />
-              <ImageUploading
-                multiple
-                value={images}
-                onChange={onChangeImage}
-                maxNumber={maxNumber}
-              >
-                {({
-                  imageList,
-                  onImageUpload,
-                  onImageUpdate,
-                  onImageRemove,
-                  isDragging,
-                  dragProps,
-                }) => (
-                  <Box
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
                     display='flex'
-                    alignItems='center'
                     flexDirection='column'
+                    justifyContent='center'
                   >
-                    <Stack
-                      width={350}
-                      height={100}
-                      sx={{
-                        border: '1px dashed #fff',
-                        cursor: 'pointer',
-                      }}
-                      onClick={onImageUpload}
-                      {...dragProps}
+                    <TextField
+                      sx={{ m: 3, width: 310 }}
+                      label='Tên món ăn:'
+                      variant='standard'
+                      defaultValue={foodDetail.name}
+                      onChange={(e) => setFoodName(e.target.value)}
+                    />
+                    <TextField
+                      sx={{ m: 3, width: 310 }}
+                      label='Tiêu đề món ăn:'
+                      variant='standard'
+                      defaultValue={foodDetail.title}
+                      onChange={(e) => setFoodTitle(e.target.value)}
+                    />
+                  </Grid>
+                  <Box
+                    sx={{
+                      position: 'fixed',
+                      height: 330,
+                      transform: 'translateZ(0px)',
+                      flexGrow: 1,
+                      right: 50,
+                      bottom: 50,
+                      zIndex: 10,
+                    }}
+                  >
+                    <Backdrop open={open} />
+                    <SpeedDial
+                      ariaLabel='SpeedDial'
+                      sx={{ position: 'absolute', bottom: 16, right: 16 }}
+                      icon={<SpeedDialIcon />}
+                      onClose={handleClose}
+                      onOpen={handleOpen}
+                      open={open}
                     >
-                      <Typography
-                        textAlign='center'
-                        mt={2}
-                        sx={{ opacity: 0.5 }}
-                      >
-                        {isDragging
-                          ? 'Thả'
-                          : 'Bấm để thêm hoặc kéo hình ảnh vào đây'}
-                      </Typography>
-                    </Stack>
-                    {images && (
+                      <SpeedDialAction
+                        icon={
+                          <AddRoundedIcon
+                            onClick={() => handleClickOpenAddDetail(foodDetail)}
+                          />
+                        }
+                        tooltipTitle='Thêm_Size_mới'
+                        tooltipOpen
+                        onClick={handleClose}
+                      />
+                    </SpeedDial>
+                  </Box>
+                </Grid>
+              )}
+              <Box width='100%' display='flex' justifyContent='center'>
+                <Button
+                  variant='contained'
+                  sx={{ my: 2 }}
+                  onClick={confirmUpdateFood}
+                >
+                  Xác nhận
+                </Button>
+              </Box>
+              <Stack spacing={2} width='100%'>
+                <TabContext value={value}>
+                  <Box
+                    sx={{ borderBottom: 1, borderColor: 'divider', color: 'white' }}
+                  >
+                    <Tabs
+                      value={`${value}`}
+                      onChange={handleChange}
+                      variant='scrollable'
+                      scrollButtons='auto'
+                      aria-label='scrollable auto tabs example'
+                    >
+                      {foodDetail.foodDetails?.map((item, index) => (
+                        <Tab
+                          key={index}
+                          label={`Size ${item.foodSize}`}
+                          value={`${index}`}
+                        />
+                      ))}
+                    </Tabs>
+                    {foodDetail.foodDetails?.map((item, index) => (
+                      <TabPanelCustom
+                        key={index}
+                        value={`${index}`}
+                        item={item}
+                        foodId={id}
+                        resetData={handleResetData}
+                      />
+                    ))}
+                  </Box>
+                </TabContext>
+              </Stack>
+            </Grid>
+          </Grid>
+          <Dialog open={openDLAddDetail} onClose={() => setOpenDLAddDetail(false)}>
+            <DialogTitle>{'Thêm chi tiết cho món ăn: ' + select.name}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                <Stack spacing={2}>
+                  <TextField
+                    label='Size'
+                    variant='standard'
+                    onChange={(e) => setSize(e.target.value)}
+                  />
+                  <TextField
+                    label='Giảm giá'
+                    variant='standard'
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                  <TextField
+                    label='Số lượng'
+                    variant='standard'
+                    onChange={(e) => setDiscount(e.target.value)}
+                  />
+                  <ImageUploading
+                    multiple
+                    value={images}
+                    onChange={onChangeImage}
+                    maxNumber={maxNumber}
+                  >
+                    {({
+                      imageList,
+                      onImageUpload,
+                      onImageUpdate,
+                      onImageRemove,
+                      isDragging,
+                      dragProps,
+                    }) => (
                       <Box
                         display='flex'
-                        width={350}
-                        sx={{ border: '1px dashed #fff', overflowX: 'auto' }}
+                        alignItems='center'
+                        flexDirection='column'
                       >
-                        {imageList?.map((image, index) => (
-                          <div key={index}>
-                            <img
-                              src={image.dataURL}
-                              style={{ margin: 5 }}
-                              alt='ImageUpload'
-                              width='100'
-                              height='100'
-                            />
-                            <div>
-                              <Button
-                                size='small'
-                                onClick={() => onImageUpdate(index)}
-                              >
-                                Update
-                              </Button>
-                              <Button
-                                size='small'
-                                color='error'
-                                onClick={() => onImageRemove(index)}
-                              >
-                                Xóa
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
+                        <Stack
+                          width={350}
+                          height={100}
+                          sx={{
+                            border: '1px dashed #fff',
+                            cursor: 'pointer',
+                          }}
+                          onClick={onImageUpload}
+                          {...dragProps}
+                        >
+                          <Typography
+                            textAlign='center'
+                            mt={2}
+                            sx={{ opacity: 0.5 }}
+                          >
+                            {isDragging
+                              ? 'Thả'
+                              : 'Bấm để thêm hoặc kéo hình ảnh vào đây'}
+                          </Typography>
+                        </Stack>
+                        {images && (
+                          <Box
+                            display='flex'
+                            width={350}
+                            sx={{ border: '1px dashed #fff', overflowX: 'auto' }}
+                          >
+                            {imageList?.map((image, index) => (
+                              <div key={index}>
+                                <img
+                                  src={image.dataURL}
+                                  style={{ margin: 5 }}
+                                  alt='ImageUpload'
+                                  width='100'
+                                  height='100'
+                                />
+                                <div>
+                                  <Button
+                                    size='small'
+                                    onClick={() => onImageUpdate(index)}
+                                  >
+                                    Update
+                                  </Button>
+                                  <Button
+                                    size='small'
+                                    color='error'
+                                    onClick={() => onImageRemove(index)}
+                                  >
+                                    Xóa
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </Box>
+                        )}
                       </Box>
                     )}
-                  </Box>
-                )}
-              </ImageUploading>
-            </Stack>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDLAddDetail(false)}>Disagree</Button>
-          <Button onClick={confirmAddDetail} autoFocus>
-            Agree
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+                  </ImageUploading>
+                </Stack>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenDLAddDetail(false)}>Disagree</Button>
+              <Button onClick={confirmAddDetail} autoFocus>
+                Agree
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Container>
+      )}
+
+      {/* antd */}
+      <Row>
+        <div className="adm-section">
+          <h2>Chỉnh sửa thông tin món ăn</h2>
+        </div>
+        <Col span={10} className="adm-edit--food">
+          <div className="adm-edit--food__inner">
+            <h3>Thông tin món ăn</h3>
+            <div className="adm-edit-food__img">
+
+            </div>
+            <Form
+              form={form}
+              labelCol={24}
+              wrapperCol={24}
+              layout='vertical'
+              initialValues={foodEditing}
+              onFinish={() => { setIsUpdating(true) }}
+            >
+              <Form.Item
+                name="id"
+                label="Id món ăn"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng không để trống mã món ăn!"
+                  }
+                ]}
+                hasFeedback
+              >
+                <Input disabled={true} />
+              </Form.Item>
+              <Form.Item
+                name="name"
+                label="Tên món ăn"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng không để trống tên món ăn !"
+                  },
+                  {
+                    whitespace: true,
+                    message: "Vui lòng không nhập khoảng trống !"
+                  }
+                ]}
+                hasFeedback
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="categoryId"
+                label="Thể loại"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng chọn thể loại!"
+                  }
+                ]}
+                hasFeedback
+              >
+                <Select>
+                  {categories.length > 0 ? (
+                    categories.map((item, index) => (
+                      <Select.Option value={item.id} key={item.id}>{item.name}</Select.Option>
+                    ))
+                  ) : ''}
+                  <Select.Option>1</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="title"
+                label="Tiêu đề"
+              >
+                <Input.TextArea />
+              </Form.Item>
+              <Form.Item
+                name="note"
+                label="Ghi chú"
+                initialValue={''}
+              >
+                <Input.TextArea />
+              </Form.Item>
+              <Form.Item
+              >
+                <AntdButton className='my-btn my-btn--primary' onClick={() => { form.submit() }}>Cập nhật</AntdButton>
+                <AntdButton className='my-btn' onClick={() => { setIsDeleting(true) }}> Xóa</AntdButton>
+              </Form.Item>
+            </Form>
+          </div>
+        </Col>
+        <Col span={14} className="adm-edit--food-detail">
+          <div className="adm-edit--food-detail__inner">
+            <h3>Size món ăn</h3>
+            <Row>
+              {
+                foodEditing.foodDetails && foodEditing.foodDetails.length > 0 ? (
+                  <Stack spacing={2} width='100%'>
+                    <TabContext value={value}>
+                      <Box
+                        sx={{ borderBottom: 1, borderColor: 'divider', color: 'white' }}
+                      >
+                        <Tabs
+                          value={`${value}`}
+                          onChange={handleChange}
+                          variant='scrollable'
+                          scrollButtons='auto'
+                          aria-label='scrollable auto tabs example'
+                        >
+                          {foodDetail.foodDetails?.map((item, index) => (
+                            <Tab
+                              key={index}
+                              label={`Size ${item.foodSize}`}
+                              value={`${index}`}
+                            />
+                          ))}
+                        </Tabs>
+                        {foodDetail.foodDetails?.map((item, index) => (
+                          <TabPanelCustom
+                            key={index}
+                            value={`${index}`}
+                            item={item}
+                            foodId={id}
+                            resetData={handleResetData}
+                          />
+                        ))}
+                      </Box>
+                    </TabContext>
+                  </Stack>
+                ) : (
+                  <div>Đồ ăn chưa có size nào</div>
+                )
+              }
+            </Row>
+          </div>
+        </Col>
+      </Row>
+      <Modal
+        visible={isUpdating}
+        title="Bạn có muốn cập nhật món ăn không!"
+        onCancel={() => { setIsUpdating(false); setUpdateStatus('') }}
+        onOk={handleUpdateFood}
+        confirmLoading={updateLoading}
+      >
+        {updateStatus}
+      </Modal>
+      <Modal
+        visible={isDeleting}
+        title="Bạn có muốn xóa món ăn không!"
+        onCancel={() => { setIsDeleting(false); setDeleteStatus('') }}
+        onOk={handleDeleteFood}
+        confirmLoading={deleteLoading}
+      >
+        {deleteStatus}
+      </Modal>
+    </>
   );
 }
 

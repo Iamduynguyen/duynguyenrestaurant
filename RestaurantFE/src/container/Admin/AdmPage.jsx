@@ -50,11 +50,11 @@ const AdmPage = () => {
             'Đồ ăn'
         ), 'sub-foods', <ReadOutlined />, [
             getItem((<Link to="/admin/foods">Danh sách</Link>), 'foods-opt-list', <AlignLeftOutlined />),
-            getItem('Thêm món ăn', 'foods-opt-add', <PlusSquareOutlined />)
+            getItem((<Link to="/admin/foods/new-food">Thêm món ăn</Link>), 'foods-opt-create', <PlusSquareOutlined />)
         ]),
         getItem('Quản lí bàn', 'sub-tables', <BankOutlined />, [
             getItem('Danh sách', 'tables-opt-list', <AlignLeftOutlined />),
-            getItem('Thêm món ăn', 'tables-opt-add', <PlusSquareOutlined />)
+            getItem('Thêm món ăn', 'tables-opt-create', <PlusSquareOutlined />)
         ]),
         getItem('Đơn đặt bàn', 'sub-order', <CalendarOutlined />, [
             getItem('Danh sách', 'order-opt-list', <AlignLeftOutlined />),
@@ -67,8 +67,6 @@ const AdmPage = () => {
     ]
 
     useEffect(()=>{
-        console.log(location.pathname)
-        console.log(menuEleRef.current)
         switch(location.pathname){
             case("/admin"):{
                 setSelectedKey('sub-dashboard')
@@ -76,6 +74,14 @@ const AdmPage = () => {
             }
             case("/admin/categories"):{
                 setSelectedKey('categories-opt-list')
+                break;
+            }
+            case("/admin/foods"):{
+                setSelectedKey('foods-opt-list')
+                break;
+            }
+            case("/admin/foods/new-food"):{
+                setSelectedKey('foods-opt-create')
                 break;
             }
             default:{

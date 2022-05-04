@@ -15,8 +15,16 @@ import React, { useEffect, useState } from "react";
 import ImageUploading from "react-images-uploading";
 import FoodsApi from "../../../../API/FoodsAPI";
 import CategoriesAPI from "../../../../API/CategoriesAPI";
+import { useNavigate } from "react-router-dom";
+import { Form, message, Row, Input, Select as AntdSelect, Button as AntdButton } from "antd";
+import { useForm } from "antd/lib/form/Form";
 
 export default function NewFood() {
+
+  const navigate = useNavigate();
+
+  const [form] = useForm();
+
   const [addDetail, setAddDetail] = useState([]);
   const [updateAll, setUpdateAll] = useState(false);
   const [getCategory, setGetCategory] = useState([]);
@@ -28,6 +36,27 @@ export default function NewFood() {
   const handleChange = (event) => {
     setSelectCategory(event.target.value);
   };
+
+
+  const onFinish = async (values) => {
+    const newFood = {
+      title: values.title,
+      name: values.name,
+      category: {
+        id: values.id,
+      },
+    };
+    const res = await FoodsApi.createFood(newFood);
+    if (res?.status == 500) {
+      message.error('Lỗi rồi!');
+    } else {
+      message.success('Thêm món ăn thành công !');
+      console.log(res);
+      form.resetFields();
+      navigate('/admin/foods/fix-food/' + res.id);
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       const res = await CategoriesAPI.getAllCategories();
@@ -45,92 +74,174 @@ export default function NewFood() {
       },
     };
     const res = await FoodsApi.createFood(newFood);
+    message.success('Thêm món ăn thành công !');
+    console.log(res);
+    // navigate(`/admin/foods/fix-food/${res.id}`);
     setNewFoodId(res.id);
     setUpdateAll(true);
   };
   return (
-    <Container>
-      <Grid container>
-        <Grid
-          item
-          xs={12}
-          my={2}
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-        >
-          <Typography variant="h5" textAlign="center" mb={2}>
-            Thêm món mới
-          </Typography>
-          <Box>
-            <TextField
-              sx={{ m: 3, width: 310 }}
-              label="Tên món ăn:"
-              variant="standard"
-              onChange={(e) => setNameFood(e.target.value)}
-            />
-            <TextField
-              sx={{ m: 3, width: 310 }}
-              label="Tiêu đề món ăn:"
-              variant="standard"
-              onChange={(e) => setTitleFood(e.target.value)}
-            />
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                mt: 2,
-              }}
-            >
-              <Box width={310}>
-                <FormControl fullWidth>
-                  <InputLabel id="Category">Món này có thể loại</InputLabel>
-                  <Select
-                    labelId="Category"
-                    value={selectCategory}
-                    label="Món này có thể loại"
-                    onChange={handleChange}
+    <>
+      {
+        false && (
+          <Container>
+            <Grid container>
+              <Grid
+                item
+                xs={12}
+                my={2}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+              >
+                <Typography variant="h5" textAlign="center" mb={2}>
+                  Thêm món mới
+                </Typography>
+                <Box>
+                  <TextField
+                    sx={{ m: 3, width: 310 }}
+                    label="Tên món ăn:"
+                    variant="standard"
+                    onChange={(e) => setNameFood(e.target.value)}
+                  />
+                  <TextField
+                    sx={{ m: 3, width: 310 }}
+                    label="Tiêu đề món ăn:"
+                    variant="standard"
+                    onChange={(e) => setTitleFood(e.target.value)}
+                  />
+                  <Box
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      mt: 2,
+                    }}
                   >
-                    {getCategory &&
-                      getCategory?.map((item) => (
-                        <MenuItem key={item.id} value={item.id}>
-                          {item.name}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
-              </Box>
-            </Box>
-          </Box>
-          <Typography variant="h5" mt={4}>
-            Thêm chi tiết món ăn
-          </Typography>
-          {addDetail.map((item, index) => (
-            <AddDetail
-              key={index}
-              i={index}
-              newFoodId={newFoodId}
-              updateAll={updateAll}
-            />
-          ))}
-          <Box mt={3}>
-            <Button
-              variant="contained"
-              sx={{ mr: 3 }}
-              onClick={() => setAddDetail((preState) => [...preState, 1])}
+                    <Box width={310}>
+                      <FormControl fullWidth>
+                        <InputLabel id="Category">Món này có thể loại</InputLabel>
+                        <Select
+                          labelId="Category"
+                          value={selectCategory}
+                          label="Món này có thể loại"
+                          onChange={handleChange}
+                        >
+                          {getCategory &&
+                            getCategory?.map((item) => (
+                              <MenuItem key={item.id} value={item.id}>
+                                {item.name}
+                              </MenuItem>
+                            ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Box>
+                </Box>
+                <Typography variant="h5" mt={4}>
+                  Thêm chi tiết món ăn
+                </Typography>
+                {addDetail.map((item, index) => (
+                  <AddDetail
+                    key={index}
+                    i={index}
+                    newFoodId={newFoodId}
+                    updateAll={updateAll}
+                  />
+                ))}
+                <Box mt={3}>
+                  <Button
+                    variant="contained"
+                    sx={{ mr: 3 }}
+                    onClick={() => setAddDetail((preState) => [...preState, 1])}
+                  >
+                    Thêm chi tiết
+                  </Button>
+                  {addDetail[0] && (
+                    <Button variant="contained" onClick={confirmAddFoods}>
+                      Xác nhận
+                    </Button>
+                  )}
+                </Box>
+                <Box mt={3}>
+
+                  <Button variant="contained" onClick={confirmAddFoods}>
+                    Xác nhận
+                  </Button>
+                </Box>
+              </Grid>
+            </Grid>
+          </Container>
+        )
+      }
+
+      {/* antd */}
+
+      <Row>
+        <div className="adm-section">
+          <h2>Thêm món ăn</h2>
+          <Form
+            labelCol={24}
+            wrapperCol={24}
+            layout='vertical'
+            form={form}
+            onFinish={onFinish}
+          >
+            <Form.Item
+              name="name"
+              label="Tên món ăn"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng nhập tên món ăn!"
+                },
+              ]}
+              hasFeedback
             >
-              Thêm chi tiết
-            </Button>
-            {addDetail[0] && (
-              <Button variant="contained" onClick={confirmAddFoods}>
-                Xác nhận
-              </Button>
-            )}
-          </Box>
-        </Grid>
-      </Grid>
-    </Container>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="title"
+              label="Tiêu đề"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng nhập tiêu đề!"
+                },
+              ]}
+              hasFeedback
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="categories"
+              label="Thể loại"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng chọn thể loại!"
+                },
+              ]}
+            >
+              <AntdSelect
+                placeholder="Select a option and change input text above"
+                allowClear
+
+              >
+                {
+                  getCategory && getCategory.map((item, index) => (
+                    <AntdSelect.Option value={item.id} key={item.id}>{item.name}</AntdSelect.Option>
+                  ))
+                }
+              </AntdSelect>
+            </Form.Item>
+            <Form.Item>
+              <AntdButton htmlType="submit" className="my-btn my-btn--primary">Thêm món ăn</AntdButton>
+            </Form.Item>
+          </Form>
+        </div>
+      </Row>
+    </>
   );
 }
 

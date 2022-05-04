@@ -70,4 +70,8 @@ public class ApplicationCustomeRegisterBean {
     public IConverterDto<Customer, CustomerDto> getCustomerMapper(){
         return new CustomerMapper(Customer.class, CustomerDto.class);
     }
+    @Bean("feedbackMapper")
+    public IConverterDto<Feedback, FeedbackDto> getFeedbackMapper(){
+        return new FeedbackMapper(Feedback.class, FeedbackDto.class);
+    }
 }

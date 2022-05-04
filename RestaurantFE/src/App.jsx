@@ -48,7 +48,7 @@ const App = () => (
     <Route path="/admin" element={<AdminLayout />}>
       <Route index element={<DashboardAdmin />} />
       <Route path="categories" element={<CategoriesAdmin />} />
-      <Route path="chartAdmin" element={<ChartAdmin />} />
+      <Route path="analist" element={<ChartAdmin />} />
       <Route path="foods" element={<FoodsAdmin />} />
       <Route path="foods/fix-food/:id" element={<FixFoods />} />
       <Route path="/admin/foods/new-food" element={<NewFood />} />

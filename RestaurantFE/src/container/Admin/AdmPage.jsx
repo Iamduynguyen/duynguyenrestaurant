@@ -52,14 +52,15 @@ const AdmPage = () => {
             getItem((<Link to="/admin/foods">Danh sách</Link>), 'foods-opt-list', <AlignLeftOutlined />),
             getItem((<Link to="/admin/foods/new-food">Thêm món ăn</Link>), 'foods-opt-create', <PlusSquareOutlined />)
         ]),
-        getItem('Quản lí bàn', 'sub-tables', <BankOutlined />, [
-            getItem('Danh sách', 'tables-opt-list', <AlignLeftOutlined />),
-            getItem('Thêm món ăn', 'tables-opt-create', <PlusSquareOutlined />)
-        ]),
-        getItem('Đơn đặt bàn', 'sub-order', <CalendarOutlined />, [
-            getItem('Danh sách', 'order-opt-list', <AlignLeftOutlined />),
-        ]),
-        getItem('Biểu đồ thống kê', 'sub-analist', <BarChartOutlined />),
+        getItem((
+            <Link to="/admin/tables">Quản lý bàn</Link>
+        ), 'sub-tables', <BankOutlined />),
+        getItem((
+            <Link to="/admin/orders">Đơn đặt bàn</Link>
+        ), 'sub-order', <CalendarOutlined />),
+        getItem((
+            <Link to="/admin/analist">Biểu đồ thống kê</Link>
+        ), 'sub-analist', <BarChartOutlined />),
         getItem((
             <Link to="/">Website</Link>
         ), 'sub-website', <ChromeOutlined />),

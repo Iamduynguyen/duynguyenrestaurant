@@ -97,7 +97,7 @@ export default function TableAdmin() {
       </div>
       <div className="w-full ">
         {table?.map((item, index) => (
-          <div className="w-full px-[30px]  grid grid-cols-[0.5fr,3fr,4fr,3fr] py-[15px] border-b border-gray-300">
+          <div className="w-full px-[30px]  grid grid-cols-[0.5fr,3fr,4fr,3fr] py-[15px] border-b border-gray-300" key={index}>
             <div className="">{index + 1}</div>
             <div className="">Table {item.id}</div>
             <div className="text-gray-400">

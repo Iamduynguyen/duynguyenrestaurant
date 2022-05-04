@@ -43,7 +43,7 @@ export default function NewFood() {
       title: values.title,
       name: values.name,
       category: {
-        id: values.id,
+        id: values.categories,
       },
     };
     const res = await FoodsApi.createFood(newFood);

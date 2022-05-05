@@ -197,7 +197,7 @@ export default function FixFoods() {
       if (foodEditing.foodDetails?.length > 0) {
         setValue('0')
       } else {
-        setValue('0')
+        setValue(+0)
       }
     }
   }, [foodEditing])

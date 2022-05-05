@@ -1,5 +1,6 @@
 package com.restarant.backend.web.controller;
 
+import com.restarant.backend.dto.CustomerDto;
 import com.restarant.backend.dto.FeedbackDto;
 import com.restarant.backend.entity.Feedback;
 import com.restarant.backend.repository.FeedbackRepository;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
@@ -33,10 +35,10 @@ public class FeedbackController {
     }
 
     @PostMapping("/feedbacks")
-    public ResponseEntity<?> createFeedback(@RequestBody FeedbackDto feedbackDto) throws URISyntaxException {
+    public ResponseEntity<?> createFeedback(@RequestBody CustomerDto dto, HttpServletRequest request,FeedbackDto feedbackDto) throws URISyntaxException {
         log.debug("REST request to save feedback : {}", feedbackDto);
         try {
-            FeedbackDto result = feedbackService.create(feedbackDto);
+            FeedbackDto result = feedbackService.createFeedbackByCustomer(request, dto, feedbackDto);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
         //    log.debug("done feedback");
         } catch (InvalidDataExeception e) {

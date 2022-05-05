@@ -1,4 +1,5 @@
 import axiosClient from "./axiosClient";
+import upLoadAxiosClient from "./uploadClient";
 
 const FoodsApi = {
   getAllFoods: (params) => {
@@ -38,8 +39,16 @@ const FoodsApi = {
     return axiosClient.delete(url);
   },
   uploadImage: (formData) => {
-    const url = `/api/food-medias/image/upload`;
+    const url = `/upload`;
     return axiosClient.post(url, formData, {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    });
+  },
+  uploadImage2: (formData) => {
+    const url = `/uploads`;
+    return upLoadAxiosClient.post(url, formData, {
       headers: {
         "content-type": "multipart/form-data",
       },

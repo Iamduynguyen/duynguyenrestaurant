@@ -2,24 +2,26 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Row, Col } from 'antd'
 import { red } from '@ant-design/colors'
 import { Menu } from 'antd';
-import {BarChartOutlined,
-        AppstoreOutlined,
-        AlignLeftOutlined,
-        RadarChartOutlined,
-        ReadOutlined,
-        PlusSquareOutlined,
-        ChromeOutlined,
-        BankOutlined,
-        CalendarOutlined,
-        SettingOutlined
-    } from '@ant-design/icons';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import {
+    BarChartOutlined,
+    AppstoreOutlined,
+    AlignLeftOutlined,
+    RadarChartOutlined,
+    ReadOutlined,
+    PlusSquareOutlined,
+    ChromeOutlined,
+    BankOutlined,
+    CalendarOutlined,
+    SettingOutlined
+} from '@ant-design/icons';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { getKey } from "../../Features/getAuth";
 
 
 
 const AdmPage = () => {
     const [selectedKey, setSelectedKey] = useState('sub-dashboard');
-    
+    const navigate = useNavigate();
     const location = useLocation();
     const menuEleRef = useRef();
 
@@ -67,51 +69,58 @@ const AdmPage = () => {
         getItem('Cài đặt', 'sub-setting', <SettingOutlined />)
     ]
 
-    useEffect(()=>{
-        switch(location.pathname){
-            case("/admin"):{
-                setSelectedKey('sub-dashboard')
-                break;
-            }
-            case("/admin/categories"):{
-                setSelectedKey('categories-opt-list')
-                break;
-            }
-            case("/admin/foods"):{
-                setSelectedKey('foods-opt-list')
-                break;
-            }
-            case("/admin/foods/new-food"):{
-                setSelectedKey('foods-opt-create')
-                break;
-            }
-            default:{
-                break;
+    useEffect(() => {
+        if (getKey("role") !== "ROLE_ADMIN") {
+            navigate("/");
+        } else {
+            switch (location.pathname) {
+                case ("/admin"): {
+                    setSelectedKey('sub-dashboard')
+                    break;
+                }
+                case ("/admin/categories"): {
+                    setSelectedKey('categories-opt-list')
+                    break;
+                }
+                case ("/admin/foods"): {
+                    setSelectedKey('foods-opt-list')
+                    break;
+                }
+                case ("/admin/foods/new-food"): {
+                    setSelectedKey('foods-opt-create')
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
         }
-    },[])
 
+    }, [])
+    if(getKey("role") !== "ROLE_ADMIN"){
+        return <></>
+    }
     return (
-        <Row className='adm' gutter={[0,0]}>
+        <Row className='adm' gutter={[0, 0]}>
             <Col span={4} className='adm--sidebar'>
                 <div className="adm--sibar__logo">
 
                 </div>
                 <Menu mode='inline'
-                    items={menuItems} 
+                    items={menuItems}
                     className='adm--sidebar__inner'
                     defaultSelectedKeys={'sub-dashboard'}
                     selectedKeys={selectedKey}
                     onClick={(item, key, keypath, domEvent) => {
                         handleSelectKey(item)
-                    }}      
+                    }}
                     ref={menuEleRef}
                 >
                 </Menu>
             </Col>
             <Col span={20} className='adm--content' >
                 <div className="adm--content__navtop">
-                    
+
                 </div>
                 <div className="adm--content__detail">
                     <Outlet />

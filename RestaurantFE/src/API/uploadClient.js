@@ -2,8 +2,8 @@ import axios from 'axios';
 import qs from 'qs';
 
 
-const axiosClient = axios.create({
-  baseURL: 'http://viprestaurant.cf:8787',
+const upLoadAxiosClient = axios.create({
+  baseURL: 'http://viprestaurant.cf:8888',
   headers: {
     'content-type': 'application/json',
   },
@@ -11,7 +11,7 @@ const axiosClient = axios.create({
     qs.stringify(params, { encodeValuesOnly: true }),
 });
 
-axiosClient.interceptors.request.use((config) => {
+upLoadAxiosClient.interceptors.request.use((config) => {
   if (!!localStorage.getItem('token') || !!sessionStorage.getItem('token')) {
     config.headers = {
       token: `${localStorage.getItem('token') || sessionStorage.getItem('token')
@@ -21,7 +21,7 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
-axiosClient.interceptors.response.use(
+upLoadAxiosClient.interceptors.response.use(
   (response) => {
     if (response && response.data) {
       return response.data;
@@ -33,4 +33,4 @@ axiosClient.interceptors.response.use(
     return error.response;
   },
 );
-export default axiosClient;
+export default upLoadAxiosClient;

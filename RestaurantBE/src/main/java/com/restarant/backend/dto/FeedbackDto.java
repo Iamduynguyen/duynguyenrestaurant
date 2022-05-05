@@ -8,5 +8,6 @@ public class FeedbackDto {
 private Long id;
 private String content;
 private Long created;
-private Customer idCustomer;
+private Long idCustomer;
+private Customer customer;
 }

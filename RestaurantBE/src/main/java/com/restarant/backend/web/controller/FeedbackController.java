@@ -35,7 +35,7 @@ public class FeedbackController {
     }
 
     @PostMapping("/feedbacks")
-    public ResponseEntity<?> createFeedback(@RequestBody CustomerDto dto, HttpServletRequest request,FeedbackDto feedbackDto) throws URISyntaxException {
+    public ResponseEntity<?> createFeedback(@RequestBody FeedbackDto feedbackDto,CustomerDto dto, HttpServletRequest request) throws URISyntaxException {
         log.debug("REST request to save feedback : {}", feedbackDto);
         try {
             FeedbackDto result = feedbackService.createFeedbackByCustomer(request, dto, feedbackDto);

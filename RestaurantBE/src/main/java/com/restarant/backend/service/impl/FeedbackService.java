@@ -73,8 +73,8 @@ public FeedbackService(FeedbackRepository feedbackRepository,
     @Override
     public FeedbackDto createFeedbackByCustomer(HttpServletRequest request, CustomerDto dto,FeedbackDto feedbackDto) throws InvalidDataExeception {
         Customer customer = jwtServiceUtils.getCustomerByToken(request);
-        System.out.println("khởi tạo feed back");
-        System.out.println(request);
+
+        System.out.println("id custommer : "+customer.getId());
     if(customer == null ){
         throw  new InvalidDataExeception("user not login");
     }
@@ -84,10 +84,8 @@ public FeedbackService(FeedbackRepository feedbackRepository,
 
         feedback.setCreated(LocalDate.now());
 
-        log.info(String.format("Someone create Food[id-%d]", feedbackDto.getId()));
-       // System.out.println("check 1");
+        log.info(String.format("Someone create Feedback[id-%d]", feedbackDto.getId()));// System.out.println("check 1");
         Feedback result = feedbackRepository.save(feedback);
-        //System.out.println("check 2");
         return mapper.convertToDto(result);
     }
 

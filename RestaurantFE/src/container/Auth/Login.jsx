@@ -4,6 +4,7 @@ import logo from "../../favicon.ico";
 import gallery04 from "../../assets/gallery04.png";
 
 import AuthAPI from "../../API/AuthAPI";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const [savePass, setSavePass] = React.useState(false);
@@ -19,27 +20,36 @@ export default function Login() {
       password: password,
     };
     const res = await AuthAPI.login(data);
-    console.log(res)
+    console.log(res);
     if (!res.status) {
-      setValidAPI("");
-      if (savePass) {
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: `Chào mừng ${res.username} đã quay trở lại!`,
+        showConfirmButton: false,
+        timerProgressBar: true,
+        timer: 1500,
+      }).then(() => {
+        setValidAPI("");
+        if (savePass) {
+          localStorage.setItem("token", res.token);
+          localStorage.setItem("name", res.username);
+          localStorage.setItem("role", res.role);
+          setToken(res.token);
+        }
+        sessionStorage.setItem("token", res.token);
+        sessionStorage.setItem("name", res.username);
+        sessionStorage.setItem("role", res.role);
         localStorage.setItem("token", res.token);
         localStorage.setItem("name", res.username);
         localStorage.setItem("role", res.role);
         setToken(res.token);
-      }
-      sessionStorage.setItem("token", res.token);
-      sessionStorage.setItem("name", res.username);
-      sessionStorage.setItem("role", res.role);
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("name", res.username);
-      localStorage.setItem("role", res.role);
-      setToken(res.token);
-      if (res.role === "ROLE_ADMIN") {
-        navigation("/admin");
-      } else {
-        navigation("/");
-      }
+        if (res.role === "ROLE_ADMIN") {
+          navigation("/admin");
+        } else {
+          navigation("/");
+        }
+      });
     } else if (res.status === 403) {
       setValidAPI("Tài khoản hoặc mật khẩu không đúng");
     } else {

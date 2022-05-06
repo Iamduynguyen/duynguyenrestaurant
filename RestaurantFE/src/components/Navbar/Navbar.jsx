@@ -72,7 +72,7 @@ const Navbar = () => {
       </div>
       <div className="app__navbar-login">
         {userLogin ? (
-          <p className="userLogin relative item-hover mb-0">
+          <span className="userLogin relative item-hover mb-0">
             <p
               className="p__opensans cursor-pointer mb-0"
               style={{ padding: "0 20px" }}
@@ -102,15 +102,15 @@ const Navbar = () => {
                 <></>
               )}
               <li className="cursor-pointer pb-[10px] px-[15px]">
-                <bottom onClick={logout} className="flex items-center">
+                <span onClick={logout} className="flex items-center">
                   <LogoutIcon
                     style={{ fontSize: "16px", marginRight: "5px" }}
                   />
                   Đăng xuất
-                </bottom>
+                </span>
               </li>
             </ul>
-          </p>
+          </span>
         ) : (
           <Link to="/login" className="">
             <p className="p__opensans mb-0">Đăng nhập</p>

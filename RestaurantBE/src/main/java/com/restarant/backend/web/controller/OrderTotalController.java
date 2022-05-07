@@ -1,5 +1,6 @@
 package com.restarant.backend.web.controller;
 
+import com.restarant.backend.dto.OrderCouterDto;
 import com.restarant.backend.dto.OrderTotalDto;
 import com.restarant.backend.entity.OrderTotal;
 import com.restarant.backend.repository.OrderTotalRepository;
@@ -20,7 +21,7 @@ import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/api")
-@Transactional
+//@Transactional
 @CrossOrigin("*")
 public class OrderTotalController {
 
@@ -33,7 +34,6 @@ public class OrderTotalController {
     public OrderTotalController(IOrderTotalService orderTotalService) {
         this.orderTotalService = orderTotalService;
     }
-
     /**
      * {@code POST  /order-totals} : Create a new orderTotal.
      *
@@ -90,7 +90,10 @@ public class OrderTotalController {
 //        log.debug("REST request to get all OrderTotals");
 //        return orderTotalRepository.findAll();
 //    }
-
+    @PostMapping("/create-order-couter")
+    public String createCounter (@RequestBody OrderCouterDto request){
+        return orderTotalService.registrationOrderCounter(request);
+    }
     /**
      * {@code GET  /order-totals/:id} : get the "id" orderTotal.
      *

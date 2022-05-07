@@ -7,6 +7,8 @@ import com.restarant.backend.repository.*;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.mapper.IConverterDto;
 import com.restarant.backend.service.utils.JwtServiceUtils;
+import com.restarant.backend.service.utils.MailDto;
+import com.restarant.backend.service.utils.MailUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
@@ -27,6 +29,10 @@ public class OrderTotalService implements IOrderTotalService {
     private OrderDetailsRepository orderDetailsRepository;
     @Autowired
     private FoodDetallsRepository foodDetallsRepository;
+    @Autowired
+    private VoucherRepository voucherRepository;
+    @Autowired
+    private MailUtils mailUtils;
     @Autowired
     private JwtServiceUtils jwtServiceUtils;
     private final OrderTotalRepository orderTotalRepository;
@@ -78,7 +84,9 @@ public class OrderTotalService implements IOrderTotalService {
         orderTotalRepository.deleteById(id);
         return true;
     }
-
+//    public OrderTotal getAll(){
+//        return null;
+//    }
     @Override
     public String registrationOrderCounter(OrderCouterDto orderCouterDto, HttpServletRequest request) {
         try {
@@ -163,6 +171,18 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
+    public String confirmCustomerOrderOnline(Long id){
+        try{
+            OrderTotal orderTotal = orderTotalRepository.getById(id);
+            orderTotal.setStatus(1);
+            orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+    @Override
     public String deleteOrderDetails(List<Long> ids){
         try {
             orderDetailsRepository.deleteAllById(ids);
@@ -173,6 +193,55 @@ public class OrderTotalService implements IOrderTotalService {
         return "SUCCESS";
     }
 
+    @Override
+    public String confirmOrderOnline(Long id,HttpServletRequest request){
+        try {
+            OrderTotal orderTotal = orderTotalRepository.getById(id);
+            if (Objects.nonNull(orderTotal)){
+                orderTotal.setStatus(2);
+                orderTotal.setNote("Người xác nhận đơn hàng :"+ jwtServiceUtils.getUserName(request));
+                orderTotalRepository.save(orderTotal);
+                MailDto mailDto  = new MailDto();
+                mailDto.setTo(orderTotal.getCustomer().getEmail());
+                mailDto.setBody("Chúng tôi đã xác nhận đặt bàn của quý khách. Mong quý khách để ý để đặt cọc bàn. <br> Mọi thắc mắc xin liên hệ  hotline : 0978825572. xin cảm ơn");
+                mailDto.setSubject("Xác nhận đơn hành thành công");
+                mailDto.setFrom("admin@gmail.com");
+                mailUtils.send(mailDto);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCCESS";
+    }
+
+    @Override
+    public String confirmDepositOnline(ConfirmDepositOnline request){
+        try{
+            OrderTotal orderTotal = orderTotalRepository.getById(request.getId());
+            orderTotal.setDeposit(request.getDeposit());
+            orderTotal.setStatus(4);
+            orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+
+    @Override
+    public String cancelOrder(Long id){
+        try{
+            OrderTotal orderTotal = orderTotalRepository.getById(id);
+            orderTotal.setStatus(-1);
+            orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+
+    }
     @Override
     public String editOrderDetails(EditOrderDetailsRequest request){
         try {
@@ -199,12 +268,22 @@ public class OrderTotalService implements IOrderTotalService {
             if (CollectionUtils.isEmpty(orderDetails)) {
                 return "FAIL";
             }
-
             BigDecimal amoutTotal = BigDecimal.ZERO;
             for (OrderDetails orderDetail : orderDetails) {
                 amoutTotal = amoutTotal.add(orderDetail.getAmount().multiply(BigDecimal.valueOf(orderDetail.getQuantity())));
             }
             OrderTotal orderTotal = orderTotalRepository.getById(paymentDto.getOrderId());
+            if(Objects.nonNull(paymentDto.getVoucherId()) && Objects.nonNull(orderTotal.getCustomer())){
+                Voucher voucher  = voucherRepository.findByIdAndCustomerId(paymentDto.getVoucherId(),orderTotal.getCustomer().getId());
+                if(Objects.isNull(voucher)){
+                   return "VOUCHER NOT";
+                }
+                OrderTotal checkVoucher =  orderTotalRepository.findByVoucherAndCustomerIdAndStatus(paymentDto.getVoucherId(),orderTotal.getCustomer().getId(),6);
+                if(Objects.nonNull(checkVoucher)){
+                   return "VOUCHER EXITS";
+                }
+                orderTotal.setVoucher(paymentDto.getVoucherId());
+            }
             orderTotal.setAmountTotal(amoutTotal);
             orderTotal.setStatus(6);
             if (Objects.nonNull(paymentDto.getVoucherId())) {

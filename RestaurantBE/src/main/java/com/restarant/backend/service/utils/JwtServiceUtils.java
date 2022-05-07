@@ -26,7 +26,10 @@ public class JwtServiceUtils {
 //        String username = jwtUtils.getUserNameFromJwtToken(token);
         return null;
     }
-
+    public String getUserName(HttpServletRequest request){
+        String token = request.getHeader("token");
+        return jwtUtils.getUserNameFromJwtToken(token);
+    }
     public Customer getCustomerByToken(HttpServletRequest request){
         String token = request.getHeader("token");
         if(token != null && jwtUtils.validateJwtToken(token)){

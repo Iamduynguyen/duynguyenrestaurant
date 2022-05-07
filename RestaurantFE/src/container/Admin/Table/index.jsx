@@ -77,23 +77,6 @@ export default function TableAdmin() {
   };
   return (
     <Grid container mt={1}>
-      <Box>
-        <MobileDatePicker
-          label="Chọn ngày đặt"
-          inputFormat="DD/MM/YYYY"
-          value={OrderDate}
-          onChange={(newValue) => setOrderDate(newValue)}
-          renderInput={(params) => <TextField {...params} />}
-        />
-      </Box>
-      <Box>
-        <MobileTimePicker
-          label="Chọn giờ đặt"
-          value={OrderTime}
-          onChange={(newValue) => setOrderTime(newValue)}
-          renderInput={(params) => <TextField {...params} />}
-        />
-      </Box>
       <p className=" pt-[20px] pl-[30px] font-medium text-[26px] text-gray-700">
         Danh sách
       </p>

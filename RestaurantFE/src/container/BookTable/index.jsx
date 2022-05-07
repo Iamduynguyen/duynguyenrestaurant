@@ -34,7 +34,9 @@ export default function BookTable() {
   const isMobile = useMediaQuery("(max-width:600px)");
   useEffect(() => {
     const fetchData = async () => {
-      const res = await TableAPI.getAllTables();
+      var time = new Date().getTime();
+      const res = await TableAPI.getTableByTime(time);
+      console.log(time);
       setTable(res);
       console.log(res);
     };

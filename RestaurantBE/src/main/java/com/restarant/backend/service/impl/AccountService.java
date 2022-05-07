@@ -1,21 +1,21 @@
 package com.restarant.backend.service.impl;
 
 import com.restarant.backend.entity.Account;
+import com.restarant.backend.entity.Customer;
 import com.restarant.backend.repository.AccountRepository;
-import com.restarant.backend.security.jwt.JwtUtils;
+import com.restarant.backend.repository.CustomerRepository;
 import com.restarant.backend.service.IAccountService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AccountService implements IAccountService {
 
     private final AccountRepository accountRepository;
+    private final CustomerRepository customerRepository;
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, CustomerRepository customerRepository) {
         this.accountRepository = accountRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Override
@@ -23,7 +23,12 @@ public class AccountService implements IAccountService {
         if(accountRepository.getByLogin(account.getLogin()) != null){
             return null;
         }
-        return accountRepository.save(account);
+        Account result =accountRepository.save(account);
+        Customer customer = new Customer();
+        customer.setName(result.getLogin());
+        customer.setAccount(result);
+        customerRepository.save(customer);
+        return result;
     }
 
     @Override

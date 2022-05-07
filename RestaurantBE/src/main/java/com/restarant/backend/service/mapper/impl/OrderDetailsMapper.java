@@ -26,15 +26,21 @@ public class OrderDetailsMapper extends AbstractDtoMapperAdapter<OrderDetails, O
             dto.setStatus("Đã xác nhận");
         }
         if (entity.getStatus()==3){
-            dto.setStatus("Sắp mang ra");
+            dto.setStatus("chờ đặt cọc");
         }
         if (entity.getStatus()==4){
-            dto.setStatus("Đang ăn");
+            dto.setStatus("chờ xác nhận cọc tiền");
+        }
+        if (entity.getStatus()==5){
+            dto.setStatus("Sắp mang ra");
         }
         if (entity.getStatus()==6){
+            dto.setStatus("Đang ăn");
+        }
+        if (entity.getStatus()==5){
             dto.setStatus("Đã thanh toán");
         }
-        if (entity.getStatus()==7){
+        if (entity.getStatus()==6){
             dto.setStatus("Nhà hàng hủy");
         }
         return dto;
@@ -42,7 +48,8 @@ public class OrderDetailsMapper extends AbstractDtoMapperAdapter<OrderDetails, O
 
     @Override
     public OrderDetails convertToEntity(OrderDetailsDto dto) {
-        OrderDetails orderDetails = super.convertToEntity(dto);
+        OrderDetails orderDetails = new OrderDetails();
+        orderDetails.setId(dto.getId());
         if(orderDetails != null && dto != null && dto.getTableOrderId() != null){
             TableOrder tableOrder = new TableOrder();
             tableOrder.setId(dto.getTableOrderId());

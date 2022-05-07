@@ -55,7 +55,6 @@ export default function Login() {
     } else {
       setValidAPI("Lỗi hệ thống, vui lòng liên hệ quản trị viên");
     }
-    console.log(res);
   };
   React.useEffect(() => {
     if (!!sessionStorage.getItem("token") || !!localStorage.getItem("token")) {
@@ -91,7 +90,7 @@ export default function Login() {
                       label="Email"
                       name="email"
                       onChange={(e) => setEmail(e.target.value)}
-                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                       placeholder=" "
                       // required
                       autoFocus
@@ -109,7 +108,7 @@ export default function Login() {
                       name="Mật khẩu"
                       id="password"
                       onChange={(e) => setPassword(e.target.value)}
-                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                       placeholder=" "
                       required
                     />
@@ -132,7 +131,7 @@ export default function Login() {
                     <div className="ml-3 text-sm">
                       <label
                         htmlFor="terms"
-                        className="font-medium text-gray-900 dark:text-gray-300"
+                        className="font-medium text-gray-900 dark:text-gray-500"
                       >
                         Nhớ mật khẩu
                       </label>

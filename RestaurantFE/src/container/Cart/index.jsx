@@ -135,7 +135,7 @@ export default function Cart() {
                       item.foodDetalls.discount == 0
                         ? item.foodDetalls.amount
                         : discount(
-                            item.foodDetalls.amount,
+                            item.foodDetalls.foodDetalls.amount,
                             item.foodDetalls.discount,
                           )
                     } * ${item.quantity} = ${

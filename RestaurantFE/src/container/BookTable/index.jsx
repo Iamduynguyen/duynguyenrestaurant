@@ -28,6 +28,9 @@ export default function BookTable() {
   const [OrderTime, setOrderTime] = useState(
     moment("2018-01-01T00:00:00.000Z")
   );
+  const [endtime, setEndtime] = useState(
+    moment("2018-01-01T00:00:00.000Z")
+  );
   const [SelectedTable, setSelectedTable] = useState([]);
   const [table, setTable] = useState();
   const [Order, setOrder] = useState(false);
@@ -44,10 +47,14 @@ export default function BookTable() {
     const timeOrder = new Date(
       OrderDate.format("L") + " " + OrderTime.format("LTS")
     ).getTime();
+    const timeEnd = new Date(
+      OrderDate.format("L") + " " + endtime.format("LTS")
+    ).getTime();
     const dataBookTables = SelectedTable.map((table) => {
       return {
         tableId: table,
         orderTime: timeOrder,
+        endtime: endtime
       };
     });
     const res = await BookTableAPI.bookTable(dataBookTables);
@@ -79,6 +86,14 @@ export default function BookTable() {
                     label="Chọn giờ đặt"
                     value={OrderTime}
                     onChange={(newValue) => setOrderTime(newValue)}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </Box>
+                <Box>
+                  <MobileTimePicker
+                    label="Giờ kết thúc"
+                    value={OrderTime}
+                    onChange={(newValue) => setEndtime(newValue)}
                     renderInput={(params) => <TextField {...params} />}
                   />
                 </Box>

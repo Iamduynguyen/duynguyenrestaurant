@@ -75,8 +75,23 @@ export default function TableAdmin() {
     console.log(res);
     setResetData(!resetData);
   };
+  const getTime = async (e) => {
+    console.log(e.target)
+  };
   return (
     <Grid container mt={1}>
+      <div>
+        <form>
+          <div>
+            <input type="date" id="appt" name="appt"
+              min="09:00" max="18:00" required />
+            <input type="time" id="appt" name="appt"
+              min="09:00" max="18:00" required />
+            <button type="submit" onSubmit={(EventTarget) = getTime}>ok</button>
+          </div>
+        </form>
+      </div>
+      <br />
       <p className=" pt-[20px] pl-[30px] font-medium text-[26px] text-gray-700">
         Danh sách
       </p>

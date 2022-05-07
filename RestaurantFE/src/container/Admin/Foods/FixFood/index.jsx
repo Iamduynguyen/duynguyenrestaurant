@@ -197,7 +197,7 @@ export default function FixFoods() {
       if (foodEditing.foodDetails?.length > 0) {
         setValue('0')
       } else {
-        setValue('0')
+        setValue(+0)
       }
     }
   }, [foodEditing])
@@ -785,7 +785,7 @@ export default function FixFoods() {
           </Button> */}
 
           <AntdButton className='my-btn my-btn--primary' onClick={() => { newDetailForm.submit() }}>Thêm ngay</AntdButton>
-          <AntdButton className='my-btn'onClick={() => setOpenDLAddDetail(false)}>Hủy bỏ</AntdButton>
+          <AntdButton className='my-btn' onClick={() => setOpenDLAddDetail(false)}>Hủy bỏ</AntdButton>
         </DialogActions>
       </Dialog>
     </>
@@ -833,7 +833,7 @@ const TabPanelCustom = ({ value, item, foodId, resetData }) => {
     });
     const res = await FoodsAPI.uploadImage(fromData);
     console.log(res);
-    let newLink = res[0].replace("http://duyndph12801.cf:8787", "http://viprestaurant.cf:8787");
+    let newLink = res;
     const medias = imagePre.map((item, index) => {
       return {
         foodUrl: item.foodUrl
@@ -851,6 +851,40 @@ const TabPanelCustom = ({ value, item, foodId, resetData }) => {
         }
       ]
     };
+
+
+    const res2 = await FoodsAPI.updateFoodDetails(item.id, foodDetail);
+    console.log(res2);
+    setImagePre(res2.foodMedias);
+    setImages([]);
+    resetData();
+    message.success('Up load ảnh thành công !');
+  };
+
+  const uploadImg2 = async () => {
+    const fromData = new FormData();
+    images.forEach((image) => {
+      fromData.append('files', image.file);
+    });
+    const res = await FoodsAPI.uploadImage2(fromData);
+    console.log(res);
+    const newLinks = res.map((item, index) => ({foodUrl: item}))
+    const medias = imagePre.map((item, index) => {
+      return {
+        foodUrl: item.foodUrl
+      }
+    })
+    const foodDetail = {
+      foodSize: size,
+      amount: amount,
+      discount: discount,
+      foodId: foodId,
+      foodMedias: [
+        ...medias,
+        ...newLinks
+      ]
+    };
+
 
     const res2 = await FoodsAPI.updateFoodDetails(item.id, foodDetail);
     console.log(res2);
@@ -1191,7 +1225,7 @@ const TabPanelCustom = ({ value, item, foodId, resetData }) => {
             </Box>
           )}
         </ImageUploading>
-        <AntdButton className='my-btn my-btn--primary' onClick={uploadImg}>Up load hình ảnh</AntdButton>
+        <AntdButton className='my-btn my-btn--primary' onClick={uploadImg2}>Up load hình ảnh</AntdButton>
       </Box>
 
       <Form

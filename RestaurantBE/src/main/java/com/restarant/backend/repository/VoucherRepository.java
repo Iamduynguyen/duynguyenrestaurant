@@ -13,4 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     @Query("SELECT v FROM Voucher v WHERE v.customer.id = :id AND v.active = 0")
     Voucher findByCustomerId(Long id);
+    @Query("SELECT v FROM Voucher v WHERE v.id= :id AND v.customer.id = :customer AND v.active = 0")
+    Voucher findByIdAndCustomerId(Long id,Long customer);
+
 }

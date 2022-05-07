@@ -15,6 +15,12 @@ public interface IOrderTotalService extends IServiceAdapter<OrderTotalDto> {
 
     String deleteOrderDetails(List<Long> ids);
 
+    String confirmOrderOnline(Long id,HttpServletRequest request);
+
+    String confirmDepositOnline(ConfirmDepositOnline request);
+
+    String cancelOrder(Long id);
+
     String editOrderDetails(EditOrderDetailsRequest request);
 
     String payment(OrderPaymentDto paymentDto, HttpServletRequest request);

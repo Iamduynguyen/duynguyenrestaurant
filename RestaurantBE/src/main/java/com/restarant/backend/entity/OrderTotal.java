@@ -48,6 +48,9 @@ public class OrderTotal implements Serializable {
     @Column(name = "end_time")
     private Long endTime;
 
+    @Column(name = "deposit")
+    private BigDecimal deposit;
+
     @Column(name = "note")
     private String note;
 

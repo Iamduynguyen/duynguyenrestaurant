@@ -90,6 +90,7 @@ public class OrderTotalController {
 //        log.debug("REST request to get all OrderTotals");
 //        return orderTotalRepository.findAll();
 //    }
+
     @PostMapping("/create-order-couter")
     public String createCounter (@RequestBody OrderCouterDto request, HttpServletRequest httpServletRequest){
         return orderTotalService.registrationOrderCounter(request,httpServletRequest);
@@ -109,6 +110,18 @@ public class OrderTotalController {
     @PostMapping("/edit-order-details")
     public String  editOrderDetails(@RequestBody EditOrderDetailsRequest request){
         return orderTotalService.editOrderDetails(request);
+    }
+    @PutMapping("/confirm-order-online/{id}")
+    public String confirmOrderOnline(@PathVariable Long id,HttpServletRequest request){
+        return orderTotalService.confirmOrderOnline(id,request);
+    }
+    @PostMapping("/confirm-deposit-online")
+    public String confirmDepositOnline(@RequestBody ConfirmDepositOnline request){
+        return orderTotalService.confirmDepositOnline(request);
+    }
+    @PutMapping("/cancel-order/{id}")
+    public String cancelOrder(@PathVariable Long id){
+        return orderTotalService.cancelOrder(id);
     }
     /**
      * {@code GET  /order-totals/:id} : get the "id" orderTotal.

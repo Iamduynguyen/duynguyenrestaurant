@@ -9,4 +9,5 @@ public class OrderDetailsDto {
     private FoodDetailsDto foodDetalls;
     private String status;
     private Long tableOrderId;
+    private Integer secret;
 }

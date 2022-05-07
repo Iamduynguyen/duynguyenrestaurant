@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Spring Data SQL repository for the OrderDetails entity.
@@ -17,4 +18,7 @@ import java.util.Collection;
 public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Long> {
     @Query("select o from OrderDetails o where o.tableOrder = :key")
     Collection<OrderDetails> getByTableorde(@Param("key")TableOrder tableOrder);
+
+    @Query("select o from OrderDetails o where o.tableOrder.orderTotal.id= :id")
+    List<OrderDetails> getByOrdertotalId(@Param("id")Long id);
 }

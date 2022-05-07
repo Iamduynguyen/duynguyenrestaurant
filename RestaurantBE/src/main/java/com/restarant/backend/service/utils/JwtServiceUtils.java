@@ -31,6 +31,7 @@ public class JwtServiceUtils {
         String token = request.getHeader("token");
         if(token != null && jwtUtils.validateJwtToken(token)){
             String username = jwtUtils.getUserNameFromJwtToken(token);
+            System.out.println(username);
             Customer customer = customerRepository.getCustomerByUsername(username);
             return customer;
         }

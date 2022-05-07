@@ -3,6 +3,8 @@ package com.restarant.backend.service.mapper.impl;
 import com.restarant.backend.dto.FoodDetailsDto;
 import com.restarant.backend.entity.FoodDetails;
 import com.restarant.backend.service.mapper.AbstractDtoMapperAdapter;
+import org.springframework.stereotype.Service;
+
 
 public class FoodDetailMapper extends AbstractDtoMapperAdapter<FoodDetails, FoodDetailsDto> {
 

@@ -38,7 +38,8 @@ public class TableOrderMapper extends AbstractDtoMapperAdapter<TableOrder, Table
 
     @Override
     public TableOrderDto convertToDto(TableOrder entity) {
-        TableOrderDto tableOrderDto = super.convertToDto(entity);
+        TableOrderDto tableOrderDto = new TableOrderDto();
+        tableOrderDto.setId(entity.getId());
         if (tableOrderDto != null && entity.getTables() != null) {
             tableOrderDto.setTableId(entity.getTables().getId());
         }

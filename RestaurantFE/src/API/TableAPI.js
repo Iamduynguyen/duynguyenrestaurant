@@ -5,6 +5,10 @@ const TableAPI = {
     const url = '/api/tables';
     return axiosClient.get(url);
   },
+  getTableByTime: (data) => {
+    const url = `/api/tables?time=${data}`;
+    return axiosClient.get(url);
+  },
   createTable: (table) => {
     const url = '/api/tables';
     return axiosClient.post(url, table);

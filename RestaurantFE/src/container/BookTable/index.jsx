@@ -21,6 +21,8 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import BookTableAPI from "../../API/BookTableAPI";
 import "./style.css";
+import Swal from 'sweetalert2'
+
 
 export default function BookTable() {
   const navigation = useNavigate();
@@ -60,6 +62,15 @@ export default function BookTable() {
       };
     });
     const res = await BookTableAPI.bookTable(dataBookTables);
+    console.log(res);
+    if(res.data=="Table are using!"){
+      Swal.fire({
+        title: 'Lỗi!',
+        text: 'Bàn này đã được đặt trước, vui lòng chọn lại!',
+        icon: 'error',
+        confirmButtonText: 'Đóng'
+      })
+    }
   };
 
   return (
@@ -94,7 +105,7 @@ export default function BookTable() {
                 <Box>
                   <MobileTimePicker
                     label="Giờ kết thúc"
-                    value={OrderTime}
+                    value={endtime}
                     onChange={(newValue) => setEndtime(newValue)}
                     renderInput={(params) => <TextField {...params} />}
                   />
@@ -206,7 +217,7 @@ export default function BookTable() {
                   >
                     <Button
                       variant="contained"
-                      sx={{ color: "white", width: "150px" }}
+                      sx={{ color: "white", width: "150px", height: "40px" }}
                       onClick={confirmBookTables}
                     >
                       Đặt bàn

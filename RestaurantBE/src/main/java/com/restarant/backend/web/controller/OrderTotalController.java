@@ -90,7 +90,10 @@ public class OrderTotalController {
 //        log.debug("REST request to get all OrderTotals");
 //        return orderTotalRepository.findAll();
 //    }
-
+    @PutMapping("/confirm-customer-order-online/{id}")
+    public String confirmCustomerOrderOnline(@PathVariable Long id){
+        return orderTotalService.confirmCustomerOrderOnline(id);
+    }
     @PostMapping("/create-order-couter")
     public String createCounter (@RequestBody OrderCouterDto request, HttpServletRequest httpServletRequest){
         return orderTotalService.registrationOrderCounter(request,httpServletRequest);

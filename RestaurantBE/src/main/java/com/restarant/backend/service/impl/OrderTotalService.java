@@ -171,6 +171,18 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
+    public String confirmCustomerOrderOnline(Long id){
+        try{
+            OrderTotal orderTotal = orderTotalRepository.getById(id);
+            orderTotal.setStatus(1);
+            orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+    @Override
     public String deleteOrderDetails(List<Long> ids){
         try {
             orderDetailsRepository.deleteAllById(ids);

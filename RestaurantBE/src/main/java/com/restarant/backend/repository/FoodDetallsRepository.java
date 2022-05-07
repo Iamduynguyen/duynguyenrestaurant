@@ -17,5 +17,6 @@ import java.util.List;
 public interface FoodDetallsRepository extends JpaRepository<FoodDetails, Long> {
     @Query(value = "select f from FoodDetails f where f.food.id = :id")
     List<FoodDetails> getByFoodId(@Param("id") Long id);
+//    FoodDetails findByIdAnd(Long id);
 
 }

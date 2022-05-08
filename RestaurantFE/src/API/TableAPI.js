@@ -6,7 +6,7 @@ const TableAPI = {
     return axiosClient.get(url);
   },
   getTableByTime: (data) => {
-    const url = `/api/tables?time=${data}`;
+    const url = `/api/tables?start=${data}&end=${data}`;
     return axiosClient.get(url);
   },
   createTable: (table) => {

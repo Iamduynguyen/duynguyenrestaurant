@@ -2,7 +2,7 @@ import axiosClient from './axiosClient';
 
 const TableAPI = {
   getAllTables: () => {
-    const url = '/api/tables';
+    const url = '/api/tables?start=1&end=1';
     return axiosClient.get(url);
   },
   getTableByTime: (data) => {

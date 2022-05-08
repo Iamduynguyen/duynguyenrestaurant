@@ -12,4 +12,5 @@ public class TableOrderDto {
     private List<OrderDetailsDto> orderDetails;
     private Long tableId;
     private Long orderTotalId;
+    private Long endTime;
 }

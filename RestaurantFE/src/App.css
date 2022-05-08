@@ -69,6 +69,11 @@
   cursor: pointer;
 }
 
+.cart-text{
+  color: rgb(217, 217, 217);
+  font-weight: 500
+}
+
 .p__cormorant {
   font-family: var(--font-base);
   color: var(--color-white);

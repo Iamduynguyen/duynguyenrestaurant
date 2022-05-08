@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Autoplay } from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -25,6 +25,7 @@ import styles from "./menu.module.css";
 import "./style.css";
 
 export default function Menu() {
+  const navigate = useNavigate();
   const [FoodsData, setFoodsData] = useState([]);
   const [NumberPage, setNumberPage] = useState(0);
   const [page, setPage] = useState(0);
@@ -134,7 +135,7 @@ export default function Menu() {
                     alt={item.title}
                   />
                 </div>
-                <CardContent>
+                <CardContent style={{marginBottom: '80px'}}>
                   <p className="p__cormorant " style={{ color: "#fac343" }}>
                     {item.name}
                   </p>
@@ -147,52 +148,50 @@ export default function Menu() {
                     }}
                     color="text.secondary"
                     mt={1}
-                    height={40}
+                    height={'40'}
                   >
                     {item.title}
                   </Typography>
+                </CardContent>
 
-                  <div className="block_price">
-                    <p className={`p__cormorant ${styles.price}`}>
+                <div>
+                  <div className="" style={{ position: "absolute", bottom: 0 }}>
+                    <div style={{marginLeft: '20px'}}>
+                    <span className={`${styles.price}`}>
                       {item.foodDetails[0]?.discount != 0
                         ? discount(
-                            item.foodDetails[0]?.amount,
-                            item.foodDetails[0]?.discount
-                          ) + " 1VND"
-                        : item.foodDetails[0]?.amount + " 2VND"}
-                    </p>
-                    <p
-                      className={`p__cormorant ${styles.discountText} ${
-                        item.foodDetails[0]?.discount != 0
+                          item.foodDetails[0]?.amount,
+                          item.foodDetails[0]?.discount
+                        ) + " VND"
+                        : item.foodDetails[0]?.amount + " VND"}
+                    </span> &ensp;
+                    <span
+                      className={`${styles.discountText} ${item.foodDetails[0]?.discount != 0
                           ? styles.discountPrice
                           : ""
-                      }`}
+                        }`}
                     >
                       {item.foodDetails[0]?.discount != 0
-                        ? item.foodDetails[0]?.amount + " 3VND"
+                        ? item.foodDetails[0]?.amount + " VND"
                         : ""}
-                    </p>
-                  </div>
-                  
-                </CardContent>
-                <CardActions>
-                  <Link to={`/menu/${item.id}`}>
-                    <Button
-                      size="small"
-                      sx={{
-                        position: "absolute",
-                        bottom: 10,
-                        border: "1px solid #7581f8",
-                        transform: "translateY(-20%)",
-                        padding: "5px 10px 5px 10px",
-                      }}
-                    >
-                     
+                    </span>
+                    </div>
+                    <div>
+                      <Button
+                        size="small"
+                        sx={{
+                          border: "1px solid #7581f8",
+                          transform: "translateY(-20%)",
+                          padding: "5px 10px 5px 10px",
+                          margin: '10px 20px'
+                        }}
+                        onClick={() => navigate(`/menu/${item.id}`)}
+                      >
                         Xem thêm
-              
-                    </Button>
-                  </Link>
-                </CardActions>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </Card>
             </Grid>
           ))}

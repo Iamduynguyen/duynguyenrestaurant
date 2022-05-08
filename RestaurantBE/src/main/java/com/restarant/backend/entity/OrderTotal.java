@@ -54,6 +54,9 @@ public class OrderTotal implements Serializable {
     @Column(name = "note")
     private String note;
 
+    @Column(name = "create_at")
+    private Long createdAt;
+
     @OneToMany(mappedBy = "orderTotal", cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = {"orderDetails", "tables", "orderTotal"}, allowSetters = true)
     private Set<TableOrder> tableOrders = new HashSet<>();

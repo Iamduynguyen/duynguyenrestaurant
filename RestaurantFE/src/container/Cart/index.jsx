@@ -74,8 +74,9 @@ export default function Cart() {
                       >
                         <img
                           style={{
-                            width: 100,
-                            height: 70,
+                            minWidth: '80px',
+                            maxWidth: '80px',
+                            height: 'auto',
                             borderRadius: 5,
                             marginRight: 20,
                           }}
@@ -84,15 +85,15 @@ export default function Cart() {
                         />
                         <p
                           style={{ textAlign: 'center' }}
-                          className='p__cormorant'
+                          className='cart-text'
                         >
                           {item.foodDetalls.foodName}
                         </p>
                       </Box>
                       <Divider orientation='vertical' flexItem />
-                      <p className='p__cormorant'>Số lượng: {item.quantity}</p>
+                      <p className='cart-text'>Số lượng: {item.quantity}</p>
                       <Divider orientation='vertical' flexItem />
-                      <p className='p__cormorant'>
+                      <p className='cart-text'>
                         {item.foodDetalls.discount == 0
                           ? item.foodDetalls.amount + ' VND'
                           : discount(
@@ -101,12 +102,11 @@ export default function Cart() {
                             ) + ' VND'}
                       </p>
                       <Divider orientation='vertical' flexItem />
-                      <p className='p__cormorant' style={{color: "green", fontSize: "medium"}}>
+                      <p className='cart-text' style={{color: "green", fontSize: "medium"}}>
                         {item.status}
                       </p>
                       <Divider orientation='vertical' flexItem />
                       <Button
-                        sx={{ transform: 'translateX(-20px)' }}
                         color='error'
                         size='small'
                         variant='contained'
@@ -123,20 +123,20 @@ export default function Cart() {
         <Grid item xs={4}>
           <Paper elevation={24}>
             <Stack spacing={2} p={2}>
-              <p style={{ textAlign: 'center' }} className='p__cormorant'>
+              <p style={{ textAlign: 'center' }} className='cart-text'>
                 Tổng thanh toán:
               </p>
               <Divider />
               <Stack spacing={2}>
                 {foodOrder?.map((item, index) => (
                   <Box key={index}>
-                    <p className='p__cormorant'>{`${index}, ${
+                    <p className='cart-text'>{`${index}, ${
                       item.foodDetalls.foodName
                     } | ${
                       item.foodDetalls.discount == 0
                         ? item.foodDetalls.amount
                         : discount(
-                            item.foodDetalls.foodDetalls.amount,
+                            item.foodDetalls.amount,
                             item.foodDetalls.discount,
                           )
                     } * ${item.quantity} = ${
@@ -162,7 +162,7 @@ export default function Cart() {
                   </Button>
                 </Box>
                 <Divider />
-                <p style={{ textAlign: 'center' }} className='p__cormorant'>
+                <p style={{ textAlign: 'center', color: '#1059f5' }} className='p__cormorant'>
                   Tổng thanh toán:{' '}
                   <span style={{ color: '#dcca87' }}>{sumPrice} VND</span>
                 </p>

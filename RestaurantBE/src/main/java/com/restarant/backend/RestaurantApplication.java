@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @EnableSwagger2
 @SpringBootApplication
+@EnableScheduling
 public class RestaurantApplication {
     static final Logger log = LoggerFactory.getLogger(RestaurantApplication.class);
     public static void main(String[] args) {

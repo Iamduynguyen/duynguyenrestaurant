@@ -1,6 +1,6 @@
 package com.restarant.backend.web.controller;
 
-import com.restarant.backend.dto.OrderTotalDto;
+import com.restarant.backend.dto.*;
 import com.restarant.backend.entity.OrderTotal;
 import com.restarant.backend.repository.OrderTotalRepository;
 import com.restarant.backend.service.IOrderTotalService;
@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/api")
-@Transactional
+//@Transactional
 @CrossOrigin("*")
 public class OrderTotalController {
 
@@ -33,7 +34,6 @@ public class OrderTotalController {
     public OrderTotalController(IOrderTotalService orderTotalService) {
         this.orderTotalService = orderTotalService;
     }
-
     /**
      * {@code POST  /order-totals} : Create a new orderTotal.
      *
@@ -90,7 +90,42 @@ public class OrderTotalController {
 //        log.debug("REST request to get all OrderTotals");
 //        return orderTotalRepository.findAll();
 //    }
-
+    @PutMapping("/confirm-customer-order-online/{id}")
+    public String confirmCustomerOrderOnline(@PathVariable Long id){
+        return orderTotalService.confirmCustomerOrderOnline(id);
+    }
+    @PostMapping("/create-order-couter")
+    public String createCounter (@RequestBody OrderCouterDto request, HttpServletRequest httpServletRequest){
+        return orderTotalService.registrationOrderCounter(request,httpServletRequest);
+    }
+    @PostMapping("/payment-order")
+    public  String payment(@RequestBody OrderPaymentDto paymentDto, HttpServletRequest request){
+        return orderTotalService.payment(paymentDto,request);
+    }
+    @PostMapping("/add-order-details")
+    public String addOrderDetails(@RequestBody TableCounterDto tableCounterDto){
+        return orderTotalService.addFoodTable(tableCounterDto);
+    }
+    @PostMapping("/delete-all-details-ids")
+    public String  deleteAllDetailsIds(@RequestBody DeleteAllOrderDetailsById detailsById){
+        return orderTotalService.deleteOrderDetails(detailsById.getIds());
+    }
+    @PostMapping("/edit-order-details")
+    public String  editOrderDetails(@RequestBody EditOrderDetailsRequest request){
+        return orderTotalService.editOrderDetails(request);
+    }
+    @PutMapping("/confirm-order-online/{id}")
+    public String confirmOrderOnline(@PathVariable Long id,HttpServletRequest request){
+        return orderTotalService.confirmOrderOnline(id,request);
+    }
+    @PostMapping("/confirm-deposit-online")
+    public String confirmDepositOnline(@RequestBody ConfirmDepositOnline request){
+        return orderTotalService.confirmDepositOnline(request);
+    }
+    @PutMapping("/cancel-order/{id}")
+    public String cancelOrder(@PathVariable Long id){
+        return orderTotalService.cancelOrder(id);
+    }
     /**
      * {@code GET  /order-totals/:id} : get the "id" orderTotal.
      *

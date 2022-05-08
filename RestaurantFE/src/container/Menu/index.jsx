@@ -115,6 +115,7 @@ export default function Menu() {
                 className={styles.CardFood}
                 sx={{
                   minHeight: 450,
+                  height: '100%',
                   position: "relative",
                   backgroundColor: "white",
                 }}
@@ -150,14 +151,15 @@ export default function Menu() {
                   >
                     {item.title}
                   </Typography>
+
                   <div className="block_price">
                     <p className={`p__cormorant ${styles.price}`}>
                       {item.foodDetails[0]?.discount != 0
                         ? discount(
                             item.foodDetails[0]?.amount,
                             item.foodDetails[0]?.discount
-                          ) + " VND"
-                        : item.foodDetails[0]?.amount + " VND"}
+                          ) + " 1VND"
+                        : item.foodDetails[0]?.amount + " 2VND"}
                     </p>
                     <p
                       className={`p__cormorant ${styles.discountText} ${
@@ -167,10 +169,11 @@ export default function Menu() {
                       }`}
                     >
                       {item.foodDetails[0]?.discount != 0
-                        ? item.foodDetails[0]?.amount + " VND"
+                        ? item.foodDetails[0]?.amount + " 3VND"
                         : ""}
                     </p>
                   </div>
+                  
                 </CardContent>
                 <CardActions>
                   <Link to={`/menu/${item.id}`}>
@@ -181,15 +184,12 @@ export default function Menu() {
                         bottom: 10,
                         border: "1px solid #7581f8",
                         transform: "translateY(-20%)",
-                        padding: "0px",
+                        padding: "5px 10px 5px 10px",
                       }}
                     >
-                      <p
-                        style={{ fontSize: "13px", color: "#7581f8" }}
-                        className="p__cormorant btn_item"
-                      >
+                     
                         Xem thêm
-                      </p>
+              
                     </Button>
                   </Link>
                 </CardActions>

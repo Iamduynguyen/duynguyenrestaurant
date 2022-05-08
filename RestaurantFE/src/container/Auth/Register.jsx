@@ -3,6 +3,7 @@ import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import logo from "../../favicon.ico";
 import gallery03 from "../../assets/gallery03.png";
 import AuthAPI from "../../API/AuthAPI";
+import Swal from "sweetalert2/dist/sweetalert2.all";
 
 export default function Register() {
   const [firstName, setFirstName] = React.useState("");
@@ -19,24 +20,23 @@ export default function Register() {
       password: password,
     };
     const res = await AuthAPI.register(data);
-    console.log(res);
-    if (!res.status) {
-      setValidAPI("");
-      if (savePass) {
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("name", res.username);
-        localStorage.setItem("role", res.role);
-        setToken(res.token);
-      }
-      sessionStorage.setItem("token", res.token);
-      sessionStorage.setItem("name", res.username);
-      sessionStorage.setItem("role", res.role);
-      setToken(res.token);
-      if (res.role === "ROLE_ADMIN") {
-        navigation("/admin");
-      } else {
-        navigation("/");
-      }
+    if (res.id !== undefined) {
+      Swal.fire("Đăng ký thành công!", "Nhấn OK để đăng nhập", "success").then(
+        async () => {
+          const resLogin = await AuthAPI.login(data);
+          if (!resLogin.status) {
+            sessionStorage.setItem("token", resLogin.token);
+            sessionStorage.setItem("name", resLogin.username);
+            sessionStorage.setItem("role", resLogin.role);
+            setToken(resLogin.token);
+            if (res.role === "ROLE_ADMIN") {
+              navigation("/admin");
+            } else {
+              navigation("/");
+            }
+          }
+        }
+      );
     } else if (res.status === 403) {
       setValidAPI("Tài khoản hoặc mật khẩu không đúng");
     } else {

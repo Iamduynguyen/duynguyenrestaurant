@@ -30,7 +30,7 @@ public class OrderSchedule {
     private OrderTotalRepository orderTotalRepository;
     @Autowired
     private MailUtils mailUtils;
-    @Scheduled(cron = "0 46 9-22 * * *")
+    @Scheduled(cron = "0 30 17-22 * * *")
     public void sendMail()  {
         System.out.println("chạy thành công");
         Date now = new Date();

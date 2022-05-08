@@ -1,29 +1,40 @@
 package com.restarant.backend.service.impl;
 
-import com.restarant.backend.dto.OrderTotalDto;
-import com.restarant.backend.dto.TableOrderDto;
-import com.restarant.backend.entity.Customer;
-import com.restarant.backend.entity.OrderTotal;
-import com.restarant.backend.entity.TableOrder;
+import com.restarant.backend.dto.*;
+import com.restarant.backend.entity.*;
 import com.restarant.backend.model.OrderTotalStatus;
 import com.restarant.backend.repository.*;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.mapper.IConverterDto;
+import com.restarant.backend.service.utils.JwtServiceUtils;
+import com.restarant.backend.service.utils.MailDto;
+import com.restarant.backend.service.utils.MailUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class OrderTotalService implements IOrderTotalService {
-
+    @Autowired
+    private OrderDetailsRepository orderDetailsRepository;
+    @Autowired
+    private FoodDetallsRepository foodDetallsRepository;
+    @Autowired
+    private VoucherRepository voucherRepository;
+    @Autowired
+    private MailUtils mailUtils;
+    @Autowired
+    private JwtServiceUtils jwtServiceUtils;
     private final OrderTotalRepository orderTotalRepository;
     private final IConverterDto<OrderTotal, OrderTotalDto> mapper;
     private final IConverterDto<TableOrder, TableOrderDto> tableOrderMapper;
@@ -66,12 +77,226 @@ public class OrderTotalService implements IOrderTotalService {
             throw new InvalidDataExeception("The food[id] not found");
         }
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
-        if(orderTotal.getStatus() >= OrderTotalStatus.WAIT_ACCEPT){
+        if (orderTotal.getStatus() >= OrderTotalStatus.WAIT_ACCEPT) {
             return false;
         }
         log.info(String.format("Someone detele orderTotal[id-%d]", id));
         orderTotalRepository.deleteById(id);
         return true;
+    }
+//    public OrderTotal getAll(){
+//        return null;
+//    }
+    @Override
+    public String registrationOrderCounter(OrderCouterDto orderCouterDto, HttpServletRequest request) {
+        try {
+            Date now = new Date();
+            OrderTotal orderTotal = new OrderTotal();
+            orderTotal.setCreatedAt(now.getTime());
+            orderTotal.setOrderTime(now.getTime());
+            orderTotal.setStatus(5);
+            // todo tạm bỏ
+            orderTotal.setNote("Người tạo hóa đơn là : " + jwtServiceUtils.getUserName(request));
+//            Staff staff = new Staff();
+//            staff.setId(1L);
+//            orderTotal.setStaff(staff);
+//        orderTotal.setDeleteflag();
+            if (orderCouterDto.getTableCounterDtos().isEmpty()) {
+                return "FAIL";
+            }
+            OrderTotal orderTotalSave = orderTotalRepository.save(orderTotal);
+            List<OrderDetails> orderDetailsList = new ArrayList<>();
+            Tables tables = new Tables();
+            FoodDetails foodDetails = new FoodDetails();
+            for (TableCounterDto tableCounterDto : orderCouterDto.getTableCounterDtos()) {
+                TableOrder tableOrder = new TableOrder();
+                tables.setId(tableCounterDto.getTableId());
+                tableOrder.setTables(tables);
+                tableOrder.setOrderTotal(orderTotalSave);
+                tableOrder = tableOrderRepository.save(tableOrder);
+                saveOrderDetails(orderDetailsList, tableCounterDto, tableOrder);
+            }
+            orderDetailsRepository.saveAll(orderDetailsList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+
+    }
+
+    private void saveOrderDetails(List<OrderDetails> orderDetailsList, TableCounterDto tableCounterDto, TableOrder tableOrder) {
+        FoodDetails foodDetails;
+        for (FoodCouter foodCouter : tableCounterDto.getIdFoodCounters()) {
+            OrderDetails orderDetails = new OrderDetails();
+            orderDetails.setTableOrder(tableOrder);
+            orderDetails.setQuantity((long) foodCouter.getQuantity());
+            foodDetails = foodDetallsRepository.findById(foodCouter.getFoodId()).get();
+            orderDetails.setFoodDetalls(foodDetails);
+            orderDetails.setAmount(foodDetails.getAmount().subtract(foodDetails.getDiscount()));
+//                    orderDetails.setStatus(5);
+            orderDetailsList.add(orderDetails);
+//                    orderDetailsRepository.save(orderDetails);
+        }
+    }
+
+    @Override
+    public String addFoodTable(TableCounterDto counterDto) {
+        try {
+            TableOrder orderDetails = tableOrderRepository.getById(counterDto.getTableId());
+            if (Objects.isNull(orderDetails)) {
+                return "FAIL";
+            }
+            List<OrderDetails> orderDetailsList = new ArrayList<>();
+            for (FoodCouter foodCouter : counterDto.getIdFoodCounters()) {
+                OrderDetails orderDetails1 = new OrderDetails();
+                orderDetails1 = orderDetailsRepository.findByTableOrderIdAndFoodDetallsId(counterDto.getTableId(),foodCouter.getFoodId());
+                FoodDetails foodDetails = foodDetallsRepository.findById(foodCouter.getFoodId()).get();
+                if(Objects.isNull(orderDetails1)){
+                    orderDetails1.setQuantity((long) foodCouter.getQuantity());
+                    orderDetails1.setAmount(foodDetails.getAmount().subtract(foodDetails.getDiscount()));
+                    orderDetails1.setFoodDetalls(foodDetails);
+                }else {
+                    orderDetails1.setQuantity((long) foodCouter.getQuantity()+orderDetails1.getQuantity());
+                }
+                orderDetails1.setTableOrder(orderDetails);
+                orderDetailsList.add(orderDetails1);
+            }
+            orderDetailsRepository.saveAll(orderDetailsList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+
+    @Override
+    public String confirmCustomerOrderOnline(Long id){
+        try{
+            OrderTotal orderTotal = orderTotalRepository.getById(id);
+            orderTotal.setStatus(1);
+            orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+    @Override
+    public String deleteOrderDetails(List<Long> ids){
+        try {
+            orderDetailsRepository.deleteAllById(ids);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+
+    @Override
+    public String confirmOrderOnline(Long id,HttpServletRequest request){
+        try {
+            OrderTotal orderTotal = orderTotalRepository.getById(id);
+            if (Objects.nonNull(orderTotal)){
+                orderTotal.setStatus(2);
+                orderTotal.setNote("Người xác nhận đơn hàng :"+ jwtServiceUtils.getUserName(request));
+                orderTotalRepository.save(orderTotal);
+                MailDto mailDto  = new MailDto();
+                mailDto.setTo(orderTotal.getCustomer().getEmail());
+                mailDto.setBody("Chúng tôi đã xác nhận đặt bàn của quý khách. Mong quý khách để ý để đặt cọc bàn. <br> Mọi thắc mắc xin liên hệ  hotline : 0978825572. xin cảm ơn");
+                mailDto.setSubject("Xác nhận đơn hành thành công");
+                mailDto.setFrom("admin@gmail.com");
+                mailUtils.send(mailDto);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCCESS";
+    }
+
+    @Override
+    public String confirmDepositOnline(ConfirmDepositOnline request){
+        try{
+            OrderTotal orderTotal = orderTotalRepository.getById(request.getId());
+            orderTotal.setDeposit(request.getDeposit());
+            orderTotal.setStatus(4);
+            orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+
+    @Override
+    public String cancelOrder(Long id){
+        try{
+            OrderTotal orderTotal = orderTotalRepository.getById(id);
+            orderTotal.setStatus(-1);
+            orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+
+    }
+    @Override
+    public String editOrderDetails(EditOrderDetailsRequest request){
+        try {
+            List<OrderDetails> orderDetailsList = new ArrayList<>();
+            for (EditOrderDetails editOrderDetails : request.getOrderDetails()){
+                OrderDetails orderDetails  =  orderDetailsRepository.getById(editOrderDetails.getOrderDetailsId());
+                if(orderDetails.getQuantity() < editOrderDetails.getQuantity()){
+                    throw  new Exception("Số lượng cần trừ không thể lớn hơn  số  lượng  đã đặt");
+                }
+                orderDetails.setQuantity(orderDetails.getQuantity() - editOrderDetails.getQuantity());
+                orderDetailsList.add(orderDetails);
+            }
+            orderDetailsRepository.saveAll(orderDetailsList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+    @Override
+    public String payment(OrderPaymentDto paymentDto, HttpServletRequest request) {
+        try {
+            List<OrderDetails> orderDetails = orderDetailsRepository.getByOrdertotalId(paymentDto.getOrderId());
+            if (CollectionUtils.isEmpty(orderDetails)) {
+                return "FAIL";
+            }
+            BigDecimal amoutTotal = BigDecimal.ZERO;
+            for (OrderDetails orderDetail : orderDetails) {
+                amoutTotal = amoutTotal.add(orderDetail.getAmount().multiply(BigDecimal.valueOf(orderDetail.getQuantity())));
+            }
+            OrderTotal orderTotal = orderTotalRepository.getById(paymentDto.getOrderId());
+            if(Objects.nonNull(paymentDto.getVoucherId()) && Objects.nonNull(orderTotal.getCustomer())){
+                Voucher voucher  = voucherRepository.findByIdAndCustomerId(paymentDto.getVoucherId(),orderTotal.getCustomer().getId());
+                if(Objects.isNull(voucher)){
+                   return "VOUCHER NOT";
+                }
+                OrderTotal checkVoucher =  orderTotalRepository.findByVoucherAndCustomerIdAndStatus(paymentDto.getVoucherId(),orderTotal.getCustomer().getId(),6);
+                if(Objects.nonNull(checkVoucher)){
+                   return "VOUCHER EXITS";
+                }
+                orderTotal.setVoucher(paymentDto.getVoucherId());
+            }
+            orderTotal.setAmountTotal(amoutTotal);
+            orderTotal.setStatus(6);
+            if (Objects.nonNull(paymentDto.getVoucherId())) {
+                orderTotal.setVoucher(paymentDto.getVoucherId());
+            }
+            orderTotal.setEndTime(new Date().getTime());
+            orderTotal.setNote(orderTotal.getNote() + " ; " + "Người thu tiền " + jwtServiceUtils.getUserName(request));
+            orderTotalRepository.save(orderTotal);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
     }
 
     @Override
@@ -96,7 +321,7 @@ public class OrderTotalService implements IOrderTotalService {
         List<OrderTotal> orderTotalList = orderTotalRepository.getListOrderTotalBetweenTime(fromTime, toTime, OrderTotalStatus.PAID);
         System.out.println(orderTotalList.size());
         BigDecimal total = new BigDecimal(0);
-        for(OrderTotal orderTotal: orderTotalList){
+        for (OrderTotal orderTotal : orderTotalList) {
             total = total.add(orderTotal.getAmountTotal());
         }
         return total;

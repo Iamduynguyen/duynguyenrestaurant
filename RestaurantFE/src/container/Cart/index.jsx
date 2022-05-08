@@ -12,6 +12,7 @@ import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 import BookTableAPI from '../../API/BookTableAPI';
 
+
 export default function Cart() {
   const [dataUser, setDataUser] = useState([]);
   const [foodOrder, setFoodOrder] = useState([]);
@@ -52,12 +53,12 @@ export default function Cart() {
         Giỏ hàng
       </p>
       <Grid container>
-        <Grid item xs={8}>
+        <Grid style={{paddingRight: '20px'}} item xs={8}>
           <Paper elevation={6}>
             {dataUser.map((item, index) => (
               <Box key={index}>
                 <Stack p={2} spacing={2}>
-                  <p className='p__cormorant'>Table {item.tableId}</p>
+                  <p style={{color: '#d9d9d9'}} className='p__cormorant'>Bàn {item.tableId}</p>
                   <Divider />
                   {item.orderDetails?.map((item, index) => (
                     <Box
@@ -153,11 +154,11 @@ export default function Cart() {
                     onClick={openAlert}
                     variant='contained'
                     color='info'
-                    size='small'
+                    size='big'
                   >
-                    <p style={{ fontSize: 20 }} className='p__cormorant'>
+                   
                       Xác nhận đơn hàng
-                    </p>
+                    
                   </Button>
                 </Box>
                 <Divider />
@@ -174,7 +175,7 @@ export default function Cart() {
                   }}
                 >
                   <Button disabled variant='contained' color='success'>
-                    <p className='p__cormorant'>Thanh toán</p>
+                    Thanh toán
                   </Button>
                 </Box>
               </Stack>

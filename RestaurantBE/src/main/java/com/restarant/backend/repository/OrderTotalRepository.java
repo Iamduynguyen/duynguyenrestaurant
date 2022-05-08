@@ -22,4 +22,6 @@ public interface OrderTotalRepository extends JpaRepository<OrderTotal, Long> {
 
     @Query("SELECT o FROM OrderTotal o ")
     List<OrderTotal> getListOrderTotalBetweenTime(long fromTime, long toTime, Integer status);
+
+    OrderTotal findByVoucherAndCustomerIdAndStatus(Long voucherId, Long customerId, Integer status);
 }

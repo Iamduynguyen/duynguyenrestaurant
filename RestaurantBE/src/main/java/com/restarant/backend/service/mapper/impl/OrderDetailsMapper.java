@@ -1,11 +1,15 @@
 package com.restarant.backend.service.mapper.impl;
 
 import com.restarant.backend.dto.OrderDetailsDto;
+import com.restarant.backend.entity.FoodDetails;
 import com.restarant.backend.entity.OrderDetails;
 import com.restarant.backend.entity.TableOrder;
+import com.restarant.backend.repository.FoodDetallsRepository;
 import com.restarant.backend.service.mapper.AbstractDtoMapperAdapter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class OrderDetailsMapper extends AbstractDtoMapperAdapter<OrderDetails, OrderDetailsDto> {
+
     public OrderDetailsMapper(Class<OrderDetails> classParameter, Class<OrderDetailsDto> classDtoParameter) {
         super(classParameter, classDtoParameter);
     }
@@ -46,6 +50,9 @@ public class OrderDetailsMapper extends AbstractDtoMapperAdapter<OrderDetails, O
         return dto;
     }
 
+    @Autowired
+    private FoodDetallsRepository foodDetallsRepository;
+
     @Override
     public OrderDetails convertToEntity(OrderDetailsDto dto) {
         OrderDetails orderDetails = new OrderDetails();
@@ -54,6 +61,11 @@ public class OrderDetailsMapper extends AbstractDtoMapperAdapter<OrderDetails, O
             TableOrder tableOrder = new TableOrder();
             tableOrder.setId(dto.getTableOrderId());
             orderDetails.setTableOrder(tableOrder);
+
+            FoodDetails foodDetails = foodDetallsRepository.getById(dto.getFoodDetalls().getId());
+            orderDetails.setFoodDetalls(foodDetails);
+            orderDetails.setQuantity(dto.getQuantity());
+            orderDetails.setAmount(foodDetails.getAmount());
         }
         return orderDetails;
     }

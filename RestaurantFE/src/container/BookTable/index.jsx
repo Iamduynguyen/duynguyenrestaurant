@@ -21,11 +21,16 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import BookTableAPI from "../../API/BookTableAPI";
 import "./style.css";
+import Swal from 'sweetalert2'
+
 
 export default function BookTable() {
   const navigation = useNavigate();
   const [OrderDate, setOrderDate] = useState(moment());
   const [OrderTime, setOrderTime] = useState(
+    moment("2018-01-01T00:00:00.000Z")
+  );
+  const [endtime, setEndtime] = useState(
     moment("2018-01-01T00:00:00.000Z")
   );
   const [SelectedTable, setSelectedTable] = useState([]);
@@ -46,13 +51,26 @@ export default function BookTable() {
     const timeOrder = new Date(
       OrderDate.format("L") + " " + OrderTime.format("LTS")
     ).getTime();
+    const timeEnd = new Date(
+      OrderDate.format("L") + " " + endtime.format("LTS")
+    ).getTime();
     const dataBookTables = SelectedTable.map((table) => {
       return {
         tableId: table,
         orderTime: timeOrder,
+        endtime: endtime
       };
     });
     const res = await BookTableAPI.bookTable(dataBookTables);
+    console.log(res);
+    if(res.data=="Table are using!"){
+      Swal.fire({
+        title: 'Lỗi!',
+        text: 'Bàn này đã được đặt trước, vui lòng chọn lại!',
+        icon: 'error',
+        confirmButtonText: 'Đóng'
+      })
+    }
   };
 
   return (
@@ -81,6 +99,14 @@ export default function BookTable() {
                     label="Chọn giờ đặt"
                     value={OrderTime}
                     onChange={(newValue) => setOrderTime(newValue)}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </Box>
+                <Box>
+                  <MobileTimePicker
+                    label="Giờ kết thúc"
+                    value={endtime}
+                    onChange={(newValue) => setEndtime(newValue)}
                     renderInput={(params) => <TextField {...params} />}
                   />
                 </Box>
@@ -191,7 +217,7 @@ export default function BookTable() {
                   >
                     <Button
                       variant="contained"
-                      sx={{ color: "white", width: "150px" }}
+                      sx={{ color: "white", width: "150px", height: "40px" }}
                       onClick={confirmBookTables}
                     >
                       Đặt bàn

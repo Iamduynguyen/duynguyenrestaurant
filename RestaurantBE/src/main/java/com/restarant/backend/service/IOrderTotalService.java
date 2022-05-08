@@ -13,7 +13,15 @@ public interface IOrderTotalService extends IServiceAdapter<OrderTotalDto> {
 
     String addFoodTable(TableCounterDto counterDto);
 
+    String confirmCustomerOrderOnline(Long id);
+
     String deleteOrderDetails(List<Long> ids);
+
+    String confirmOrderOnline(Long id,HttpServletRequest request);
+
+    String confirmDepositOnline(ConfirmDepositOnline request);
+
+    String cancelOrder(Long id);
 
     String editOrderDetails(EditOrderDetailsRequest request);
 

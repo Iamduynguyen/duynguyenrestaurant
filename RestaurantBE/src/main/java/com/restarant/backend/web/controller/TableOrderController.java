@@ -41,7 +41,6 @@ public class TableOrderController {
     /**
      * {@code POST  /table-orders} : Create a new tableOrder.
      *
-     * @param tableOrder the tableOrder to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new tableOrder, or with status {@code 400 (Bad Request)} if the tableOrder has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
@@ -72,16 +71,16 @@ public class TableOrderController {
         return ResponseEntity.ok(tableOrderService.getTableOrderingByTableId(id, queryTime));
     }
 
-    /**
-     * {@code PUT  /table-orders/:id} : Updates an existing tableOrder.
-     *
-     * @param id         the id of the tableOrder to save.
-     * @param tableOrder the tableOrder to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated tableOrder,
-     * or with status {@code 400 (Bad Request)} if the tableOrder is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the tableOrder couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
+//    /**
+//     * {@code PUT  /table-orders/:id} : Updates an existing tableOrder.
+//     *
+//     * @param id         the id of the tableOrder to save.
+//     * @param tableOrder the tableOrder to update.
+//     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated tableOrder,
+//     * or with status {@code 400 (Bad Request)} if the tableOrder is not valid,
+//     * or with status {@code 500 (Internal Server Error)} if the tableOrder couldn't be updated.
+//     * @throws URISyntaxException if the Location URI syntax is incorrect.
+//     */
 //    @PutMapping("/table-orders/{id}")
 //    public ResponseEntity<?> updateTableOrder(
 //        @PathVariable(value = "id", required = false) final Long id,

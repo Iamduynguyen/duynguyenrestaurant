@@ -16,4 +16,6 @@ public interface ITableService extends IServiceAdapter<TableDto>{
     List<TableDto> getAllTableAvailable(Pageable pageable, Long timestamp);
 
     boolean isAvailable(Long tableId, Long timestamp);
+
+    List<TableDto> getbytime(Long start,Long end);
 }

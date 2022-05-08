@@ -76,7 +76,8 @@ public class OrderTotalService implements IOrderTotalService {
 
     @Override
     public List<OrderTotalDto> getAll() {
-        return null;
+        List<OrderTotal> lst = orderTotalRepository.findAll();
+        return mapper.convertToListDto(lst);
     }
 
     @Override

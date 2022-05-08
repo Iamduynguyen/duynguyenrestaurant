@@ -57,10 +57,12 @@ public class OrderDetailsService implements IOrderDetailsService {
         if(!tableOrderRepository.existsById(dto.getTableOrderId())){
             throw new InvalidDataExeception("The TableOrderId not found");
         }
-        OrderDetails entity = mapper.convertToEntity(dto);
+        OrderDetails entity = new OrderDetails();
+        entity.setTableOrder(tableOrderRepository.findById(dto.getTableOrderId()).get());
+        entity.setFoodDetalls(foodDetallsRepository.findById(dto.getFoodDetalls().getId()).get());
         entity.setStatus(0);
-        log.info("Someone create table " + dto);
         OrderDetails result = orderDetailsRepository.save(entity);
+        System.out.println(entity.toString()+"alo");
         return mapper.convertToDto(result);
     }
 

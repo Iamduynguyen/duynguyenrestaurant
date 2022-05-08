@@ -16,7 +16,6 @@ import java.util.Set;
 /**
  * A FoodDetalls.
  */
-@Data
 @Entity
 @Table(name = "food_detalls")
 @SQLDelete(sql = "UPDATE food_detalls SET deleteflag = 1 WHERE id = ?")
@@ -71,5 +70,75 @@ public class FoodDetails implements Serializable {
         return Objects.hash(id);
     }
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFoodsize() {
+        return foodsize;
+    }
+
+    public void setFoodsize(String foodsize) {
+        this.foodsize = foodsize;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public Long getDeleteflag() {
+        return deleteflag;
+    }
+
+    public void setDeleteflag(Long deleteflag) {
+        this.deleteflag = deleteflag;
+    }
+
+    public List<FoodMedia> getFoodMedias() {
+        return foodMedias;
+    }
+
+    public void setFoodMedias(List<FoodMedia> foodMedias) {
+        this.foodMedias = foodMedias;
+    }
+
+    public List<OrderDetails> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetails> orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
+    public Food getFood() {
+        return food;
+    }
+
+    public void setFood(Food food) {
+        this.food = food;
+    }
+
+    public List<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
+    }
 }

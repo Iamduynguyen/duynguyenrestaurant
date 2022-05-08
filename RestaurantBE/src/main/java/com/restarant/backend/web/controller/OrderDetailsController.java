@@ -50,6 +50,7 @@ public class OrderDetailsController {
         List<OrderDetailsDto> result = new ArrayList<>();
         for (OrderDetailsDto orderDetailsDto : dto) {
             try {
+                System.out.println(orderDetailsDto.toString());
                 result.add(orderDetailsService.create(orderDetailsDto));
             } catch (InvalidDataExeception e) {
                 log.error("Error when create order-detail", e);

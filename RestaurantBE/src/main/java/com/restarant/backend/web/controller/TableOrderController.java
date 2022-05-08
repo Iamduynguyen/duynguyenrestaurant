@@ -59,7 +59,6 @@ public class TableOrderController {
             }
         }
         return ResponseEntity.ok().body(result);
-
     }
 
     @GetMapping("table-orders/customer")

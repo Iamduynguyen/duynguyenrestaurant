@@ -122,6 +122,7 @@ public class OrderTotalController {
     public String editOrderDetails(@RequestBody EditOrderDetailsRequest request) {
         return orderTotalService.editOrderDetails(request);
     }
+
     @PutMapping("/confirm-order-online/{id}")
     public String confirmOrderOnline(@PathVariable Long id,HttpServletRequest request){
         return orderTotalService.confirmOrderOnline(id,request);

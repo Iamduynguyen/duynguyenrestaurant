@@ -3,6 +3,7 @@ package com.restarant.backend.repository;
 import com.restarant.backend.entity.TableOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -24,10 +25,12 @@ public interface TableOrderRepository extends JpaRepository<TableOrder, Long> {
     @Query("SELECT e FROM TableOrder e WHERE e.tables.id = :tableId")
     Collection<TableOrder> getAllByTable(Long tableId);
 
-    @Query("SELECT e FROM TableOrder e " +
-            "WHERE e.tables.id = :tableId " +
-            "AND e.orderTotal.orderTime >= :startTime " +
-            "AND e.orderTotal.orderTime <= :endTime " +
-            "AND e.orderTotal.status <> 3")
+    @Query("SELECT e FROM TableOrder e ")
     TableOrder getByOrderTimeAndTableId(long tableId, long startTime, long endTime);
+
+    @Query("select t from TableOrder t where t.orderTotal.orderTime > :start and t.orderTotal.orderTime < :end")
+    List<TableOrder> getBystart(@Param("start") Long start, @Param("end") Long end);
+
+    @Query("select t from TableOrder t where t.orderTotal.endTime > :start and t.orderTotal.orderTime < :end")
+    List<TableOrder> getByEnd(@Param("start") Long start, @Param("end") Long end);
 }

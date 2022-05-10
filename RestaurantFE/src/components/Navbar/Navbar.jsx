@@ -39,7 +39,7 @@ const Navbar = () => {
       <div className="app__navbar-logo">
         <img src={images.gericht} alt="app__logo" />
       </div>
-      <ul className="app__navbar-links">
+      <ul className="app__navbar-links mb-0">
         <li className="p__opensans">
           <Link to="/" className="p__opensans">
             Trang chủ
@@ -71,13 +71,10 @@ const Navbar = () => {
         )}
       </div>
       <div className="app__navbar-login">
-        {/* <Link to="/login">
-          <p className="p__opensans">Log In / Registration</p>
-        </Link> */}
         {userLogin ? (
-          <p className="userLogin relative item-hover ">
+          <span className="userLogin relative item-hover mb-0">
             <p
-              className="p__opensans cursor-pointer  "
+              className="p__opensans cursor-pointer mb-0"
               style={{ padding: "0 20px" }}
             >
               Xin chào {getKey("name")}!
@@ -105,18 +102,18 @@ const Navbar = () => {
                 <></>
               )}
               <li className="cursor-pointer pb-[10px] px-[15px]">
-                <bottom onClick={logout} className="flex items-center">
+                <span onClick={logout} className="flex items-center">
                   <LogoutIcon
                     style={{ fontSize: "16px", marginRight: "5px" }}
                   />
                   Đăng xuất
-                </bottom>
+                </span>
               </li>
             </ul>
-          </p>
+          </span>
         ) : (
           <Link to="/login" className="">
-            <p className="p__opensans">Đăng nhập</p>
+            <p className="p__opensans mb-0">Đăng nhập</p>
           </Link>
         )}
         <div />

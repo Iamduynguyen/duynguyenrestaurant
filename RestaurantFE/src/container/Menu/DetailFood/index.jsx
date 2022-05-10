@@ -193,7 +193,7 @@ export default function DetailFood() {
                   </Box>
                 )}
               </div>
-              <p className="text-[16px] text-[#999] mt-[20px] italic">
+              <p className="text-[16px] text-[#999] mt-[20px] italic" style={{maxWidth: '530px'}}>
                 {FoodsData?.title}
               </p>
               <div className="mt-[30px]">

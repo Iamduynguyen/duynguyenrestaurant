@@ -12,6 +12,7 @@ import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 import BookTableAPI from '../../API/BookTableAPI';
 
+
 export default function Cart() {
   const [dataUser, setDataUser] = useState([]);
   const [foodOrder, setFoodOrder] = useState([]);
@@ -52,12 +53,12 @@ export default function Cart() {
         Giỏ hàng
       </p>
       <Grid container>
-        <Grid item xs={8}>
+        <Grid style={{paddingRight: '20px'}} item xs={8}>
           <Paper elevation={6}>
             {dataUser.map((item, index) => (
               <Box key={index}>
                 <Stack p={2} spacing={2}>
-                  <p className='p__cormorant'>Table {item.tableId}</p>
+                  <p style={{color: '#d9d9d9'}} className='p__cormorant'>Bàn {item.tableId}</p>
                   <Divider />
                   {item.orderDetails?.map((item, index) => (
                     <Box
@@ -73,8 +74,9 @@ export default function Cart() {
                       >
                         <img
                           style={{
-                            width: 100,
-                            height: 70,
+                            minWidth: '80px',
+                            maxWidth: '80px',
+                            height: 'auto',
                             borderRadius: 5,
                             marginRight: 20,
                           }}
@@ -83,15 +85,15 @@ export default function Cart() {
                         />
                         <p
                           style={{ textAlign: 'center' }}
-                          className='p__cormorant'
+                          className='cart-text'
                         >
                           {item.foodDetalls.foodName}
                         </p>
                       </Box>
                       <Divider orientation='vertical' flexItem />
-                      <p className='p__cormorant'>Số lượng: {item.quantity}</p>
+                      <p className='cart-text'>Số lượng: {item.quantity}</p>
                       <Divider orientation='vertical' flexItem />
-                      <p className='p__cormorant'>
+                      <p className='cart-text'>
                         {item.foodDetalls.discount == 0
                           ? item.foodDetalls.amount + ' VND'
                           : discount(
@@ -100,12 +102,11 @@ export default function Cart() {
                             ) + ' VND'}
                       </p>
                       <Divider orientation='vertical' flexItem />
-                      <p className='p__cormorant' style={{color: "green", fontSize: "medium"}}>
+                      <p className='cart-text' style={{color: "green", fontSize: "medium"}}>
                         {item.status}
                       </p>
                       <Divider orientation='vertical' flexItem />
                       <Button
-                        sx={{ transform: 'translateX(-20px)' }}
                         color='error'
                         size='small'
                         variant='contained'
@@ -122,14 +123,14 @@ export default function Cart() {
         <Grid item xs={4}>
           <Paper elevation={24}>
             <Stack spacing={2} p={2}>
-              <p style={{ textAlign: 'center' }} className='p__cormorant'>
+              <p style={{ textAlign: 'center' }} className='cart-text'>
                 Tổng thanh toán:
               </p>
               <Divider />
               <Stack spacing={2}>
                 {foodOrder?.map((item, index) => (
                   <Box key={index}>
-                    <p className='p__cormorant'>{`${index}, ${
+                    <p className='cart-text'>{`${index}, ${
                       item.foodDetalls.foodName
                     } | ${
                       item.foodDetalls.discount == 0
@@ -153,15 +154,15 @@ export default function Cart() {
                     onClick={openAlert}
                     variant='contained'
                     color='info'
-                    size='small'
+                    size='big'
                   >
-                    <p style={{ fontSize: 20 }} className='p__cormorant'>
+                   
                       Xác nhận đơn hàng
-                    </p>
+                    
                   </Button>
                 </Box>
                 <Divider />
-                <p style={{ textAlign: 'center' }} className='p__cormorant'>
+                <p style={{ textAlign: 'center', color: '#1059f5' }} className='p__cormorant'>
                   Tổng thanh toán:{' '}
                   <span style={{ color: '#dcca87' }}>{sumPrice} VND</span>
                 </p>
@@ -174,7 +175,7 @@ export default function Cart() {
                   }}
                 >
                   <Button disabled variant='contained' color='success'>
-                    <p className='p__cormorant'>Thanh toán</p>
+                    Thanh toán
                   </Button>
                 </Box>
               </Stack>

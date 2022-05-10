@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import fakeData from './fakeChartData'
+// import fakeData from './fakeChartData'
 
 ChartJS.register(
   CategoryScale,

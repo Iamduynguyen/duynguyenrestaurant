@@ -15,8 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 @RestController
 @RequestMapping("/api")
@@ -88,13 +92,18 @@ public class TablesController {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of tables in body.
      */
     @GetMapping("/tables")
-    public List<TableDto> getAllTables(Pageable pageable,
-                                       @RequestParam(value = "order_time", required = false) Long timestamp) {
+    public List<TableDto> getAllTables(@RequestParam(value = "start") Long start,@RequestParam(value = "end", required = false) Long end) {
         log.debug("REST request to get all Tables");
-        if(timestamp == null){
-            return tableService.getAllTableAvailable(pageable, System.currentTimeMillis());
+        if(end == null){
+            LocalDateTime end1 = LocalDateTime.ofInstant(Instant.ofEpochSecond(start),
+                    TimeZone.getDefault().toZoneId());
+            ZoneId zoneId = ZoneId.systemDefault();
+            LocalDateTime  end2 = end1.minusHours(3l);
+            System.out.println(end2.toString());
+            end = LocalDateTime.now().atZone(zoneId).toEpochSecond();
         }
-        return tableService.getAllTableAvailable(pageable, timestamp);
+        tableService.getbytime(start,end);
+        return tableService.getbytime(start,end);
     }
 
     /**

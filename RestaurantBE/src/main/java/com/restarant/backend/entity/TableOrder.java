@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * A TableOrder.
  */
-@Data
+
 @Entity
 @Table(name = "table_order")
 @SQLDelete(sql = "UPDATE table_order SET deleteflag = 1 WHERE id = ?")
@@ -66,5 +66,45 @@ public class TableOrder implements Serializable {
             }
         }
         return total;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getDeleteflag() {
+        return deleteflag;
+    }
+
+    public void setDeleteflag(Long deleteflag) {
+        this.deleteflag = deleteflag;
+    }
+
+    public Set<OrderDetails> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(Set<OrderDetails> orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
+    public Tables getTables() {
+        return tables;
+    }
+
+    public void setTables(Tables tables) {
+        this.tables = tables;
+    }
+
+    public OrderTotal getOrderTotal() {
+        return orderTotal;
+    }
+
+    public void setOrderTotal(OrderTotal orderTotal) {
+        this.orderTotal = orderTotal;
     }
 }

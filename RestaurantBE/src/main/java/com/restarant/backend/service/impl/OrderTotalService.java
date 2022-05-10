@@ -12,12 +12,15 @@ import com.restarant.backend.service.utils.MailUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +44,7 @@ public class OrderTotalService implements IOrderTotalService {
     private final CustomerRepository customerRepository;
     private final TableOrderRepository tableOrderRepository;
     private final TablesRepository tablesRepository;
+    private final ModelMapper MODEL_MAPPER = new ModelMapper();
 
     public OrderTotalService(OrderTotalRepository orderTotalRepository,
                              IConverterDto<OrderTotal, OrderTotalDto> mapper,
@@ -83,6 +87,52 @@ public class OrderTotalService implements IOrderTotalService {
         log.info(String.format("Someone detele orderTotal[id-%d]", id));
         orderTotalRepository.deleteById(id);
         return true;
+    }
+
+    @Override
+    public List<GetAllToTalOrder> getAllOrderTotal(){
+        Type type =  new TypeToken<List<GetAllToTalOrder>>(){}.getType();
+        List<OrderTotal> orderTotalList = orderTotalRepository.findAll();
+        List<GetAllToTalOrder> getAllToTalOrders =MODEL_MAPPER.map(orderTotalList,type);
+        for (GetAllToTalOrder x : getAllToTalOrders){
+            if(Objects.nonNull(x.getVoucher())){
+                Voucher  voucher = voucherRepository.getById(x.getVoucher());
+                double voucherDiscount = voucher.getPercent()/100.0;
+                BigDecimal sumMoney =  x.getAmountTotal().multiply(BigDecimal.valueOf(voucherDiscount));
+//                BigDecimal check = sumMoney.subtract(voucher.getMaxMoney());
+                if(sumMoney.compareTo(voucher.getMaxMoney())>0){
+                    x.setDiscount(voucher.getMaxMoney());
+                }else {
+                    x.setDiscount(sumMoney);
+                }
+            }
+            List<TableOrder> tableOrder =  tableOrderRepository.getAllByTotalId(x.getId());
+            List<GetTableOrDer> getTableOrDers = new ArrayList<>();
+            for (TableOrder tableOrder1: tableOrder){
+                GetTableOrDer getTableOrDer = new GetTableOrDer();
+                getTableOrDer.setOrderTableId(tableOrder1.getId());
+                getTableOrDer.setOrderId(tableOrder1.getOrderTotal().getId());
+                getTableOrDer.setOrderId(tableOrder1.getTables().getId());
+                List<OrderDetails>  orderDetails =  orderDetailsRepository.getByOrderTableId(tableOrder1.getId());
+                for (OrderDetails y : orderDetails){
+                    List<GetAllFoodOrder> foodOrders = new ArrayList<>();
+                    GetAllFoodOrder getAllFoodOrder = new GetAllFoodOrder();
+                    getAllFoodOrder.setFoodDetailsId(y.getFoodDetalls().getId());
+                    getAllFoodOrder.setFoodName(y.getFoodDetalls().getFood().getName());
+                    getAllFoodOrder.setOrderTableId(y.getTableOrder().getId());
+                    getAllFoodOrder.setAmount(y.getAmount());
+                    getAllFoodOrder.setQuantity(y.getQuantity());
+//                    getAllFoodOrder.setNote(y.get);
+
+                    getAllFoodOrder.setId(y.getId());
+                    foodOrders.add(getAllFoodOrder);
+                    getTableOrDer.setFoodOrders(foodOrders);
+                }
+                getTableOrDers.add(getTableOrDer);
+            }
+            x.setOrDers(getTableOrDers);
+        }
+        return getAllToTalOrders;
     }
 //    public OrderTotal getAll(){
 //        return null;

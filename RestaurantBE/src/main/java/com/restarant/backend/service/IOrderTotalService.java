@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface IOrderTotalService extends IServiceAdapter<OrderTotalDto> {
+    List<GetAllToTalOrder> getAllOrderTotal();
+
     String registrationOrderCounter (OrderCouterDto orderCouterDto, HttpServletRequest request);
 
     String addFoodTable(TableCounterDto counterDto);

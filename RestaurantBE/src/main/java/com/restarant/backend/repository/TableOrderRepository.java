@@ -17,6 +17,10 @@ import java.util.List;
 public interface TableOrderRepository extends JpaRepository<TableOrder, Long> {
     @Query("SELECT e FROM TableOrder e WHERE e.tables.id = :tableId")
     List<TableOrder> getAllByTableId(Long tableId);
+    @Query("SELECT e FROM TableOrder e WHERE e.orderTotal.id = :tableId")
+    List<TableOrder> getAllByTotalId(Long tableId);
+
+    TableOrder findByOrderTotalId(Long orderId);
 
     @Query("SELECT e FROM TableOrder e WHERE e.tables.id = :tableId")
     Collection<TableOrder> getAllByTable(Long tableId);

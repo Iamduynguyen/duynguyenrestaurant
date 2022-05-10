@@ -90,10 +90,9 @@ public class OrderTotalController {
 //        return orderTotalRepository.findAll();
 //    }
     @GetMapping("/orders")
-    public List<OrderTotal> getAllOrders() {
-        return orderTotalRepository.findAll();
+    public List<GetAllToTalOrder> getAllToTalOrders(){
+        return orderTotalService.getAllOrderTotal();
     }
-
     @PutMapping("/confirm-customer-order-online/{id}")
     public String confirmCustomerOrderOnline(@PathVariable Long id){
         return orderTotalService.confirmCustomerOrderOnline(id);

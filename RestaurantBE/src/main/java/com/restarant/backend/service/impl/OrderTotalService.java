@@ -99,7 +99,12 @@ public class OrderTotalService implements IOrderTotalService {
                 Voucher  voucher = voucherRepository.getById(x.getVoucher());
                 double voucherDiscount = voucher.getPercent()/100.0;
                 BigDecimal sumMoney =  x.getAmountTotal().multiply(BigDecimal.valueOf(voucherDiscount));
-                x.setDiscount(sumMoney);
+//                BigDecimal check = sumMoney.subtract(voucher.getMaxMoney());
+                if(sumMoney.compareTo(voucher.getMaxMoney())>0){
+                    x.setDiscount(voucher.getMaxMoney());
+                }else {
+                    x.setDiscount(sumMoney);
+                }
             }
             List<TableOrder> tableOrder =  tableOrderRepository.getAllByTotalId(x.getId());
             List<GetTableOrDer> getTableOrDers = new ArrayList<>();

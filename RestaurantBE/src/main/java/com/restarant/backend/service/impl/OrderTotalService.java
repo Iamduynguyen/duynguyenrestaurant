@@ -96,12 +96,12 @@ public class OrderTotalService implements IOrderTotalService {
         List<GetAllToTalOrder> getAllToTalOrders =MODEL_MAPPER.map(orderTotalList,type);
         for (GetAllToTalOrder x : getAllToTalOrders){
             List<TableOrder> tableOrder =  tableOrderRepository.getAllByTotalId(x.getId());
-            List<GetTableOrDer> getTableOrDers = new ArrayList<>();
+            List<GetTableOrDer> getTableOrders = new ArrayList<>();
             for (TableOrder tableOrder1: tableOrder){
                 GetTableOrDer getTableOrDer = new GetTableOrDer();
                 getTableOrDer.setOrderTableId(tableOrder1.getId());
                 getTableOrDer.setOrderId(tableOrder1.getOrderTotal().getId());
-                getTableOrDer.setOrderId(tableOrder1.getTables().getId());
+                getTableOrDer.setTablesId(tableOrder1.getTables().getId());
                 List<OrderDetails>  orderDetails =  orderDetailsRepository.getByOrderTableId(tableOrder1.getId());
                 for (OrderDetails y : orderDetails){
                     List<GetAllFoodOrder> foodOrders = new ArrayList<>();
@@ -117,15 +117,13 @@ public class OrderTotalService implements IOrderTotalService {
                     foodOrders.add(getAllFoodOrder);
                     getTableOrDer.setFoodOrders(foodOrders);
                 }
-                getTableOrDers.add(getTableOrDer);
+                getTableOrders.add(getTableOrDer);
             }
-            x.setOrDers(getTableOrDers);
+            x.setOrders(getTableOrders);
         }
         return getAllToTalOrders;
     }
-//    public OrderTotal getAll(){
-//        return null;
-//    }
+
     @Override
     public String registrationOrderCounter(OrderCouterDto orderCouterDto, HttpServletRequest request) {
         try {

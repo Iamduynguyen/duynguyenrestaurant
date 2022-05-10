@@ -30,5 +30,5 @@ public class GetAllToTalOrder {
     private String note;
     private Long createdAt;
     private CustomerOrderDto customer;
-    List<GetTableOrDer> orDers;
+    List<GetTableOrDer> orders;
 }

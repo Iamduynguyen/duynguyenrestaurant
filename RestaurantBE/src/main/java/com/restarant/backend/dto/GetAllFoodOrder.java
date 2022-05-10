@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class GetAllFoodOrder {
     private Long id;
-    private Long OrderTableId;
+    private Long orderTableId;
     private Long foodDetailsId;
     private String foodName;
     private Long quantity;

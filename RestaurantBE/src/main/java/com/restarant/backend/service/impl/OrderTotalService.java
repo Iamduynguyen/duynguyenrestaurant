@@ -95,6 +95,12 @@ public class OrderTotalService implements IOrderTotalService {
         List<OrderTotal> orderTotalList = orderTotalRepository.findAll();
         List<GetAllToTalOrder> getAllToTalOrders =MODEL_MAPPER.map(orderTotalList,type);
         for (GetAllToTalOrder x : getAllToTalOrders){
+            if(Objects.nonNull(x.getVoucher())){
+                Voucher  voucher = voucherRepository.getById(x.getVoucher());
+                double voucherDiscount = voucher.getPercent()/100;
+                BigDecimal sumMoney =  x.getAmountTotal().multiply(BigDecimal.valueOf(voucherDiscount));
+                x.setDiscount(sumMoney);
+            }
             List<TableOrder> tableOrder =  tableOrderRepository.getAllByTotalId(x.getId());
             List<GetTableOrDer> getTableOrDers = new ArrayList<>();
             for (TableOrder tableOrder1: tableOrder){

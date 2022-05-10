@@ -11,13 +11,17 @@ import {
 import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 import BookTableAPI from '../../API/BookTableAPI';
-
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 export default function Cart() {
   const [dataUser, setDataUser] = useState([]);
   const [foodOrder, setFoodOrder] = useState([]);
   const [sumPrice, setSumPrice] = useState('');
   const [alert, setAlert] = useState(false);
+  const [socketUrl, setSocketUrl] = useState('localhost:8787');
+  const [messageHistory, setMessageHistory] = useState([]);
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+
   const discount = (price, discount) => {
     return (parseInt(price, 10) * (100 - parseInt(discount, 10))) / 100;
   };
@@ -27,26 +31,42 @@ export default function Cart() {
       setAlert(false);
     }, 3000);
   };
+  const fetchData = async () => {
+    let countPrice = [];
+    let sum = 0;
+    const res = await BookTableAPI.getUserBookTable();
+    setDataUser(res);
+    res.forEach((item) => {
+      if (item.orderDetails[0]) {
+        item.orderDetails.forEach((order) => {
+          countPrice.push(order);
+          sum += order.foodDetalls.amount;
+        });
+      }
+    });
+    setFoodOrder(countPrice);
+    setSumPrice(sum);
+    console.log(res);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      let countPrice = [];
-      let sum = 0;
-      const res = await BookTableAPI.getUserBookTable();
-      setDataUser(res);
-      res.forEach((item) => {
-        if (item.orderDetails[0]) {
-          item.orderDetails.forEach((order) => {
-            countPrice.push(order);
-            sum += order.foodDetalls.amount;
-          });
-        }
-      });
-      setFoodOrder(countPrice);
-      setSumPrice(sum);
-      console.log(res);
-    };
     fetchData();
-  }, []);
+    sendMessage('Hello');
+  },  []);
+  // var stompClient = require('./websocket-listener')
+
+  // const handleClickChangeSocketUrl = useCallback(
+  //   () => setSocketUrl('localhost:8787'),
+  //   []
+  // );
+
+  // const connectionStatus = {
+  //   [ReadyState.CONNECTING]: 'Connecting',
+  //   [ReadyState.OPEN]: 'Open',
+  //   [ReadyState.CLOSING]: 'Closing',
+  //   [ReadyState.CLOSED]: 'Closed',
+  //   [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  // }[readyState];
+
   return (
     <Container>
       <p style={{ margin: '20px 0' }} className='headtext__cormorant'>

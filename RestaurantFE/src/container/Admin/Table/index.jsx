@@ -84,9 +84,9 @@ export default function TableAdmin() {
         <form>
           <div>
             <input type="date" id="appt" name="appt"
-              min="09:00" max="18:00" required />
+              min="09:00" max="22:30" required />
             <input type="time" id="appt" name="appt"
-              min="09:00" max="18:00" required />
+              min="09:00" max="22:30" required />
             <button type="submit" onSubmit={(EventTarget) = getTime}>ok</button>
           </div>
         </form>

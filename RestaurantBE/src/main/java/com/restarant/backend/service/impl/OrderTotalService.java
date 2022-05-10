@@ -375,4 +375,128 @@ public class OrderTotalService implements IOrderTotalService {
         return total;
     }
 
+
+    public Boolean customerConfirm1(Long id){
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,0);
+        if (orderTotal==null){
+            return false;
+        }else if (lst==null){
+            return false;
+        }
+        for (OrderDetails x:lst){
+            x.setStatus(1);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(1);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean customerConfirm3(Long id){
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,2);
+        if (orderTotal==null){
+            return false;
+        }else if (lst==null){
+            return false;
+        }
+        for (OrderDetails x:lst){
+            x.setStatus(3);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(3);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean customerConfirm6(Long id){
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,5);
+        if (orderTotal==null){
+            return false;
+        }else if (lst==null){
+            return false;
+        }
+        for (OrderDetails x:lst){
+            x.setStatus(6);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(6);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean staffConfirm2(Long id,HttpServletRequest req){
+        Account account = jwtServiceUtils.getAccountByToken(req);
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,1);
+        if (orderTotal==null||account==null){
+            return false;
+        }else if (lst==null){
+            return false;
+        }
+        for (OrderDetails x:lst){
+            x.setStatus(2);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(2);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean staffConfirm4(Long id,HttpServletRequest req){
+        Account account = jwtServiceUtils.getAccountByToken(req);
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,3);
+        if (orderTotal==null||account==null){
+            return false;
+        }else if (lst==null){
+            return false;
+        }
+        for (OrderDetails x:lst){
+            x.setStatus(4);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(4);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean staffConfirm5(Long id,HttpServletRequest req){
+        Account account = jwtServiceUtils.getAccountByToken(req);
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,4);
+        if (orderTotal==null||account==null){
+            return false;
+        }else if (lst==null){
+            return false;
+        }
+        for (OrderDetails x:lst){
+            x.setStatus(5);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(5);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean staffConfirm7(Long id,HttpServletRequest req){
+        Account account = jwtServiceUtils.getAccountByToken(req);
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,6);
+        if (orderTotal==null||account==null){
+            return false;
+        }else if (lst==null){
+            return false;
+        }
+        for (OrderDetails x:lst){
+            x.setStatus(7);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(7);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
 }

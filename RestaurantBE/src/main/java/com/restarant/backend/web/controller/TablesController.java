@@ -1,13 +1,16 @@
 package com.restarant.backend.web.controller;
 
 import com.restarant.backend.dto.TableDto;
+import com.restarant.backend.dto.TimeDto;
 import com.restarant.backend.entity.Tables;
 import com.restarant.backend.model.Pages;
 import com.restarant.backend.repository.TablesRepository;
 import com.restarant.backend.service.ITableService;
+import com.restarant.backend.service.utils.ConvertTime;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,8 @@ public class TablesController {
     private final Logger log = LoggerFactory.getLogger(TablesController.class);
 
     private static final String ENTITY_NAME = "tables";
+    @Autowired
+    ConvertTime convertTime;
 
 
     private final ITableService tableService;
@@ -92,18 +97,16 @@ public class TablesController {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of tables in body.
      */
     @GetMapping("/tables")
-    public List<TableDto> getAllTables(@RequestParam(value = "start") Long start,@RequestParam(value = "end", required = false) Long end) {
+    public List<TableDto> getAllTables(@RequestParam Long start,@RequestParam Long end) {
         log.debug("REST request to get all Tables");
-        if(end == null){
-            LocalDateTime end1 = LocalDateTime.ofInstant(Instant.ofEpochSecond(start),
-                    TimeZone.getDefault().toZoneId());
-            ZoneId zoneId = ZoneId.systemDefault();
-            LocalDateTime  end2 = end1.minusHours(3l);
-            System.out.println(end2.toString());
-            end = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        Long start1;
+        start1 = convertTime.validate(start);
+        if (end==start){
+            end = convertTime.addHour(start,3l);
+        }else {
+            end = convertTime.validate(end);
         }
-        tableService.getbytime(start,end);
-        return tableService.getbytime(start,end);
+        return tableService.getbytime(start1,end);
     }
 
     /**

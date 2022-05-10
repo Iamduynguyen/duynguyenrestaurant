@@ -4,6 +4,7 @@ import com.restarant.backend.dto.*;
 import com.restarant.backend.entity.OrderTotal;
 import com.restarant.backend.repository.OrderTotalRepository;
 import com.restarant.backend.service.IOrderTotalService;
+import com.restarant.backend.service.impl.OrderTotalService;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,9 @@ public class OrderTotalController {
     private static final String ENTITY_NAME = "orderTotal";
 
     private final IOrderTotalService orderTotalService;
+
+    @Autowired
+    OrderTotalService orderTotalService1;
 
     public OrderTotalController(IOrderTotalService orderTotalService) {
         this.orderTotalService = orderTotalService;
@@ -169,5 +173,41 @@ public class OrderTotalController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    @GetMapping("/order-total/customer-confirm1/{id}")
+    public ResponseEntity<?> customerRequest1(@PathVariable Long id){
+        Boolean rs = orderTotalService1.customerConfirm1(id);
+        return ResponseEntity.ok(rs);
+    }
+
+    @GetMapping("/order-total/customer-confirm3/{id}")
+    public ResponseEntity<?> customerRequest2(@PathVariable Long id){
+        Boolean rs = orderTotalService1.customerConfirm3(id);
+        return ResponseEntity.ok(rs);
+    }
+
+    @GetMapping("/order-total/customer-confirm6/{id}")
+    public ResponseEntity<?> customerRequest6(@PathVariable Long id){
+        Boolean rs = orderTotalService1.customerConfirm6(id);
+        return ResponseEntity.ok(rs);
+    }
+
+    @GetMapping("/order-total/staff-confirm2/{id}")
+    public ResponseEntity<?> staffConfirm2(@PathVariable Long id,HttpServletRequest request){
+        Boolean rs = orderTotalService1.staffConfirm2(id,request);
+        return ResponseEntity.ok(rs);
+    }
+
+    @GetMapping("/order-total/staff-confirm4/{id}")
+    public ResponseEntity<?> staffConfirm4(@PathVariable Long id,HttpServletRequest request){
+        Boolean rs = orderTotalService1.staffConfirm4(id,request);
+        return ResponseEntity.ok(rs);
+    }
+
+    @GetMapping("/order-total/staff-confirm5/{id}")
+    public ResponseEntity<?> staffConfirm5(@PathVariable Long id,HttpServletRequest request){
+        Boolean rs = orderTotalService1.staffConfirm5(id,request);
+        return ResponseEntity.ok(rs);
     }
 }

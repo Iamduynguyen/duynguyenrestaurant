@@ -22,6 +22,7 @@ import java.util.List;
 public class GetAllToTalOrder {
     private Long id;
     private Long voucher;
+    private BigDecimal discount;
     private BigDecimal amountTotal;
     private Integer status;
     private Long orderTime;

@@ -97,7 +97,7 @@ public class OrderTotalService implements IOrderTotalService {
         for (GetAllToTalOrder x : getAllToTalOrders){
             if(Objects.nonNull(x.getVoucher())){
                 Voucher  voucher = voucherRepository.getById(x.getVoucher());
-                double voucherDiscount = voucher.getPercent()/100;
+                double voucherDiscount = voucher.getPercent()/100.0;
                 BigDecimal sumMoney =  x.getAmountTotal().multiply(BigDecimal.valueOf(voucherDiscount));
                 x.setDiscount(sumMoney);
             }

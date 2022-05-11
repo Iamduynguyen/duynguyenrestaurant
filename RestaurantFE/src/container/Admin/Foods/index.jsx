@@ -14,14 +14,13 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import FoodsAPI from "./../../../API/FoodsAPI";
 import styles from "../Categories/Categories.module.css";
-import { Row, Table, Button as AntdButton, Modal, message } from 'antd';
+import { Row, Table, Button as AntdButton, Modal, message } from "antd";
 
 export default function FoodsAdmin() {
-
   const [tableData, setTableData] = useState([]);
   const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteStatus, setDeleteStatus] = useState('');
+  const [deleteStatus, setDeleteStatus] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deletedId, setDeletedId] = useState(null);
 
@@ -45,40 +44,40 @@ export default function FoodsAdmin() {
   const handleDeleteFood = async () => {
     if (deletedId) {
       setDeleteLoading(true);
-      setDeleteStatus('Đang xóa...!');
+      setDeleteStatus("Đang xóa...!");
       const res = await FoodsAPI.deleteFood(deletedId);
-      console.log(res)
-      if (res === 'Delete success!') {
+      console.log(res);
+      if (res === "Delete success!") {
         setDeleteLoading(false);
-        setDeleteStatus('');
-        setIsDeleting(false)
-        message.success('Xóa thành công!');
+        setDeleteStatus("");
+        setIsDeleting(false);
+        message.success("Xóa thành công!");
         setResetData(!resetData);
       }
     }
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await FoodsAPI.getAllFoods();
       setFoodsData(res);
-      setTableData(res.map((item, index) => {
-        return {
-          ...item,
-          stt: index + 1,
-          key: item.id,
-          categoryName: item.category ? item.category.name : 'Không có'
-        }
-      }))
-      console.log(res)
-
+      setTableData(
+        res.map((item, index) => {
+          return {
+            ...item,
+            stt: index + 1,
+            key: item.id,
+            categoryName: item.category ? item.category.name : "Không có",
+          };
+        })
+      );
+      console.log(res);
     };
     fetchData();
   }, [resetData]);
   return (
     <>
-      {
-        false &&
+      {false && (
         <Grid container mt={1}>
           <p className=" pt-[20px] pl-[30px] font-medium text-[26px] text-gray-700">
             Danh sách
@@ -101,16 +100,20 @@ export default function FoodsAdmin() {
               <p className="text-xs font-bold tracking-wide text-left text-gray-500">
                 Lượt mua
               </p>
-              <p className="text-xs font-bold tracking-wide text-left text-gray-500">
-              </p>
+              <p className="text-xs font-bold tracking-wide text-left text-gray-500"></p>
             </div>
           </div>
           <div className="w-full ">
             {FoodsData?.map((item, index) => (
-              <div className="w-full px-[30px]  grid grid-cols-[0.5fr,2fr,2fr,2fr,3fr] py-[15px] border-b border-gray-300" key={index}>
+              <div
+                className="w-full px-[30px]  grid grid-cols-[0.5fr,2fr,2fr,2fr,3fr] py-[15px] border-b border-gray-300"
+                key={index}
+              >
                 <div className="">{index + 1}</div>
                 <div className="">{item.name}</div>
-                <div className=""><img style={{ height: 100 }} src={item.avtUrl} alt="" /></div>
+                <div className="">
+                  <img style={{ height: 100 }} src={item.avtUrl} alt="" />
+                </div>
                 <div className=""></div>
                 <div className="flex justify-end">
                   <Stack direction="row" spacing={1} position="absolute">
@@ -163,14 +166,14 @@ export default function FoodsAdmin() {
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setOpenDLDelete(false)}>Disagree</Button>
+              <Button onClick={() => setOpenDLDelete(false)}>Huỷ bỏ</Button>
               <Button onClick={confirmDeleteCategory} autoFocus>
-                Agree
+                Đồng ý
               </Button>
             </DialogActions>
           </Dialog>
         </Grid>
-      }
+      )}
 
       {/* antd */}
       <Row>
@@ -183,62 +186,98 @@ export default function FoodsAdmin() {
           pagination={true}
           dataSource={tableData}
           expandable={{
-            expandedRowRender: record => {
+            expandedRowRender: (record) => {
               return (
                 <div className="food--details">
-                  {
-                    record.foodDetails.map((item, index) => {
-                      return (
-                        <div key={index} className='food--details__item'>
-                          <div className="food--details__item--content">
-                            <div className="food--details__item--size">
-                              Size: {item.foodSize}
-                            </div>
-                            <div className="food--details__item--price">
-                              Giá: {item.amount}
-                            </div>
-                            <div className="food--details__item--discount">
-                              Giảm giá: {item.discount} %
-                            </div>
+                  {record.foodDetails.map((item, index) => {
+                    return (
+                      <div key={index} className="food--details__item">
+                        <div className="food--details__item--content">
+                          <div className="food--details__item--size">
+                            Size: {item.foodSize}
                           </div>
-                          <div className="food--details__item--imgs">
-                            {item.foodMedias.length >0 ? item.foodMedias.map((item, index) => <img src={item.foodUrl} alt={item.foodSize} key={index} />) : <div>No image</div>}
+                          <div className="food--details__item--price">
+                            Giá: {item.amount}
+                          </div>
+                          <div className="food--details__item--discount">
+                            Giảm giá: {item.discount} %
                           </div>
                         </div>
-                      )
-                    })
-                  }
+                        <div className="food--details__item--imgs">
+                          {item.foodMedias.length > 0 ? (
+                            item.foodMedias.map((item, index) => (
+                              <img
+                                src={item.foodUrl}
+                                alt={item.foodSize}
+                                key={index}
+                              />
+                            ))
+                          ) : (
+                            <div>No image</div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              )
+              );
             },
-            rowExpandable: record => record.foodDetails.length > 0
+            rowExpandable: (record) => record.foodDetails.length > 0,
           }}
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
         >
           <Table.Column title="STT" dataIndex="stt" key="stt" />
           <Table.Column title="Tên món ăn" dataIndex="name" key="name" />
           <Table.Column title="Tiêu đề" dataIndex="title" key="title" />
-          <Table.Column title="Thể loại" dataIndex="categoryName" key="categoryName" />
-          <Table.Column title="Thể loại" key="action" render={record => (
-            <div className="action__column--btn">
-              <AntdButton className="action__column--btn__delete"  type='danger' onClick={() => { setIsDeleting(true); setDeletedId(record.id) }}>Xóa</AntdButton>
-              <AntdButton className="action__column--btn__edit" onClick={() => { navigate(`/admin/foods/fix-food/${record.id}`) }}>Sửa</AntdButton>
-            </div>
-          )} />
+          <Table.Column
+            title="Thể loại"
+            dataIndex="categoryName"
+            key="categoryName"
+          />
+          <Table.Column
+            title=""
+            key="action"
+            render={(record) => (
+              <div className="action__column--btn">
+                <AntdButton
+                  className="action__column--btn__delete"
+                  type="danger"
+                  onClick={() => {
+                    setIsDeleting(true);
+                    setDeletedId(record.id);
+                    setDeleteStatus(record);
+                  }}
+                >
+                  Xóa
+                </AntdButton>
+                <AntdButton
+                  className="action__column--btn__edit"
+                  onClick={() => {
+                    navigate(`/admin/foods/fix-food/${record.id}`);
+                  }}
+                >
+                  Sửa
+                </AntdButton>
+              </div>
+            )}
+          />
         </Table>
       </Row>
       <Modal
         title="Bạn muốn xóa món ăn ?"
         visible={isDeleting}
-        onCancel={() => { setIsDeleting(false), setDeletedId(null) }}
+        onCancel={() => {
+          setIsDeleting(false), setDeletedId(null);
+        }}
+        cancelText="Huỷ bỏ"
         onOk={handleDeleteFood}
+        okText="Đồng ý"
         confirmLoading={deleteLoading}
       >
-        {deleteStatus}
+        <p>{deleteStatus.name}</p>
+        <i>{deleteStatus.title}</i>
       </Modal>
       {/* end antd */}
     </>
-
-
   );
 }

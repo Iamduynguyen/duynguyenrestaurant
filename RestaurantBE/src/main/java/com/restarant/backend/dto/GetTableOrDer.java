@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GetTableOrDer {
     private Long orderTableId;
-    private Long OrderId;
+    private Long orderId;
     private Long tablesId;
     private List<GetAllFoodOrder> foodOrders;
 

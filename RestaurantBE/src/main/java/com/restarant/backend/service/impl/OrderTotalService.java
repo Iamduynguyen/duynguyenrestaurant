@@ -90,31 +90,32 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
-    public List<GetAllToTalOrder> getAllOrderTotal(){
-        Type type =  new TypeToken<List<GetAllToTalOrder>>(){}.getType();
+    public List<GetAllToTalOrder> getAllOrderTotal() {
+        Type type = new TypeToken<List<GetAllToTalOrder>>() {
+        }.getType();
         List<OrderTotal> orderTotalList = orderTotalRepository.findAll();
-        List<GetAllToTalOrder> getAllToTalOrders =MODEL_MAPPER.map(orderTotalList,type);
-        for (GetAllToTalOrder x : getAllToTalOrders){
-            if(Objects.nonNull(x.getVoucher())){
-                Voucher  voucher = voucherRepository.getById(x.getVoucher());
-                double voucherDiscount = voucher.getPercent()/100.0;
-                BigDecimal sumMoney =  x.getAmountTotal().multiply(BigDecimal.valueOf(voucherDiscount));
+        List<GetAllToTalOrder> getAllToTalOrders = MODEL_MAPPER.map(orderTotalList, type);
+        for (GetAllToTalOrder x : getAllToTalOrders) {
+            if (Objects.nonNull(x.getVoucher())) {
+                Voucher voucher = voucherRepository.getById(x.getVoucher());
+                double voucherDiscount = voucher.getPercent() / 100.0;
+                BigDecimal sumMoney = x.getAmountTotal().multiply(BigDecimal.valueOf(voucherDiscount));
 //                BigDecimal check = sumMoney.subtract(voucher.getMaxMoney());
-                if(sumMoney.compareTo(voucher.getMaxMoney())>0){
+                if (sumMoney.compareTo(voucher.getMaxMoney()) > 0) {
                     x.setDiscount(voucher.getMaxMoney());
-                }else {
+                } else {
                     x.setDiscount(sumMoney);
                 }
             }
-            List<TableOrder> tableOrder =  tableOrderRepository.getAllByTotalId(x.getId());
+            List<TableOrder> tableOrder = tableOrderRepository.getAllByTotalId(x.getId());
             List<GetTableOrDer> getTableOrders = new ArrayList<>();
-            for (TableOrder tableOrder1: tableOrder){
+            for (TableOrder tableOrder1 : tableOrder) {
                 GetTableOrDer getTableOrDer = new GetTableOrDer();
                 getTableOrDer.setOrderTableId(tableOrder1.getId());
                 getTableOrDer.setOrderId(tableOrder1.getOrderTotal().getId());
                 getTableOrDer.setTablesId(tableOrder1.getTables().getId());
-                List<OrderDetails>  orderDetails =  orderDetailsRepository.getByOrderTableId(tableOrder1.getId());
-                for (OrderDetails y : orderDetails){
+                List<OrderDetails> orderDetails = orderDetailsRepository.getByOrderTableId(tableOrder1.getId());
+                for (OrderDetails y : orderDetails) {
                     List<GetAllFoodOrder> foodOrders = new ArrayList<>();
                     GetAllFoodOrder getAllFoodOrder = new GetAllFoodOrder();
                     getAllFoodOrder.setFoodDetailsId(y.getFoodDetalls().getId());
@@ -198,14 +199,14 @@ public class OrderTotalService implements IOrderTotalService {
             List<OrderDetails> orderDetailsList = new ArrayList<>();
             for (FoodCouter foodCouter : counterDto.getIdFoodCounters()) {
                 OrderDetails orderDetails1 = new OrderDetails();
-                orderDetails1 = orderDetailsRepository.findByTableOrderIdAndFoodDetallsId(counterDto.getTableId(),foodCouter.getFoodId());
+                orderDetails1 = orderDetailsRepository.findByTableOrderIdAndFoodDetallsId(counterDto.getTableId(), foodCouter.getFoodId());
                 FoodDetails foodDetails = foodDetallsRepository.findById(foodCouter.getFoodId()).get();
-                if(Objects.isNull(orderDetails1)){
+                if (Objects.isNull(orderDetails1)) {
                     orderDetails1.setQuantity((long) foodCouter.getQuantity());
                     orderDetails1.setAmount(foodDetails.getAmount().subtract(foodDetails.getDiscount()));
                     orderDetails1.setFoodDetalls(foodDetails);
-                }else {
-                    orderDetails1.setQuantity((long) foodCouter.getQuantity()+orderDetails1.getQuantity());
+                } else {
+                    orderDetails1.setQuantity((long) foodCouter.getQuantity() + orderDetails1.getQuantity());
                 }
                 orderDetails1.setTableOrder(orderDetails);
                 orderDetailsList.add(orderDetails1);
@@ -219,22 +220,12 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
-    public String confirmCustomerOrderOnline(Long id){
-        try{
+    public String confirmCustomerOrderOnline(Long id) {
+        try {
             OrderTotal orderTotal = orderTotalRepository.getById(id);
             orderTotal.setStatus(1);
             orderTotalRepository.save(orderTotal);
-        }catch (Exception e){
-            e.printStackTrace();
-            return "FAIL";
-        }
-        return "SUCCESS";
-    }
-    @Override
-    public String deleteOrderDetails(List<Long> ids){
-        try {
-            orderDetailsRepository.deleteAllById(ids);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return "FAIL";
         }
@@ -242,21 +233,32 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
-    public String confirmOrderOnline(Long id,HttpServletRequest request){
+    public String deleteOrderDetails(List<Long> ids) {
+        try {
+            orderDetailsRepository.deleteAllById(ids);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+
+    @Override
+    public String confirmOrderOnline(Long id, HttpServletRequest request) {
         try {
             OrderTotal orderTotal = orderTotalRepository.getById(id);
-            if (Objects.nonNull(orderTotal)){
+            if (Objects.nonNull(orderTotal)) {
                 orderTotal.setStatus(2);
-                orderTotal.setNote("Người xác nhận đơn hàng :"+ jwtServiceUtils.getUserName(request));
+                orderTotal.setNote("Người xác nhận đơn hàng :" + jwtServiceUtils.getUserName(request));
                 orderTotalRepository.save(orderTotal);
-                MailDto mailDto  = new MailDto();
+                MailDto mailDto = new MailDto();
                 mailDto.setTo(orderTotal.getCustomer().getEmail());
                 mailDto.setBody("Chúng tôi đã xác nhận đặt bàn của quý khách. Mong quý khách để ý để đặt cọc bàn. <br> Mọi thắc mắc xin liên hệ  hotline : 0978825572. xin cảm ơn");
                 mailDto.setSubject("Xác nhận đơn hành thành công");
                 mailDto.setFrom("admin@gmail.com");
                 mailUtils.send(mailDto);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return "FAIL";
         }
@@ -264,13 +266,13 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
-    public String confirmDepositOnline(ConfirmDepositOnline request){
-        try{
+    public String confirmDepositOnline(ConfirmDepositOnline request) {
+        try {
             OrderTotal orderTotal = orderTotalRepository.getById(request.getId());
             orderTotal.setDeposit(request.getDeposit());
             orderTotal.setStatus(4);
             orderTotalRepository.save(orderTotal);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return "FAIL";
         }
@@ -278,26 +280,27 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
-    public String cancelOrder(Long id){
-        try{
+    public String cancelOrder(Long id) {
+        try {
             OrderTotal orderTotal = orderTotalRepository.getById(id);
             orderTotal.setStatus(-1);
             orderTotalRepository.save(orderTotal);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return "FAIL";
         }
         return "SUCCESS";
 
     }
+
     @Override
-    public String editOrderDetails(EditOrderDetailsRequest request){
+    public String editOrderDetails(EditOrderDetailsRequest request) {
         try {
             List<OrderDetails> orderDetailsList = new ArrayList<>();
-            for (EditOrderDetails editOrderDetails : request.getOrderDetails()){
-                OrderDetails orderDetails  =  orderDetailsRepository.getById(editOrderDetails.getOrderDetailsId());
-                if(orderDetails.getQuantity() < editOrderDetails.getQuantity()){
-                    throw  new Exception("Số lượng cần trừ không thể lớn hơn  số  lượng  đã đặt");
+            for (EditOrderDetails editOrderDetails : request.getOrderDetails()) {
+                OrderDetails orderDetails = orderDetailsRepository.getById(editOrderDetails.getOrderDetailsId());
+                if (orderDetails.getQuantity() < editOrderDetails.getQuantity()) {
+                    throw new Exception("Số lượng cần trừ không thể lớn hơn  số  lượng  đã đặt");
                 }
                 orderDetails.setQuantity(orderDetails.getQuantity() - editOrderDetails.getQuantity());
                 orderDetailsList.add(orderDetails);
@@ -309,6 +312,7 @@ public class OrderTotalService implements IOrderTotalService {
         }
         return "SUCCESS";
     }
+
     @Override
     public String payment(OrderPaymentDto paymentDto, HttpServletRequest request) {
         try {
@@ -321,14 +325,14 @@ public class OrderTotalService implements IOrderTotalService {
                 amoutTotal = amoutTotal.add(orderDetail.getAmount().multiply(BigDecimal.valueOf(orderDetail.getQuantity())));
             }
             OrderTotal orderTotal = orderTotalRepository.getById(paymentDto.getOrderId());
-            if(Objects.nonNull(paymentDto.getVoucherId()) && Objects.nonNull(orderTotal.getCustomer())){
-                Voucher voucher  = voucherRepository.findByIdAndCustomerId(paymentDto.getVoucherId(),orderTotal.getCustomer().getId());
-                if(Objects.isNull(voucher)){
-                   return "VOUCHER NOT";
+            if (Objects.nonNull(paymentDto.getVoucherId()) && Objects.nonNull(orderTotal.getCustomer())) {
+                Voucher voucher = voucherRepository.findByIdAndCustomerId(paymentDto.getVoucherId(), orderTotal.getCustomer().getId());
+                if (Objects.isNull(voucher)) {
+                    return "VOUCHER NOT";
                 }
-                OrderTotal checkVoucher =  orderTotalRepository.findByVoucherAndCustomerIdAndStatus(paymentDto.getVoucherId(),orderTotal.getCustomer().getId(),6);
-                if(Objects.nonNull(checkVoucher)){
-                   return "VOUCHER EXITS";
+                OrderTotal checkVoucher = orderTotalRepository.findByVoucherAndCustomerIdAndStatus(paymentDto.getVoucherId(), orderTotal.getCustomer().getId(), 6);
+                if (Objects.nonNull(checkVoucher)) {
+                    return "VOUCHER EXITS";
                 }
                 orderTotal.setVoucher(paymentDto.getVoucherId());
             }
@@ -376,15 +380,15 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
 
-    public Boolean customerConfirm1(Long id){
+    public Boolean customerConfirm1(Long id) {
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
-        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,0);
-        if (orderTotal==null){
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 0);
+        if (orderTotal == null) {
             return false;
-        }else if (lst==null){
+        } else if (lst == null) {
             return false;
         }
-        for (OrderDetails x:lst){
+        for (OrderDetails x : lst) {
             x.setStatus(1);
         }
         orderDetailsRepository.saveAll(lst);
@@ -393,15 +397,15 @@ public class OrderTotalService implements IOrderTotalService {
         return true;
     }
 
-    public Boolean customerConfirm3(Long id){
+    public Boolean customerConfirm3(Long id) {
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
-        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,2);
-        if (orderTotal==null){
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 2);
+        if (orderTotal == null) {
             return false;
-        }else if (lst==null){
+        } else if (lst == null) {
             return false;
         }
-        for (OrderDetails x:lst){
+        for (OrderDetails x : lst) {
             x.setStatus(3);
         }
         orderDetailsRepository.saveAll(lst);
@@ -410,15 +414,15 @@ public class OrderTotalService implements IOrderTotalService {
         return true;
     }
 
-    public Boolean customerConfirm6(Long id){
+    public Boolean customerConfirm6(Long id) {
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
-        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,5);
-        if (orderTotal==null){
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 5);
+        if (orderTotal == null) {
             return false;
-        }else if (lst==null){
+        } else if (lst == null) {
             return false;
         }
-        for (OrderDetails x:lst){
+        for (OrderDetails x : lst) {
             x.setStatus(6);
         }
         orderDetailsRepository.saveAll(lst);
@@ -427,34 +431,38 @@ public class OrderTotalService implements IOrderTotalService {
         return true;
     }
 
-    public Boolean staffConfirm2(Long id,HttpServletRequest req){
-        Account account = jwtServiceUtils.getAccountByToken(req);
+    public Boolean staffConfirm2(Long id, HttpServletRequest req) {
+        String username = jwtServiceUtils.getUserName(req);
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
-        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,1);
-        if (orderTotal==null||account==null){
-            return false;
-        }else if (lst==null){
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 1);
+        if (username == null) {
             return false;
         }
-        for (OrderDetails x:lst){
-            x.setStatus(2);
+
+        if (!lst.isEmpty()) {
+            for (OrderDetails x : lst) {
+                x.setStatus(2);
+            }
         }
+
         orderDetailsRepository.saveAll(lst);
+
         orderTotal.setStatus(2);
         orderTotalRepository.save(orderTotal);
+
         return true;
     }
 
-    public Boolean staffConfirm4(Long id,HttpServletRequest req){
+    public Boolean staffConfirm4(Long id, HttpServletRequest req) {
         Account account = jwtServiceUtils.getAccountByToken(req);
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
-        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,3);
-        if (orderTotal==null||account==null){
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 3);
+        if (orderTotal == null || account == null) {
             return false;
-        }else if (lst==null){
+        } else if (lst == null) {
             return false;
         }
-        for (OrderDetails x:lst){
+        for (OrderDetails x : lst) {
             x.setStatus(4);
         }
         orderDetailsRepository.saveAll(lst);
@@ -463,16 +471,16 @@ public class OrderTotalService implements IOrderTotalService {
         return true;
     }
 
-    public Boolean staffConfirm5(Long id,HttpServletRequest req){
+    public Boolean staffConfirm5(Long id, HttpServletRequest req) {
         Account account = jwtServiceUtils.getAccountByToken(req);
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
-        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,4);
-        if (orderTotal==null||account==null){
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 4);
+        if (orderTotal == null || account == null) {
             return false;
-        }else if (lst==null){
+        } else if (lst == null) {
             return false;
         }
-        for (OrderDetails x:lst){
+        for (OrderDetails x : lst) {
             x.setStatus(5);
         }
         orderDetailsRepository.saveAll(lst);
@@ -481,16 +489,16 @@ public class OrderTotalService implements IOrderTotalService {
         return true;
     }
 
-    public Boolean staffConfirm7(Long id,HttpServletRequest req){
+    public Boolean staffConfirm7(Long id, HttpServletRequest req) {
         Account account = jwtServiceUtils.getAccountByToken(req);
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
-        List<OrderDetails> lst =  orderTotalRepository.getOrderdetailbyTotalAndStatus(id,6);
-        if (orderTotal==null||account==null){
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 6);
+        if (orderTotal == null || account == null) {
             return false;
-        }else if (lst==null){
+        } else if (lst == null) {
             return false;
         }
-        for (OrderDetails x:lst){
+        for (OrderDetails x : lst) {
             x.setStatus(7);
         }
         orderDetailsRepository.saveAll(lst);

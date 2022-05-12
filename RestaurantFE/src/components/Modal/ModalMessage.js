@@ -21,6 +21,9 @@ const ModalMessage = {
     middleModal(type, title, message) {
         Swal.fire(title, message, type);
     },
+    middleModal(type, title) {
+        Swal.fire(title, "", type);
+    },
 };
 
 export default ModalMessage;

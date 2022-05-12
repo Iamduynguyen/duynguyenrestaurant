@@ -24,6 +24,16 @@
         }
         &__delete {}
     }
+    &--btn_table {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        max-width: 370px;
+    }
 }
 
 .index__column {

@@ -1,7 +1,14 @@
 import { Row, Table } from "antd";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { IconButton } from "@mui/material";
+import Swal from "sweetalert2";
+import ModalMessage from "../../../components/Modal/ModalMessage";
+import OrdersAPI from "../../../API/OrdersAPI";
 
 const OrderDetail = (props) => {
   const navigation = useNavigate();
@@ -10,6 +17,84 @@ const OrderDetail = (props) => {
 
   const [loading, setLoading] = useState(true);
   const [tableData, setTableData] = useState([]);
+
+  // API OrderDetail
+  const addQty = async (foodOrders) => {
+    const { value: qty } = await Swal.fire({
+      title: `Món ${foodOrders.foodName}`,
+      input: "text",
+      inputLabel: "Nhập số lượng cần thêm",
+      inputPlaceholder: "Số lượng thêm vào",
+      confirmButtonText: "Thêm",
+      confirmButtonColor: "#19a400",
+    });
+    if (qty) {
+      if (!/^\d+$/.test(qty)) {
+        ModalMessage.miniTopRightModal(
+          "error",
+          `Số lượng vừa nhập<br>không hợp lệ!`
+        );
+      } else if (+qty <= 0) {
+        ModalMessage.miniTopRightModal("warning", `Số lượng phải lớn hơn 0!`);
+      } else {
+        const data = {
+          tableId: foodOrders.orderTableId,
+          idFoodCounters: [{ foodId: foodOrders.foodDetailsId, quantity: qty }],
+        };
+        const res = await OrdersAPI.addQty(data);
+        console.log(res);
+        if (res === "SUCCESS") {
+          ModalMessage.miniTopRightModal(
+            "success",
+            `Đã thêm ${qty} x ${foodOrders.foodName}`
+          );
+          navigation("/admin/orders-management");
+        } else {
+          ModalMessage.miniTopRightModal(
+            "error",
+            `Lỗi<br/>Vui lòng thử lại sau!`
+          );
+        }
+      }
+    }
+  };
+  const removeQty = async (foodOrders) => {
+    const { value: qty } = await Swal.fire({
+      title: `Món ${foodOrders.foodName}`,
+      input: "text",
+      inputLabel: "Nhập số lượng cần trừ",
+      inputPlaceholder: "Số lượng trừ đi",
+      confirmButtonText: "Trừ",
+      confirmButtonColor: "#c20000",
+    });
+    if (qty) {
+      if (!/^\d+$/.test(qty)) {
+        ModalMessage.miniTopRightModal(
+          "error",
+          `Số lượng vừa nhập<br>không hợp lệ!`
+        );
+      } else if (+qty > +foodOrders.quantity) {
+        ModalMessage.miniTopRightModal("error", `Vượt quá số lượng hiện tại!`);
+      } else {
+        const data = {
+          orderDetails: [{ orderDetailsId: foodOrders.id, quantity: qty }],
+        };
+        const res = await OrdersAPI.removeQty(data);
+        if (res === "SUCCESS") {
+          ModalMessage.middleModal(
+            "success",
+            `Đã trừ ${qty} x ${foodOrders.foodName}`
+          );
+          navigation("/admin/orders-management");
+        } else {
+          ModalMessage.miniTopRightModal(
+            "error",
+            `Lỗi<br/>Vui lòng thử lại sau!`
+          );
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     console.log(props.foodsAtTable);
@@ -68,13 +153,35 @@ const OrderDetail = (props) => {
             title="Tên món"
             dataIndex="foodName"
             key="foodName"
-            align="center"
+            align="left"
+            width={600}
           />
           <Table.Column
             title="Số lượng"
-            dataIndex="quantity"
             key="quantity"
-            width={100}
+            align="center"
+            width={120}
+            render={(record) => {
+              return (
+                <>
+                  <IconButton
+                    aria-label="delete"
+                    size="small"
+                    onClick={() => addQty(record)}
+                  >
+                    <AddIcon fontSize="small" color="success" />
+                  </IconButton>
+                  <span style={{ padding: "0 5px" }}>{record.quantity}</span>
+                  <IconButton
+                    aria-label="delete"
+                    size="small"
+                    onClick={() => removeQty(record)}
+                  >
+                    <RemoveIcon fontSize="small" color="error" />
+                  </IconButton>
+                </>
+              );
+            }}
           />
           <Table.Column
             title="Giá"
@@ -82,6 +189,15 @@ const OrderDetail = (props) => {
             key="amount"
             align="right"
             width={200}
+            render={(text) => {
+              if (text !== null) {
+                return `${text
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;
+              } else {
+                return `0 VNĐ`;
+              }
+            }}
           />
           <Table.Column title="Ghi chú" dataIndex="note" key="note" />
         </Table>

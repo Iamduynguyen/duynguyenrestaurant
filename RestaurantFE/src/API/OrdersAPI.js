@@ -9,34 +9,36 @@ const OrdersAPI = {
         const url = `/api/order-total/customer-confirm1/${id}`;
         return axiosClient.get(url);
     },
-    confirmOrder2: (id) => {
-        const url = `/api/order-total/staff-confirm2/${id}`;
-        return axiosClient.get(url);
+    // status 1 => 2
+    staffConfirmOrderOnline: (id) => {
+        const url = `/api/confirm-order-online/${id}`;
+        return axiosClient.put(url);
     },
-    confirmOrder4: (id) => {
-        const url = `/api/order-total/staff-confirm4/${id}`;
-        return axiosClient.get(url);
+    // status 3 => 4
+    staffConfirmDepositOnline: (data) => {
+        const url = `/api/confirm-deposit-online`;
+        return axiosClient.post(url, data);
     },
-    confirmOrder6: (id) => {
-        const url = `/api/order-total/staff-confirm6/${id}`;
-        return axiosClient.get(url);
+    // status 5 => 6
+    staffConfirmPayment: (data) => {
+        const url = `/api/payment-order`;
+        return axiosClient.post(url, data);
     },
-    // deleteOrder: (data) => {
-    //     const url = "/api/delete-all-details-ids";
-    //     return axiosClient.post(url, data);
-    // },
-    // getTableByTime: (data) => {
-    //     const url = `/api/tables?time=${data}`;
-    //     return axiosClient.get(url);
-    // },
-    // updateTable: (id, table) => {
-    //     const url = `/api/tables/${id}`;
-    //     return axiosClient.put(url, table);
-    // },
-    // deleteTable: (id) => {
-    //     const url = `/api/tables/${id}`;
-    //     return axiosClient.delete(url);
-    // },
+    // status => -1
+    deleteOrder: (id) => {
+        const url = `/api/cancel-order/${id}`;
+        return axiosClient.put(url);
+    },
+    // add qty orderDetail
+    addQty: (data) => {
+        const url = `/api/add-order-details`;
+        return axiosClient.post(url, data);
+    },
+    // remove qty orderDetail
+    removeQty: (data) => {
+        const url = `/api/edit-order-details`;
+        return axiosClient.post(url, data);
+    },
 };
 
 export default OrdersAPI;

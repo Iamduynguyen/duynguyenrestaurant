@@ -1,45 +1,147 @@
 import { Button } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import OrdersAPI from "../../../API/OrdersAPI";
-import { Row, Table, Button as message, Tag } from "antd";
+import { Row, Table, Button as message } from "antd";
 import ModalMessage from "../../../components/Modal/ModalMessage";
+import Swal from "sweetalert2";
 
 export default function FoodsAdmin(props) {
   const [loading, setLoading] = useState(true);
   const [tableData, setTableData] = useState([]);
   const navigation = useNavigate();
+  let tempVoucherId = "";
 
   const [resetData, setResetData] = useState(false);
 
-  // API Customer confirm
-  const confirmOrder2 = async (id) => {
-    const res = await OrdersAPI.confirmOrder2(id);
-    if (res) {
+  // API Staff confirm
+  const staffConfirmOrderOnline = async (id) => {
+    const res = await OrdersAPI.staffConfirmOrderOnline(id);
+    if (res === "SUCCESS") {
       ModalMessage.miniTopRightModal("success", "Xác nhận đơn thành công");
     } else {
       ModalMessage.miniTopRightModal("error", `Lỗi<br/>Vui lòng thử lại sau!`);
     }
     setResetData(!resetData);
   };
-  const confirmOrder4 = async (id) => {
-    const res = await OrdersAPI.confirmOrder4(id);
-    if (res) {
-      ModalMessage.miniTopRightModal("success", "Xác nhận đặt cọc thành công");
-    } else {
-      ModalMessage.miniTopRightModal("error", `Lỗi<br/>Vui lòng thử lại sau!`);
+  const staffConfirmDepositOnline = async (id) => {
+    const { value: deposit } = await Swal.fire({
+      title: `Xác nhận đặt cọc hoá đơn ${id}`,
+      input: "text",
+      inputLabel: "Nhập số tiền đặt cọc",
+      inputPlaceholder: "Tiền đặt cọc",
+      confirmButtonText: "Xác nhận",
+    });
+    if (deposit !== undefined) {
+      if (deposit === "") {
+        ModalMessage.miniTopRightModal("error", "Chưa nhập số tiền đặt cọc!");
+      } else if (!/^\d+$/.test(deposit)) {
+        ModalMessage.miniTopRightModal(
+          "error",
+          `Số tiền vừa nhập<br>không hợp lệ!`
+        );
+      } else {
+        const data = { id: id, deposit: +deposit };
+        const res = await OrdersAPI.staffConfirmDepositOnline(data);
+        if (res === "SUCCESS") {
+          ModalMessage.miniTopRightModal(
+            "success",
+            "Xác nhận đặt cọc thành công"
+          );
+        } else {
+          ModalMessage.miniTopRightModal(
+            "error",
+            `Lỗi<br/>Vui lòng thử lại sau!`
+          );
+        }
+        setResetData(!resetData);
+      }
     }
-    setResetData(!resetData);
   };
-  const confirmOrder6 = async (id) => {
-    const res = await OrdersAPI.confirmOrder6(id);
-    if (res) {
-      ModalMessage.miniTopRightModal("success", "Đơn hàng đã hoàn thành");
-    } else {
-      ModalMessage.miniTopRightModal("error", `Lỗi<br/>Vui lòng thử lại sau!`);
-    }
-    setResetData(!resetData);
+  const staffConfirmPayment = async (id) => {
+    Swal.fire({
+      title: `Xác nhận thanh toán<br>Hoá đơn ${id}`,
+      text: "",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#12a524",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Xác nhận",
+      cancelButtonText: "Huỷ bỏ",
+      reverseButtons: true,
+      input: "text",
+      inputPlaceholder: "Mã voucher (Nếu có)",
+      preConfirm: (voucherId) => {
+        tempVoucherId = voucherId;
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const data = { orderId: id, voucherId: tempVoucherId };
+        if (tempVoucherId !== "" && !/^\d+$/.test(tempVoucherId)) {
+          ModalMessage.middleModal(
+            "error",
+            `Mã voucher "${data.voucherId}"<br>không hợp lệ!<br>Vui lòng chỉ nhập số!`
+          );
+        } else {
+          const res = await OrdersAPI.staffConfirmPayment(data);
+
+          console.log(res);
+
+          if (res === "NO ITEM ORDERED") {
+            ModalMessage.middleModal("info", `Chưa có món ăn được đặt!`);
+          } else if (res === "VOUCHER NOT") {
+            ModalMessage.middleModal(
+              "error",
+              `Mã voucher ${data.voucherId} không tồn tại!`
+            );
+          } else if (res === "VOUCHER EXITS") {
+            ModalMessage.middleModal(
+              "error",
+              `Mã voucher ${data.voucherId} đã được áp dụng trước đó!`
+            );
+          } else if (res === "SUCCESS") {
+            ModalMessage.middleModal(
+              "success",
+              `Thanh toán<br>Hoá đơn ${id} hoàn tất!`
+            );
+          } else {
+            ModalMessage.middleModal("error", `Lỗi! Vui lòng thử lại sau!`);
+          }
+          setResetData(!resetData);
+        }
+      }
+    });
+  };
+  const deleteOrder = async (id) => {
+    Swal.fire({
+      title: `Huỷ<br>Hoá đơn ${id}`,
+      text: "Bạn có chắc chắn không?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#12a524",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có, huỷ ngay!",
+      cancelButtonText: "Không, xem xét lại!",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const res = await OrdersAPI.deleteOrder(id);
+        if (res === "SUCCESS") {
+          ModalMessage.miniTopRightModal(
+            "success",
+            `Huỷ hoá đơn ${id} thành công!`
+          );
+        } else {
+          ModalMessage.miniTopRightModal(
+            "error",
+            `Lỗi<br/>Vui lòng thử lại sau!`
+          );
+        }
+        setResetData(!resetData);
+      }
+    });
   };
 
   // Update food at table
@@ -135,8 +237,9 @@ export default function FoodsAdmin(props) {
           <Table.Column
             title="Bàn đặt"
             key="table"
+            width={385}
             render={(record) => (
-              <div className="action__column--btn">
+              <div className="action__column--btn_table">
                 {record.orders.map((item) => (
                   <Button
                     key={item.orderTableId}
@@ -157,45 +260,85 @@ export default function FoodsAdmin(props) {
             width={200}
             render={(record) => {
               if (record.status === -1)
-                return <Tag color={"default"}>Đã huỷ</Tag>;
+                return (
+                  <Button variant="contained" disabled>
+                    Đã huỷ
+                  </Button>
+                );
               else if (record.status === 0)
-                return <Tag color={"gold"}>Chờ khách hàng gửi order</Tag>;
+                return (
+                  <Button variant="contained" color="warning">
+                    Chờ khách hàng gửi order
+                  </Button>
+                );
               else if (record.status === 1)
                 return (
                   <Button
                     variant="contained"
-                    color="error"
-                    onClick={() => confirmOrder2(record.id)}
+                    color="secondary"
+                    onClick={() => staffConfirmOrderOnline(record.id)}
                   >
                     Chờ nhân viên xác nhận order
                   </Button>
                 );
               else if (record.status === 2)
-                return <Tag color={"gold"}>Chờ khách hàng đặt cọc</Tag>;
+                return (
+                  <Button variant="contained" color="warning">
+                    Chờ khách hàng đặt cọc
+                  </Button>
+                );
               else if (record.status === 3)
                 return (
                   <Button
                     variant="contained"
-                    color="error"
-                    onClick={() => confirmOrder4(record.id)}
+                    color="secondary"
+                    onClick={() => staffConfirmDepositOnline(record.id)}
                   >
                     Chờ nhân viên xác nhận đặt cọc
                   </Button>
                 );
               else if (record.status === 4)
-                return <Tag color={"gold"}>Chờ khách hàng đến nhà hàng</Tag>;
+                return (
+                  <Button variant="contained" color="warning">
+                    Chờ khách hàng đến nhà hàng
+                  </Button>
+                );
               else if (record.status === 5)
                 return (
                   <Button
                     variant="contained"
-                    color="error"
-                    onClick={() => confirmOrder6(record.id)}
+                    color="secondary"
+                    onClick={() => staffConfirmPayment(record.id)}
                   >
                     Đang phục vụ
                   </Button>
                 );
               else if (record.status === 6)
-                return <Tag color={"success"}>Hoàn thành</Tag>;
+                return (
+                  <Button variant="contained" color="success">
+                    Hoàn thành
+                  </Button>
+                );
+            }}
+          />
+          <Table.Column
+            title=""
+            key="status"
+            align="center"
+            width={100}
+            render={(record) => {
+              if (record.status !== -1 && record.status !== 6) {
+                return (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => deleteOrder(record.id)}
+                  >
+                    Huỷ
+                  </Button>
+                );
+              }
             }}
           />
           <Table.Column

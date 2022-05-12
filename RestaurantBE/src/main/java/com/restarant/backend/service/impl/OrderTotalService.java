@@ -262,7 +262,7 @@ public class OrderTotalService implements IOrderTotalService {
             e.printStackTrace();
             return "FAIL";
         }
-        return "SUCCCESS";
+        return "SUCCESS";
     }
 
     @Override
@@ -318,7 +318,7 @@ public class OrderTotalService implements IOrderTotalService {
         try {
             List<OrderDetails> orderDetails = orderDetailsRepository.getByOrdertotalId(paymentDto.getOrderId());
             if (CollectionUtils.isEmpty(orderDetails)) {
-                return "FAIL";
+                return "NO ITEM ORDERED";
             }
             BigDecimal amoutTotal = BigDecimal.ZERO;
             for (OrderDetails orderDetail : orderDetails) {

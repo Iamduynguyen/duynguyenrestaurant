@@ -1,6 +1,5 @@
 package com.restarant.backend.dto;
 
-import com.restarant.backend.entity.Customer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,5 +30,5 @@ public class GetAllToTalOrder {
     private String note;
     private Long createdAt;
     private CustomerOrderDto customer;
-    List<GetTableOrDer> orders;
+    List<GetTableOrder> orders;
 }

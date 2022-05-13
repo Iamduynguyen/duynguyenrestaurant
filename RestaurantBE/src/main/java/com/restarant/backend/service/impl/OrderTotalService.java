@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -108,28 +107,26 @@ public class OrderTotalService implements IOrderTotalService {
                 }
             }
             List<TableOrder> tableOrder = tableOrderRepository.getAllByTotalId(x.getId());
-            List<GetTableOrDer> getTableOrders = new ArrayList<>();
+            List<GetTableOrder> getTableOrders = new ArrayList<>();
             for (TableOrder tableOrder1 : tableOrder) {
-                GetTableOrDer getTableOrDer = new GetTableOrDer();
-                getTableOrDer.setOrderTableId(tableOrder1.getId());
-                getTableOrDer.setOrderId(tableOrder1.getOrderTotal().getId());
-                getTableOrDer.setTablesId(tableOrder1.getTables().getId());
+                GetTableOrder getTableOrder = new GetTableOrder();
+                getTableOrder.setOrderTableId(tableOrder1.getId());
+                getTableOrder.setOrderId(tableOrder1.getOrderTotal().getId());
+                getTableOrder.setTablesId(tableOrder1.getTables().getId());
                 List<OrderDetails> orderDetails = orderDetailsRepository.getByOrderTableId(tableOrder1.getId());
+                List<GetAllFoodOrder> foodOrders = new ArrayList<>();
                 for (OrderDetails y : orderDetails) {
-                    List<GetAllFoodOrder> foodOrders = new ArrayList<>();
                     GetAllFoodOrder getAllFoodOrder = new GetAllFoodOrder();
                     getAllFoodOrder.setFoodDetailsId(y.getFoodDetalls().getId());
                     getAllFoodOrder.setFoodName(y.getFoodDetalls().getFood().getName());
                     getAllFoodOrder.setOrderTableId(y.getTableOrder().getId());
                     getAllFoodOrder.setAmount(y.getAmount());
                     getAllFoodOrder.setQuantity(y.getQuantity());
-//                    getAllFoodOrder.setNote(y.get);
-
                     getAllFoodOrder.setId(y.getId());
                     foodOrders.add(getAllFoodOrder);
-                    getTableOrDer.setFoodOrders(foodOrders);
                 }
-                getTableOrders.add(getTableOrDer);
+                getTableOrder.setFoodOrders(foodOrders);
+                getTableOrders.add(getTableOrder);
             }
             x.setOrders(getTableOrders);
         }
@@ -234,11 +231,13 @@ public class OrderTotalService implements IOrderTotalService {
 
     @Override
     public String deleteOrderDetails(List<Long> ids) {
-        try {
-            orderDetailsRepository.deleteAllById(ids);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "FAIL";
+        for (Long id : ids) {
+            try {
+                orderDetailsRepository.deleteOrderDetailsByIds(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "FAIL";
+            }
         }
         return "SUCCESS";
     }

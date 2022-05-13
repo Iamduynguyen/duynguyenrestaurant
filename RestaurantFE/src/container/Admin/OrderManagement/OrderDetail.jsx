@@ -3,9 +3,10 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import { IconButton } from "@mui/material";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { Button, IconButton } from "@mui/material";
 import Swal from "sweetalert2";
 import ModalMessage from "../../../components/Modal/ModalMessage";
 import OrdersAPI from "../../../API/OrdersAPI";
@@ -17,6 +18,7 @@ const OrderDetail = (props) => {
 
   const [loading, setLoading] = useState(true);
   const [tableData, setTableData] = useState([]);
+  const [selectedRow, setSelectedRow] = useState([]);
 
   // API OrderDetail
   const addQty = async (foodOrders) => {
@@ -95,6 +97,53 @@ const OrderDetail = (props) => {
       }
     }
   };
+  const deleteOrderDetails = async (data) => {
+    if (data.length === 0) {
+      ModalMessage.miniTopRightModal("warning", "Chưa chọn món cần xoá!");
+    } else {
+      Swal.fire({
+        title: `Xoá món ăn`,
+        html: `Bạn có chắc chắn muốn xoá<br>${data.map(
+          (e) => e.foodName
+        )}<br> khỏi hoá đơn không?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#12a524",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Có, huỷ ngay!",
+        cancelButtonText: "Không, xem xét lại!",
+        reverseButtons: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const reqData = { ids: data.map((e) => e.id) };
+          const res = await OrdersAPI.deleteOrderDetails(reqData);
+          if (res === "SUCCESS") {
+            ModalMessage.miniTopRightModal(
+              "success",
+              `Xoá ${data.length} món ăn thành công!`
+            );
+            navigation("/admin/orders-management");
+          } else {
+            ModalMessage.miniTopRightModal(
+              "error",
+              `Lỗi<br/>Vui lòng thử lại sau!`
+            );
+          }
+        }
+      });
+    }
+  };
+
+  // Config checkbox for Table
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {},
+    onSelect: (record, selected, selectedRows) => {
+      setSelectedRow(selectedRows);
+    },
+    onSelectAll: (selected, selectedRows, changeRows) => {
+      setSelectedRow(selectedRows);
+    },
+  };
 
   useEffect(() => {
     console.log(props.foodsAtTable);
@@ -131,8 +180,30 @@ const OrderDetail = (props) => {
     <>
       <Row>
         <div className="adm-section">
-          <h2>Mã hoá đơn {props.foodsAtTable.orderId}</h2>
-          <h2>Bàn số {props.foodsAtTable.tablesId}</h2>
+          <h3>Mã hoá đơn {props.foodsAtTable.orderId}</h3>
+          <h4>Bàn số {props.foodsAtTable.tablesId}</h4>
+        </div>
+        <div className="table-header__btn">
+          <Button
+            variant="outlined"
+            size="small"
+            color="error"
+            startIcon={<DeleteForeverIcon />}
+            onClick={() => {
+              deleteOrderDetails(selectedRow);
+              console.log(selectedRow.map((e) => e.id));
+            }}
+          >
+            Xoá
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            color="secondary"
+            startIcon={<AddRoundedIcon />}
+          >
+            Thêm mới
+          </Button>
         </div>
         <Table
           loading={loading}
@@ -140,6 +211,7 @@ const OrderDetail = (props) => {
           bordered={true}
           pagination={true}
           dataSource={tableData}
+          rowSelection={{ ...rowSelection }}
           style={{ width: "100%" }}
         >
           <Table.Column
@@ -169,7 +241,7 @@ const OrderDetail = (props) => {
                     size="small"
                     onClick={() => addQty(record)}
                   >
-                    <AddIcon fontSize="small" color="success" />
+                    <AddRoundedIcon fontSize="small" color="success" />
                   </IconButton>
                   <span style={{ padding: "0 5px" }}>{record.quantity}</span>
                   <IconButton
@@ -177,7 +249,7 @@ const OrderDetail = (props) => {
                     size="small"
                     onClick={() => removeQty(record)}
                   >
-                    <RemoveIcon fontSize="small" color="error" />
+                    <RemoveRoundedIcon fontSize="small" color="error" />
                   </IconButton>
                 </>
               );

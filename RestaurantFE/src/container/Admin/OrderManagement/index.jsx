@@ -1,4 +1,5 @@
 import { Button } from "@mui/material";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -147,7 +148,7 @@ export default function FoodsAdmin(props) {
   // Update food at table
   const updateFood = (data) => {
     props.setFoodsAtTable(data);
-    if (data.foodOrders === null) {
+    if (data.foodOrders.length === 0) {
       ModalMessage.miniTopRightModal(
         "info",
         `Bàn ${data.tablesId}<br/> Chưa đặt đồ ăn`
@@ -186,7 +187,18 @@ export default function FoodsAdmin(props) {
     <>
       <Row>
         <div className="adm-section">
-          <h2>Danh sách hoá đơn</h2>
+          <h3>Danh sách hoá đơn</h3>
+        </div>
+        <div className="table-header__btn">
+          <Button
+            variant="contained"
+            size="small"
+            color="secondary"
+            onClick={() => navigation("create")}
+            startIcon={<AddRoundedIcon />}
+          >
+            Thêm mới
+          </Button>
         </div>
         <Table
           loading={loading}

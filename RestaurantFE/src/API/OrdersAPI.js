@@ -1,6 +1,9 @@
 import axiosClient from "./axiosClient";
 
 const OrdersAPI = {
+    /**
+     * Orders
+     */
     getAllOrders: () => {
         const url = "/api/orders";
         return axiosClient.get(url);
@@ -29,6 +32,10 @@ const OrdersAPI = {
         const url = `/api/cancel-order/${id}`;
         return axiosClient.put(url);
     },
+
+    /**
+     * OrderDetails
+     */
     // add qty orderDetail
     addQty: (data) => {
         const url = `/api/add-order-details`;
@@ -37,6 +44,11 @@ const OrdersAPI = {
     // remove qty orderDetail
     removeQty: (data) => {
         const url = `/api/edit-order-details`;
+        return axiosClient.post(url, data);
+    },
+    // remove orderDetail by ids
+    deleteOrderDetails: (data) => {
+        const url = `/api/delete-all-details-ids`;
         return axiosClient.post(url, data);
     },
 };

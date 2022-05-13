@@ -154,4 +154,15 @@ public class FoodController {
     public ResponseEntity<Pages> getPages(Pageable pageable){
         return ResponseEntity.ok(foodservice.getPage(pageable));
     }
+
+    @GetMapping("/foods/filterByCategory/{id}")
+    public ResponseEntity<List<FoodDto>> getAllFoods(@PathVariable Long id) {
+        List<FoodDto> result = foodservice.getFoodsByCategoryId(id);
+        for (FoodDto x:result) {
+            if (!x.getFoodDetails().isEmpty()){
+                x.setAvtUrl(x.getFoodDetails().get(0).getFoodMedias().get(0).getFoodUrl());
+            }
+        }
+        return ResponseEntity.ok(result);
+    }
 }

@@ -1,6 +1,6 @@
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 import React, { useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import { HomePage } from "./container";
 import FixFoods from "./container/Admin/Foods/FixFood";
@@ -23,7 +23,9 @@ import DashboardAdmin from "./container/Admin/Dashboard";
 import UserSettings from "./container/User";
 import OrderManagement from "./container/Admin/OrderManagement";
 import OrderDetail from "./container/Admin/OrderManagement/OrderDetail";
+import CreateOrder from "./container/Admin/OrderManagement/CreateOrder";
 import NotFound404 from "./components/NotFound404";
+
 const MuiTheme = createTheme({
   typography: {
     allVariants: {
@@ -64,6 +66,15 @@ const App = () => {
           path="orders-management"
           element={
             <OrderManagement
+              foodsAtTable={foodsAtTable}
+              setFoodsAtTable={setFoodsAtTable}
+            />
+          }
+        />
+        <Route
+          path="orders-management/create"
+          element={
+            <CreateOrder
               foodsAtTable={foodsAtTable}
               setFoodsAtTable={setFoodsAtTable}
             />

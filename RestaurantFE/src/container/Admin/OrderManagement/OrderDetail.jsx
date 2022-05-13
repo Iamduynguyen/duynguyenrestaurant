@@ -191,7 +191,6 @@ const OrderDetail = (props) => {
             startIcon={<DeleteForeverIcon />}
             onClick={() => {
               deleteOrderDetails(selectedRow);
-              console.log(selectedRow.map((e) => e.id));
             }}
           >
             Xoá

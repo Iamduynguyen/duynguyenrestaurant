@@ -7,13 +7,10 @@ import {
   DialogTitle,
   Grid,
   Stack,
-  Typography,
-  useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import FoodsAPI from "./../../../API/FoodsAPI";
-import styles from "../Categories/Categories.module.css";
 import { Row, Table, Button as AntdButton, Modal, message } from "antd";
 
 export default function FoodsAdmin() {
@@ -27,7 +24,6 @@ export default function FoodsAdmin() {
   const [FoodsData, setFoodsData] = useState([]);
   const [openDLDelete, setOpenDLDelete] = useState(false);
   const [select, setSelect] = useState([]);
-  const isMobile = useMediaQuery("(max-width:600px)");
   const [resetData, setResetData] = useState(false);
   const confirmDeleteCategory = async () => {
     setOpenDLDelete(false);

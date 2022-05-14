@@ -102,7 +102,7 @@ public class OrderTotalController {
     public List<GetAllToTalOrder> getAllToTalOrders(){
         return orderTotalService.getAllOrderTotal();
     }
-    @GetMapping("/orders")
+    @GetMapping("/orders1")
     public List<OrderTotal> getAllOrders() {
         return orderTotalRepository.findAll();
     }

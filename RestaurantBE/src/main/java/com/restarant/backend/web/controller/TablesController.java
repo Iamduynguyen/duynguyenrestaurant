@@ -44,13 +44,6 @@ public class TablesController {
         this.tableService = tableService;
     }
 
-    /**
-     * {@code POST  /tables} : Create a new tables.
-     *
-     * @param tables the tables to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new tables, or with status {@code 400 (Bad Request)} if the tables has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("/tables")
     public ResponseEntity<?> createTables(@RequestBody TableDto dto) {
         log.debug("REST request to save Tables : {}", dto);
@@ -63,16 +56,6 @@ public class TablesController {
         }
     }
 
-    /**
-     * {@code PUT  /tables/:id} : Updates an existing tables.
-     *
-     * @param id the id of the tables to save.
-     * @param tables the tables to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated tables,
-     * or with status {@code 400 (Bad Request)} if the tables is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the tables couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/tables/{id}")
     public ResponseEntity<?> updateTables(@PathVariable(value = "id", required = false) final Long id,
                                           @RequestBody TableDto tableDto)
@@ -148,5 +131,10 @@ public class TablesController {
     @GetMapping("/tables/pages")
     public ResponseEntity<Pages> getPages(Pageable pageable){
         return ResponseEntity.ok(tableService.getPage(pageable));
+    }
+
+    @GetMapping("/tables/exist")
+    public ResponseEntity<List<TableDto>> findAllTablesExist() {
+        return ResponseEntity.ok(tableService.findAllTablesExist());
     }
 }

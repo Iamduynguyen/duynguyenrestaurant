@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -22,4 +23,6 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
 
     @Query("select f from Food f where f.category.id = :query")
     Page<Food> getByCategoryId(Pageable pageable,@Param("query") Long query);
+
+    List<Food> findByCategoryId(Long categoryId);
 }

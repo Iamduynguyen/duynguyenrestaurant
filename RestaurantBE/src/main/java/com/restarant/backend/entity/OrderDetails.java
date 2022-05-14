@@ -3,6 +3,7 @@ package com.restarant.backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "order_details")
 @SQLDelete(sql = "UPDATE order_details SET deleteflag = 1 WHERE id = ?")
+@SQLDeleteAll(sql = "UPDATE order_details SET deleteflag = 1 WHERE id = ?")
 @Where(clause = "deleteflag = 0")
 public class OrderDetails implements Serializable {
 
@@ -33,6 +35,9 @@ public class OrderDetails implements Serializable {
 
     @Column(name = "deleteflag")
     private Long deleteflag = 0L;
+
+    @Column(name = "amount")
+    private BigDecimal amount;
 
     @ManyToOne
     @JsonIgnoreProperties(value = {"foodMedias", "orderDetails", "food"}, allowSetters = true)

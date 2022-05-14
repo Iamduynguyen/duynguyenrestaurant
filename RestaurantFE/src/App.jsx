@@ -1,6 +1,6 @@
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { createTheme } from "@mui/material/styles";
+import React, { useState } from "react";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import { HomePage } from "./container";
 import FixFoods from "./container/Admin/Foods/FixFood";
@@ -21,6 +21,11 @@ import AdminLayout from "./components/layout/LayoutAdmin";
 import ChartAdmin from "./container/Admin/Chart/Chart";
 import DashboardAdmin from "./container/Admin/Dashboard";
 import UserSettings from "./container/User";
+import OrderManagement from "./container/Admin/OrderManagement";
+import OrderDetail from "./container/Admin/OrderManagement/OrderDetail";
+import CreateOrder from "./container/Admin/OrderManagement/CreateOrder";
+import NotFound404 from "./components/NotFound404";
+
 const MuiTheme = createTheme({
   typography: {
     allVariants: {
@@ -32,30 +37,62 @@ const MuiTheme = createTheme({
   },
 });
 
-const App = () => (
-  <Routes>
-    <Route path="/" element={<WebsiteLayout />}>
-      <Route index element={<HomePage />} />
-      <Route path="/book-table" element={<BookTable />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/menu" element={<Menu />} />
-      <Route path="/menu/:id" element={<DetailFood />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/user-settings" element={<UserSettings />} />
-    </Route>
-    <Route path="/admin" element={<AdminLayout />}>
-      <Route index element={<DashboardAdmin />} />
-      <Route path="categories" element={<CategoriesAdmin />} />
-      <Route path="analist" element={<ChartAdmin />} />
-      <Route path="foods" element={<FoodsAdmin />} />
-      <Route path="foods/fix-food/:id" element={<FixFoods />} />
-      <Route path="/admin/foods/new-food" element={<NewFood />} />
-      <Route path="tables" element={<TableAdmin />} />
-      <Route path="orders" element={<ConfirmOrder />} />
-    </Route>
-  </Routes>
-);
+const App = () => {
+  const [foodsAtTable, setFoodsAtTable] = useState([]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<WebsiteLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="/book-table" element={<BookTable />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/menu" element={<Menu />} />
+        <Route path="/menu/:id" element={<DetailFood />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/user-settings" element={<UserSettings />} />
+      </Route>
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<DashboardAdmin />} />
+        <Route path="categories" element={<CategoriesAdmin />} />
+        <Route path="analist" element={<ChartAdmin />} />
+        <Route path="foods" element={<FoodsAdmin />} />
+        <Route path="foods/fix-food/:id" element={<FixFoods />} />
+        <Route path="/admin/foods/new-food" element={<NewFood />} />
+        <Route path="tables" element={<TableAdmin />} />
+        <Route path="orders" element={<ConfirmOrder />} />
+        <Route
+          path="orders-management"
+          element={
+            <OrderManagement
+              foodsAtTable={foodsAtTable}
+              setFoodsAtTable={setFoodsAtTable}
+            />
+          }
+        />
+        <Route
+          path="orders-management/create"
+          element={
+            <CreateOrder
+              foodsAtTable={foodsAtTable}
+              setFoodsAtTable={setFoodsAtTable}
+            />
+          }
+        />
+        <Route
+          path="orders-management/:orderId/:tableId"
+          element={
+            <OrderDetail
+              foodsAtTable={foodsAtTable}
+              setFoodsAtTable={setFoodsAtTable}
+            />
+          }
+        />
+      </Route>
+      <Route path="/404" element={<NotFound404 />} />
+    </Routes>
+  );
+};
 
 export default App;

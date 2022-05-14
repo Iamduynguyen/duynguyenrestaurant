@@ -132,6 +132,30 @@ public class TableService implements ITableService {
                         && orderTime <= userOrderTime + TIME_EATING);
     }
 
+    @Override
+    public List<TableDto> getbytime(Long start,Long end){
+        List<TableOrder> lst1 = tableOrderRepository.getBystart(start,end);
+        List<TableOrder> lst2 = tableOrderRepository.getByEnd(start,end);
+        Set<Long> lst = new HashSet<>();
+        for (TableOrder x: lst1){
+            lst.add(x.getTables().getId());
+        }
+        for (TableOrder x: lst2){
+            lst.add(x.getTables().getId());
+        }
+        List<TableDto> resutl = tableMapper.convertToListDto(tablesRepository.findAll());
+        for (Long x:lst){
+            for (TableDto y:resutl){
+                if (y.getId()==x){
+                    y.setStatus(1);
+                }
+            }
+        }
+        return resutl;
+    }
 
-
+    @Override
+    public List<TableDto> findAllTablesExist() {
+        return tableMapper.convertToListDto(tablesRepository.findByDeleteflagFalse());
+    }
 }

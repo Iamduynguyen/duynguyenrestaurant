@@ -75,9 +75,17 @@ public class FoodService implements IFoodService {
     }
 
     @Override
+    public List<FoodDto> getFoodsByCategoryId(Long id) {
+        return mapper.convertToListDto(foodRepository.findByCategoryId(id));
+    }
+
+    @Override
     public FoodDto getById(Long id) {
         Food food = foodRepository.findById(id).orElse(null);
-        return mapper.convertToDto(food);
+        System.out.println(food.toString());
+        FoodDto result = mapper.convertToDto(food);
+        System.out.println("llll"+result.toString());
+        return result;
     }
 
     @Override

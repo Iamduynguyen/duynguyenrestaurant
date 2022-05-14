@@ -4,6 +4,7 @@ import logo from "../../favicon.ico";
 import gallery04 from "../../assets/gallery04.png";
 
 import AuthAPI from "../../API/AuthAPI";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const [savePass, setSavePass] = React.useState(false);
@@ -19,33 +20,41 @@ export default function Login() {
       password: password,
     };
     const res = await AuthAPI.login(data);
-    console.log(res)
+    console.log(res);
     if (!res.status) {
-      setValidAPI("");
-      if (savePass) {
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: `Chào mừng ${res.username} đã quay trở lại!`,
+        showConfirmButton: false,
+        timerProgressBar: true,
+        timer: 1500,
+      }).then(() => {
+        setValidAPI("");
+        if (savePass) {
+          localStorage.setItem("token", res.token);
+          localStorage.setItem("name", res.username);
+          localStorage.setItem("role", res.role);
+          setToken(res.token);
+        }
+        sessionStorage.setItem("token", res.token);
+        sessionStorage.setItem("name", res.username);
+        sessionStorage.setItem("role", res.role);
         localStorage.setItem("token", res.token);
         localStorage.setItem("name", res.username);
         localStorage.setItem("role", res.role);
         setToken(res.token);
-      }
-      sessionStorage.setItem("token", res.token);
-      sessionStorage.setItem("name", res.username);
-      sessionStorage.setItem("role", res.role);
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("name", res.username);
-      localStorage.setItem("role", res.role);
-      setToken(res.token);
-      if (res.role === "ROLE_ADMIN") {
-        navigation("/admin");
-      } else {
-        navigation("/");
-      }
+        if (res.role === "ROLE_ADMIN") {
+          navigation("/admin");
+        } else {
+          navigation("/");
+        }
+      });
     } else if (res.status === 403) {
       setValidAPI("Tài khoản hoặc mật khẩu không đúng");
     } else {
       setValidAPI("Lỗi hệ thống, vui lòng liên hệ quản trị viên");
     }
-    console.log(res);
   };
   React.useEffect(() => {
     if (!!sessionStorage.getItem("token") || !!localStorage.getItem("token")) {
@@ -81,7 +90,7 @@ export default function Login() {
                       label="Email"
                       name="email"
                       onChange={(e) => setEmail(e.target.value)}
-                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                       placeholder=" "
                       // required
                       autoFocus
@@ -99,7 +108,7 @@ export default function Login() {
                       name="Mật khẩu"
                       id="password"
                       onChange={(e) => setPassword(e.target.value)}
-                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                      className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                       placeholder=" "
                       required
                     />
@@ -122,7 +131,7 @@ export default function Login() {
                     <div className="ml-3 text-sm">
                       <label
                         htmlFor="terms"
-                        className="font-medium text-gray-900 dark:text-gray-300"
+                        className="font-medium text-gray-900 dark:text-gray-500"
                       >
                         Nhớ mật khẩu
                       </label>

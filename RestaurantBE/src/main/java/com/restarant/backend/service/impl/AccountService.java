@@ -27,7 +27,9 @@ public class AccountService implements IAccountService {
         Customer customer = new Customer();
         customer.setName(result.getLogin());
         customer.setAccount(result);
-        customerRepository.save(customer);
+        Customer customer1 = customerRepository.save(customer);
+        result.setCustomer(customer1);
+        accountRepository.save(result);
         return result;
     }
 

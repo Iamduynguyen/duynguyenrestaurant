@@ -3,7 +3,6 @@ package com.restarant.backend.dto;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class TableOrderDto {
@@ -12,4 +11,5 @@ public class TableOrderDto {
     private List<OrderDetailsDto> orderDetails;
     private Long tableId;
     private Long orderTotalId;
+    private Long endTime;
 }

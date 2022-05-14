@@ -56,7 +56,7 @@ public class Food implements Serializable {
     @JsonIgnoreProperties(value = { "food" }, allowSetters = true)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "food", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "food", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "foodMedias", "orderDetails", "food" }, allowSetters = true)
     private List<FoodDetails> foodDetails;
 

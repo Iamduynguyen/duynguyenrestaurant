@@ -107,10 +107,11 @@ export default function AdminPage() {
                 <AccordionSummary
                   aria-controls="panel1a-content"
                   onClick={() => navigate("/admin/chartAdmin")}
-                  className={`${styles.navItem} ${location.pathname === "/admin/chartAdmin"
+                  className={`${styles.navItem} ${
+                    location.pathname === "/admin/chartAdmin"
                       ? styles.navItemActive
                       : ""
-                    }`}
+                  }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography
@@ -133,10 +134,11 @@ export default function AdminPage() {
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel1a-content"
                   onClick={() => navigate("/admin/categories")}
-                  className={`${styles.navItem} ${location.pathname === "/admin/categories"
+                  className={`${styles.navItem} ${
+                    location.pathname === "/admin/categories"
                       ? styles.navItemActive
                       : ""
-                    }`}
+                  }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography
@@ -168,10 +170,11 @@ export default function AdminPage() {
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel2a-content"
                   onClick={() => navigate("/admin/foods")}
-                  className={`${styles.navItem} ${location.pathname === "/admin/foods"
+                  className={`${styles.navItem} ${
+                    location.pathname === "/admin/foods"
                       ? styles.navItemActive
                       : ""
-                    }`}
+                  }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography
@@ -201,10 +204,11 @@ export default function AdminPage() {
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel2a-content"
                   onClick={() => navigate("/admin/tables")}
-                  className={`${styles.navItem} ${location.pathname === "/admin/tables"
+                  className={`${styles.navItem} ${
+                    location.pathname === "/admin/tables"
                       ? styles.navItemActive
                       : ""
-                    }`}
+                  }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography
@@ -237,10 +241,11 @@ export default function AdminPage() {
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel2a-content"
                   onClick={() => navigate("/admin/orders")}
-                  className={`${styles.navItem} ${location.pathname === "/admin/orders"
+                  className={`${styles.navItem} ${
+                    location.pathname === "/admin/orders"
                       ? styles.navItemActive
                       : ""
-                    }`}
+                  }`}
                   style={{ borderRadius: "10px" }}
                 >
                   <Typography

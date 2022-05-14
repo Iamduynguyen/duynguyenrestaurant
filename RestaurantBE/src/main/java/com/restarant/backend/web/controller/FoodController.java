@@ -72,7 +72,10 @@ public class FoodController {
         throws URISyntaxException {
         log.debug("REST request to update Food : {}, {}", id, foodDto);
         try {
+            System.out.println(id);
+            System.out.println(foodDto);
             FoodDto result = foodservice.update(id, foodDto);
+            System.out.println("ủa "+result);
             if(result == null){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("food Id not exists!");
             }

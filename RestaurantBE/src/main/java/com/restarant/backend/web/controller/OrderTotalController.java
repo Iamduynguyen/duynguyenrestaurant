@@ -102,18 +102,12 @@ public class OrderTotalController {
     public List<GetAllToTalOrder> getAllToTalOrders(){
         return orderTotalService.getAllOrderTotal();
     }
-<<<<<<< HEAD
-    @GetMapping("/orders1")
-    public List<OrderTotal> getAllOrders() {
-        return orderTotalRepository.findAll();
-    }
 
-=======
->>>>>>> b992cbea2be7492eed6fffaedeeb35aefb3c5c2d
     @PutMapping("/confirm-customer-order-online/{id}")
     public String confirmCustomerOrderOnline(@PathVariable Long id){
         return orderTotalService.confirmCustomerOrderOnline(id);
     }
+
     @PostMapping("/create-order-couter")
     public String createCounter(@RequestBody OrderCouterDto request, HttpServletRequest httpServletRequest) {
         return orderTotalService.registrationOrderCounter(request, httpServletRequest);

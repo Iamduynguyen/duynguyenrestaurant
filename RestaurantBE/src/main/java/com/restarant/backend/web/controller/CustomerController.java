@@ -4,8 +4,10 @@ import com.restarant.backend.dto.FavouriteFoodDto;
 import com.restarant.backend.entity.Customer;
 import com.restarant.backend.service.ICustomerService;
 import com.restarant.backend.dto.CustomerDto;
+import com.restarant.backend.service.utils.JwtServiceUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,9 @@ import java.util.Set;
 @Transactional
 @CrossOrigin("*")
 public class CustomerController {
+
+    @Autowired
+    private JwtServiceUtils jwtServiceUtils;
 
     private static final String ENTITY_NAME = "customer";
 
@@ -132,6 +137,25 @@ public class CustomerController {
             CustomerDto customer = customerService.getById(request);
             if(customer == null){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+            return ResponseEntity.ok(customer);
+        } catch (InvalidDataExeception e) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    @PostMapping("/customer")
+    public ResponseEntity<?> saveCustomer(HttpServletRequest request, @RequestBody CustomerDto customerDto) {
+        try {
+            CustomerDto customer = customerService.getById(request);
+            System.out.println(customerDto.toString());
+            if(customer == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            } else {
+                customer.setName(customerDto.getName());
+                customer.setPhoneNumber(customerDto.getPhoneNumber());
+                customerService.create(customerDto);
             }
             return ResponseEntity.ok(customer);
         } catch (InvalidDataExeception e) {

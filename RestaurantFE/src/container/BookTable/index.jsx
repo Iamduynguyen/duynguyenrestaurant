@@ -47,6 +47,21 @@ export default function BookTable() {
     };
     fetchData();
   }, []);
+
+  const gettime = async () => {
+    var time = new Date().getTime();
+    console.log(time)
+    const timeOrder = new Date(
+      OrderDate.format("L") + " " + OrderTime.format("LTS")
+    ).getTime();
+    const timeEnd = new Date(
+      OrderDate.format("L") + " " + endtime.format("LTS")
+    ).getTime();
+      console.log(timeOrder);
+      setOrder(true);
+    ;
+  }
+
   const confirmBookTables = async () => {
     const timeOrder = new Date(
       OrderDate.format("L") + " " + OrderTime.format("LTS")
@@ -116,7 +131,7 @@ export default function BookTable() {
               <Button
                 variant="contained"
                 sx={{ color: "white", background: "#42a5f5" }}
-                onClick={() => setOrder(true)}
+                onClick={() => gettime()}
               >
                 Xác nhận thời gian trên
               </Button>

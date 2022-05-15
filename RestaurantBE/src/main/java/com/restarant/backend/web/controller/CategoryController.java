@@ -1,12 +1,9 @@
 package com.restarant.backend.web.controller;
 
 import com.restarant.backend.dto.CategoryDto;
-import com.restarant.backend.entity.Category;
 import com.restarant.backend.model.Pages;
-import com.restarant.backend.repository.CategoryRepository;
 import com.restarant.backend.service.ICategoryService;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -27,8 +21,6 @@ import java.util.Optional;
 public class CategoryController {
 
     private final Logger log = LoggerFactory.getLogger(CategoryController.class);
-
-    private static final String ENTITY_NAME = "category";
 
     private final ICategoryService categoryService;
 
@@ -59,7 +51,7 @@ public class CategoryController {
     @GetMapping("/categories")
     public List<CategoryDto> getAllCategories(Pageable pageable) {
         log.debug("REST request to get all Categories");
-        return (List<CategoryDto>) categoryService.getAll(pageable);
+        return categoryService.getAll(pageable);
     }
 
 

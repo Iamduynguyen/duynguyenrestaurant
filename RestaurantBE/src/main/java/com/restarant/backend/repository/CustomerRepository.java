@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
-    @Query("SELECT e FROM Customer e WHERE e.name = :username")
+    @Query("SELECT e FROM Customer e WHERE e.account.login = :username")
     Customer getCustomerByUsername(String username);
 }

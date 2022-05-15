@@ -15,9 +15,9 @@ import java.util.List;
  * Project_name: Tech-cam
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class GetTableOrDer {
+@AllArgsConstructor
+public class GetTableOrder {
     private Long orderTableId;
     private Long orderId;
     private Long tablesId;

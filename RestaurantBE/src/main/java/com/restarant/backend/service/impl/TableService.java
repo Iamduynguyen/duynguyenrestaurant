@@ -154,6 +154,8 @@ public class TableService implements ITableService {
         return resutl;
     }
 
-
-
+    @Override
+    public List<TableDto> findAllTablesExist() {
+        return tableMapper.convertToListDto(tablesRepository.findByDeleteflagFalse());
+    }
 }

@@ -17,10 +17,9 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import TableAPI from "./../../../API/TableAPI";
-import styles from "../Categories/Categories.module.css";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 
 export default function TableAdmin() {
-  const isMobile = useMediaQuery("(max-width:600px)");
   const [openDLDelete, setOpenDLDelete] = useState(false);
   const [openChangeStatus, setOpenChangeStatus] = useState(false);
   const [openTableDetail, setOpenTableDetail] = useState(false);
@@ -76,35 +75,66 @@ export default function TableAdmin() {
     setResetData(!resetData);
   };
   const getTime = async (e) => {
-    console.log(e.target)
+    console.log(e.target);
   };
   return (
     <Grid container mt={1}>
-      <div>
+      <div
+        className="adm-section"
+        style={{ display: "flex", gap: "50px", alignItems: "flex-end" }}
+      >
+        <h2 style={{ margin: "10px 0px 0px 0px", fontSize: 30 }}>Danh sách</h2>
         <form>
-          <div>
-            <input type="date" id="appt" name="appt"
-              min="09:00" max="18:00" required />
-            <input type="time" id="appt" name="appt"
-              min="09:00" max="18:00" required />
-            <button type="submit" onSubmit={(EventTarget) = getTime}>ok</button>
+          <div style={{ marginBottom: "5px", display: "flex", gap: 10 }}>
+            <input
+              type="date"
+              id="appt"
+              name="appt"
+              min="09:00"
+              max="22:30"
+              required
+              style={{
+                background: "#9c27b029",
+                border: "1px solid #9c27b029",
+                borderRadius: "5px",
+                padding: "5px",
+              }}
+            />
+            <input
+              type="time"
+              id="appt"
+              name="appt"
+              min="09:00"
+              max="22:30"
+              required
+              style={{
+                background: "#9c27b029",
+                border: "1px solid #9c27b029",
+                borderRadius: "5px",
+                padding: "5px",
+              }}
+            />
+            <Button
+              type="submit"
+              onSubmit={(EventTarget = getTime)}
+              variant="contained"
+              color="secondary"
+              startIcon={<EventAvailableIcon />}
+            >
+              OK
+            </Button>
           </div>
         </form>
       </div>
-      <br />
-      <p className=" pt-[20px] pl-[30px] font-medium text-[26px] text-gray-700">
-        Danh sách
-      </p>
-
-      <div className="px-[30px] mt-[20px] py-[15px] w-full  uppercase border-b dark:border-gray-700 bg-gray-50 ">
+      <div className="px-[30px] pt-[15px] w-full uppercase border-b dark:border-gray-700 bg-gray-50 ">
         <div className="w-full grid grid-cols-[0.5fr,3fr,4fr,3fr]">
-          <p className="text-xs font-bold tracking-wide text-left text-gray-500">
+          <p className="text-base font-bold tracking-wide text-left text-gray-500">
             #
           </p>
-          <p className="text-xs font-bold tracking-wide text-left text-gray-500">
+          <p className="text-base font-bold tracking-wide text-left text-gray-500">
             Danh sách bàn
           </p>
-          <p className="text-xs font-bold tracking-wide text-left text-gray-500">
+          <p className="text-base font-bold tracking-wide text-left text-gray-500">
             Trạng thái
           </p>
           <p className=""></p>
@@ -112,7 +142,10 @@ export default function TableAdmin() {
       </div>
       <div className="w-full ">
         {table?.map((item, index) => (
-          <div className="w-full px-[30px]  grid grid-cols-[0.5fr,3fr,4fr,3fr] py-[15px] border-b border-gray-300" key={index}>
+          <div
+            className="w-full px-[30px]  grid grid-cols-[0.5fr,3fr,4fr,3fr] py-[15px] border-b border-gray-300"
+            key={index}
+          >
             <div className="">{index + 1}</div>
             <div className="">Table {item.id}</div>
             <div className="text-gray-400">

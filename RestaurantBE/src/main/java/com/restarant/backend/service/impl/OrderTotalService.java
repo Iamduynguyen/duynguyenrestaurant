@@ -35,6 +35,8 @@ public class OrderTotalService implements IOrderTotalService {
     @Autowired
     private VoucherRepository voucherRepository;
     @Autowired
+    IConverterDto<Customer,CustomerDto> mapperCus;
+    @Autowired
     private MailUtils mailUtils;
     @Autowired
     private JwtServiceUtils jwtServiceUtils;
@@ -389,6 +391,189 @@ public class OrderTotalService implements IOrderTotalService {
             total = total.add(orderTotal.getAmountTotal());
         }
         return total;
+    }
+
+
+    public Boolean customerConfirm1(Long id) {
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 0);
+        if (orderTotal == null) {
+            return false;
+        } else if (lst == null) {
+            return false;
+        }
+        for (OrderDetails x : lst) {
+            x.setStatus(1);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(1);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean customerConfirm3(Long id) {
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 2);
+        if (orderTotal == null) {
+            return false;
+        } else if (lst == null) {
+            return false;
+        }
+        for (OrderDetails x : lst) {
+            x.setStatus(3);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(3);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean customerConfirm6(Long id) {
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 5);
+        if (orderTotal == null) {
+            return false;
+        } else if (lst == null) {
+            return false;
+        }
+        for (OrderDetails x : lst) {
+            x.setStatus(6);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(6);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean staffConfirm2(Long id, HttpServletRequest req) {
+        String username = jwtServiceUtils.getUserName(req);
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 1);
+        if (username == null) {
+            return false;
+        }
+
+        if (!lst.isEmpty()) {
+            for (OrderDetails x : lst) {
+                x.setStatus(2);
+            }
+        }
+
+        orderDetailsRepository.saveAll(lst);
+
+        orderTotal.setStatus(2);
+        orderTotalRepository.save(orderTotal);
+
+        return true;
+    }
+
+    public Boolean staffConfirm4(Long id, HttpServletRequest req) {
+        Account account = jwtServiceUtils.getAccountByToken(req);
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 3);
+        if (orderTotal == null || account == null) {
+            return false;
+        } else if (lst == null) {
+            return false;
+        }
+        for (OrderDetails x : lst) {
+            x.setStatus(4);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(4);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean staffConfirm5(Long id, HttpServletRequest req) {
+        Account account = jwtServiceUtils.getAccountByToken(req);
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 4);
+        if (orderTotal == null || account == null) {
+            return false;
+        } else if (lst == null) {
+            return false;
+        }
+        for (OrderDetails x : lst) {
+            x.setStatus(5);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(5);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public Boolean staffConfirm7(Long id, HttpServletRequest req) {
+        Account account = jwtServiceUtils.getAccountByToken(req);
+        OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 6);
+        if (orderTotal == null || account == null) {
+            return false;
+        } else if (lst == null) {
+            return false;
+        }
+        for (OrderDetails x : lst) {
+            x.setStatus(7);
+        }
+        orderDetailsRepository.saveAll(lst);
+        orderTotal.setStatus(7);
+        orderTotalRepository.save(orderTotal);
+        return true;
+    }
+
+    public List<OrderTotalDto> getbystatus(Integer status){
+        System.out.println(status);
+        List<OrderTotal> orderTotalList = orderTotalRepository.getBystaus(status);
+        if (orderTotalList==null){
+            return null;
+        }
+        List<OrderTotalDto> rs = new ArrayList<>();
+        for (OrderTotal x:orderTotalList){
+            OrderTotalDto a = new OrderTotalDto();
+            a.setId(x.getId());
+            a.setAmountTotal(x.getAmountTotal());
+            a.setOrderTime(x.getOrderTime());
+            a.setCustomer(mapperCus.convertToDto(x.getCustomer()));
+            a.setCreatedAt(x.getCreatedAt());
+            a.setTableOrders(tableOrderMapper.convertToListDto(x.getTableOrders()));
+            a.setStatus(convert(x.getStatus()));
+            rs.add(a);
+        }
+        return rs;
+    }
+
+    private String convert(Integer x){
+        OrderDetails entity = new OrderDetails();
+        entity.setStatus(x);
+        OrderDetailsDto dto = new OrderDetailsDto();
+        if (entity.getStatus()==0){
+            dto.setStatus("Vừa thêm vào");
+        }
+        if (entity.getStatus()==1){
+            dto.setStatus("chờ xác nhận");
+        }
+        if (entity.getStatus()==2){
+            dto.setStatus("Đã xác nhận");
+        }
+        if (entity.getStatus()==3){
+            dto.setStatus("chờ đặt cọc");
+        }
+        if (entity.getStatus()==4){
+            dto.setStatus("chờ xác nhận cọc tiền");
+        }
+        if (entity.getStatus()==5){
+            dto.setStatus("Sắp mang ra");
+        }
+        if (entity.getStatus()==6){
+            dto.setStatus("Đang ăn");
+        }
+        if (entity.getStatus()==5){
+            dto.setStatus("Đã thanh toán");
+        }
+        if (entity.getStatus()==6){
+            dto.setStatus("Nhà hàng hủy");
+        }
+        return dto.getStatus();
     }
 
 }

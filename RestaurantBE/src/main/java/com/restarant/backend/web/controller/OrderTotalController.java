@@ -111,7 +111,10 @@ public class OrderTotalController {
     public String createCounter(@RequestBody OrderCouterDto request, HttpServletRequest httpServletRequest) {
         return orderTotalService.registrationOrderCounter(request, httpServletRequest);
     }
-
+    @PutMapping("/confirm-customer-go-restaurant/{id}")
+    public String confirmCustomerGoRestaurant(@PathVariable Long id) throws InvalidDataExeception {
+      return orderTotalService.confirmCustomerGoRestaurant(id);
+    }
     @PostMapping("/payment-order")
     public String payment(@RequestBody OrderPaymentDto paymentDto, HttpServletRequest request) {
         return orderTotalService.payment(paymentDto, request);

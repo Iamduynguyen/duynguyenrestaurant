@@ -90,6 +90,20 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
+    public String confirmCustomerGoRestaurant(Long id) throws InvalidDataExeception {
+        OrderTotal orderTotal =  orderTotalRepository.getById(id);
+        if(Objects.isNull(orderTotal)){
+            throw new InvalidDataExeception("Vui lòng thử lại.");
+        }
+        orderTotal.setStatus(5);
+        try{
+           orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+    @Override
     public List<GetAllToTalOrder> getAllOrderTotal(){
         Type type =  new TypeToken<List<GetAllToTalOrder>>(){}.getType();
         List<OrderTotal> orderTotalList = orderTotalRepository.findAll();

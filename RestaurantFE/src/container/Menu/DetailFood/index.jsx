@@ -40,6 +40,7 @@ export default function DetailFood() {
   const [allFoodsData, setAllFoodsData] = useState([]);
   const [openOrderFood, setOpenOrderFood] = useState(false);
   const [addFoodToTable, setAddFoodToTable] = useState([]);
+  const [quantity, setQuantity] = useState([]);
   const [userOrder, setUserOrder] = useState([]);
   const discount = (price, discount) => {
     return (parseInt(price, 10) * (100 - parseInt(discount, 10))) / 100;
@@ -51,6 +52,11 @@ export default function DetailFood() {
       setAddFoodToTable(addFoodToTable.filter((item) => item !== food.id));
     }
   };
+
+  const setQuantitya = (evt) => {
+    console.log(evt.target)
+  };
+
   const confirmOrderFoods = async () => {
     setOpenOrderFood(false);
     const order = addFoodToTable.map((item) => {
@@ -149,7 +155,7 @@ export default function DetailFood() {
           </Grid>
           <div className=" mt-[70px]  ">
             <div className="pl-[80px] ">
-              <p className="text-[36px] font-medium text-[#F8B400]">
+              <p className="text-[36px] font-medium text-[#F8B400]" style={{maxWidth: '530px'}}>
                 {FoodsData?.name}
               </p>
               <div className="">
@@ -232,6 +238,8 @@ export default function DetailFood() {
                     ) : null}
                   </Button>
                 ))}
+                <br />
+                <label>So luong</label><input type="number" id="quantity" min={1} onChange={()=>setQuantitya(Event)} style={{border:'1px solid blue',marginLeft:'10px'}} ></input>
               </div>
               <div className="mt-[30px]">
                 <button

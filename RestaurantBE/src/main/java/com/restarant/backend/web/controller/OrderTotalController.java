@@ -42,66 +42,19 @@ public class OrderTotalController {
     public OrderTotalController(IOrderTotalService orderTotalService) {
         this.orderTotalService = orderTotalService;
     }
-//    /**
-//     * {@code POST  /order-totals} : Create a new orderTotal.
-//     *
-//     * @param orderTotal the orderTotal to create.
-//     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new orderTotal, or with status {@code 400 (Bad Request)} if the orderTotal has already an ID.
-//     * @throws URISyntaxException if the Location URI syntax is incorrect.
-//     */
-//    @PostMapping("/order-totals")
-//    public ResponseEntity<OrderTotal> createOrderTotal(@RequestBody OrderTotal orderTotal) throws URISyntaxException {
-//        log.debug("REST request to save OrderTotal : {}", orderTotal);
-//        OrderTotal result = orderTotalRepository.save(orderTotal);
-//        return ResponseEntity.ok().body(result);
-//    }
 
-//    /**
-//     * {@code PUT  /order-totals/:id} : Updates an existing orderTotal.
-//     *
-//     * @param id the id of the orderTotal to save.
-//     * @param orderTotal the orderTotal to update.
-//     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated orderTotal,
-//     * or with status {@code 400 (Bad Request)} if the orderTotal is not valid,
-//     * or with status {@code 500 (Internal Server Error)} if the orderTotal couldn't be updated.
-//     * @throws URISyntaxException if the Location URI syntax is incorrect.
-//     */
-//    @PutMapping("/order-totals/{id}")
-//    public ResponseEntity<?> updateOrderTotal(
-//        @PathVariable(value = "id", required = false) final Long id,
-//        @RequestBody OrderTotal orderTotal
-//    ) throws URISyntaxException {
-//        log.debug("REST request to update OrderTotal : {}, {}", id, orderTotal);
-//        if (!orderTotalRepository.existsById(id)) {
-//            return ResponseEntity.badRequest().body("Entity not found");
-//        }
-//        OrderTotal result = orderTotalRepository.save(orderTotal);
-//        return ResponseEntity.ok().body(result);
-//    }
-
-
-    //    /**
-//     * {@code GET  /order-totals} : get all the orderTotals.
-//     *
-//     * @param filter the filter of the request.
-//     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orderTotals in body.
-//     */
-//    @GetMapping("/order-totals")
-//    public List<OrderTotal> getAllOrderTotals(@RequestParam(required = false) String filter) {
-//        if ("payment-is-null".equals(filter)) {
-//            log.debug("REST request to get all OrderTotals where payment is null");
-//            return StreamSupport
-//                .stream(orderTotalRepository.findAll().spliterator(), false)
-//                .filter(orderTotal -> orderTotal.getPayment() == null)
-//                .collect(Collectors.toList());
-//        }
-//        log.debug("REST request to get all OrderTotals");
-//        return orderTotalRepository.findAll();
-//    }
     @GetMapping("/orders")
     public List<GetAllToTalOrder> getAllToTalOrders(){
         return orderTotalService.getAllOrderTotal();
     }
+<<<<<<< Updated upstream
+=======
+
+    @GetMapping("/orders1")
+    public List<OrderTotal> getAllOrders() {
+        return orderTotalRepository.findAll();
+    }
+>>>>>>> Stashed changes
 
     @PutMapping("/confirm-customer-order-online/{id}")
     public String confirmCustomerOrderOnline(@PathVariable Long id){
@@ -214,6 +167,12 @@ public class OrderTotalController {
     @GetMapping("/order-total/staff-confirm5/{id}")
     public ResponseEntity<?> staffConfirm5(@PathVariable Long id,HttpServletRequest request){
         Boolean rs = orderTotalService1.staffConfirm5(id,request);
+        return ResponseEntity.ok(rs);
+    }
+
+    @GetMapping("/order-totalby")
+    public ResponseEntity<?> waiting(@RequestParam("status") Integer status){
+        List<OrderTotalDto> rs = orderTotalService1.getbystatus(status);
         return ResponseEntity.ok(rs);
     }
 }

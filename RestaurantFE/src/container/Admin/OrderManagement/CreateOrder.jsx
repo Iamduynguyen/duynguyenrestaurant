@@ -233,7 +233,7 @@ const CreateOrder = () => {
                 return (
                   <div className="item">
                     <img src={e.avtUrl} alt={e.id} />
-                    <p>{e.title}</p>
+                    <p>{e.name}</p>
                   </div>
                 );
               })}

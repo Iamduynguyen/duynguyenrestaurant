@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -146,7 +145,7 @@ public class OrderTotalService implements IOrderTotalService {
                 }
                 getTableOrDers.add(getTableOrDer);
             }
-            x.setOrDers(getTableOrDers);
+            x.setOrders(getTableOrDers);
         }
         return getAllToTalOrders;
     }

@@ -11,9 +11,15 @@ export default function Cart() {
   const navigate = useNavigate();
 
   const [dataUser, setDataUser] = useState([]);
-  const [orderId, setOrderId] = useState("");
   const [foodOrder, setFoodOrder] = useState([]);
+  const [xacnhanBtn, setXacnhanBtn] = useState(false);
+  const [datcocBtn, setDatcocBtn] = useState(false);
+  const [orderId, setOrderId] = useState("");
   const [sumPrice, setSumPrice] = useState("");
+
+  const [sum, setSum] = useState(0);
+  const [countPrice, setCountPrice] = useState([])
+
   const [socketUrl, setSocketUrl] = useState("localhost:8787");
   const [messageHistory, setMessageHistory] = useState([]);
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
@@ -34,29 +40,47 @@ export default function Cart() {
   };
 
   const fetchData = async () => {
-    let countPrice = [];
-    let sum = 0;
     const res = await BookTableAPI.getUserBookTable();
-    setDataUser(res);
-    if (res.length !== 0) {
-      setOrderId(res[0].orderTotalId);
-    }
-    res.forEach((item) => {
-      if (item.orderDetails[0]) {
-        item.orderDetails.forEach((order) => {
-          countPrice.push(order);
-          sum += order.foodDetalls.amount;
-        });
-      }
-    });
-    setFoodOrder(countPrice);
-    setSumPrice(sum);
     console.log(res);
+    if (res.length !== 0) {
+      setDataUser(res);
+
+      // Set sum & countPrice
+      let countXacnhan = 0;
+      let countDatcoc = 0;
+      let sumI = 0
+      let tempOrder = [];
+      res[0].orderDetails.map((e)=>{
+        sumI+=(discount(
+          e.foodDetalls.amount,
+          e.foodDetalls.discount
+        ))*+e.quantity;
+
+        if (e.status==="Vừa thêm vào") {
+          countXacnhan++;
+        }
+        if (e.status==="Đã xác nhận") {
+          countDatcoc++;
+        }
+
+        tempOrder.push(e);
+      })
+      
+      setFoodOrder(tempOrder);
+      setOrderId(res[0].orderTotalId);
+      setSumPrice(sumI);
+
+      if(countXacnhan > 0) {
+        setXacnhanBtn(true);
+      }
+      if(countDatcoc > 0) {
+        setDatcocBtn(true);
+      }
+    }
   };
 
   useEffect(() => {
     fetchData();
-    sendMessage("Hello");
   }, []);
   // var stompClient = require('./websocket-listener')
 
@@ -180,7 +204,7 @@ export default function Cart() {
                   <Stack spacing={2}>
                     {foodOrder?.map((item, index) => (
                       <Box key={index}>
-                        <p className="cart-text">{`${index}, ${
+                        <p className="cart-text">{`${index+1}, ${
                           item.foodDetalls.foodName
                         } | ${
                           item.foodDetalls.discount == 0
@@ -199,7 +223,7 @@ export default function Cart() {
                         } VND`}</p>
                       </Box>
                     ))}
-                    <Box width="100%" textAlign="center">
+                    {xacnhanBtn && (<Box id="confirm" width="100%" textAlign="center">
                       <Button
                         onClick={() => confirmOrder1(orderId)}
                         variant="contained"
@@ -208,7 +232,18 @@ export default function Cart() {
                       >
                         Xác nhận đơn hàng
                       </Button>
-                    </Box>
+                    </Box>)}
+                    <Divider />
+                    {datcocBtn && (<Box id="datcoc" width="100%" textAlign="center">
+                      <Button
+                        onClick={() => confirmOrder1(orderId)}
+                        variant="contained"
+                        color="info"
+                        size="big"
+                      >
+                        Đặt cọc
+                      </Button>
+                    </Box>)}
                     <Divider />
                     <p
                       style={{ textAlign: "center", color: "#1059f5" }}

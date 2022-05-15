@@ -47,14 +47,12 @@ public class OrderTotalController {
     public List<GetAllToTalOrder> getAllToTalOrders(){
         return orderTotalService.getAllOrderTotal();
     }
-<<<<<<< Updated upstream
-=======
 
     @GetMapping("/orders1")
     public List<OrderTotal> getAllOrders() {
         return orderTotalRepository.findAll();
     }
->>>>>>> Stashed changes
+
 
     @PutMapping("/confirm-customer-order-online/{id}")
     public String confirmCustomerOrderOnline(@PathVariable Long id){

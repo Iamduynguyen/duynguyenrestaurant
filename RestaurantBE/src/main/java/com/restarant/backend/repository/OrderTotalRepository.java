@@ -19,7 +19,7 @@ public interface OrderTotalRepository extends JpaRepository<OrderTotal, Long> {
     @Query("select o from OrderDetails o where o.tableOrder.orderTotal.id = :id and o.status= :status")
     List<OrderDetails> getOrderdetailbyTotalAndStatus(@Param("id") Long id,@Param("status") Integer status);
 
-    @Query("SELECT o FROM OrderTotal o WHERE o.customer.id = :id AND o.status < 6 and o.status >0")
+    @Query("SELECT o FROM OrderTotal o WHERE o.customer.id = :id AND o.status < 6 and o.status >-1")
     OrderTotal getOrderTotalByCustomerId(Long id);
 
     @Query("SELECT o FROM OrderTotal o WHERE o.customer.id = :id AND o.status = :status")

@@ -135,6 +135,7 @@ public class OrderTotalService implements IOrderTotalService {
                     GetAllFoodOrder getAllFoodOrder = new GetAllFoodOrder();
                     getAllFoodOrder.setFoodDetailsId(y.getFoodDetalls().getId());
                     getAllFoodOrder.setFoodName(y.getFoodDetalls().getFood().getName());
+                    getAllFoodOrder.setSize(y.getFoodDetalls().getFoodsize());
                     getAllFoodOrder.setOrderTableId(y.getTableOrder().getId());
                     getAllFoodOrder.setAmount(y.getAmount());
                     getAllFoodOrder.setQuantity(y.getQuantity());
@@ -215,6 +216,7 @@ public class OrderTotalService implements IOrderTotalService {
                 orderDetails1 = orderDetailsRepository.findByTableOrderIdAndFoodDetallsId(counterDto.getTableId(), foodCouter.getFoodId());
                 FoodDetails foodDetails = foodDetallsRepository.findById(foodCouter.getFoodId()).get();
                 if (Objects.isNull(orderDetails1)) {
+                    orderDetails1 = new OrderDetails();
                     orderDetails1.setQuantity((long) foodCouter.getQuantity());
                     orderDetails1.setAmount(foodDetails.getAmount().subtract(foodDetails.getDiscount()));
                     orderDetails1.setFoodDetalls(foodDetails);

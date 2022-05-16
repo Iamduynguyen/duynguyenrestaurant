@@ -34,6 +34,8 @@ public class OrderTotalService implements IOrderTotalService {
     @Autowired
     private VoucherRepository voucherRepository;
     @Autowired
+    IConverterDto<Customer,CustomerDto> mapperCus;
+    @Autowired
     private MailUtils mailUtils;
     @Autowired
     private JwtServiceUtils jwtServiceUtils;
@@ -88,6 +90,20 @@ public class OrderTotalService implements IOrderTotalService {
         return true;
     }
 
+    @Override
+    public String confirmCustomerGoRestaurant(Long id) throws InvalidDataExeception {
+        OrderTotal orderTotal =  orderTotalRepository.getById(id);
+        if(Objects.isNull(orderTotal)){
+            throw new InvalidDataExeception("Vui lòng thử lại.");
+        }
+        orderTotal.setStatus(5);
+        try{
+           orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
     @Override
     public List<GetAllToTalOrder> getAllOrderTotal() {
         Type type = new TypeToken<List<GetAllToTalOrder>>() {
@@ -248,7 +264,14 @@ public class OrderTotalService implements IOrderTotalService {
             OrderTotal orderTotal = orderTotalRepository.getById(id);
             if (Objects.nonNull(orderTotal)) {
                 orderTotal.setStatus(2);
-                orderTotal.setNote("Người xác nhận đơn hàng :" + jwtServiceUtils.getUserName(request));
+                List<OrderDetails> lst = orderDetailsRepository.getByOrdertotalId(orderTotal.getId());
+                for (OrderDetails x:lst){
+                    if (x.getStatus()==1){
+                        x.setStatus(2);
+                    }
+                }
+                orderDetailsRepository.saveAll(lst);
+                orderTotal.setNote("Người xác nhận đơn hàng :"+ jwtServiceUtils.getUserName(request));
                 orderTotalRepository.save(orderTotal);
                 MailDto mailDto = new MailDto();
                 mailDto.setTo(orderTotal.getCustomer().getEmail());
@@ -504,6 +527,61 @@ public class OrderTotalService implements IOrderTotalService {
         orderTotal.setStatus(7);
         orderTotalRepository.save(orderTotal);
         return true;
+    }
+
+    public List<OrderTotalDto> getbystatus(Integer status){
+        System.out.println(status);
+        List<OrderTotal> orderTotalList = orderTotalRepository.getBystaus(status);
+        if (orderTotalList==null){
+            return null;
+        }
+        List<OrderTotalDto> rs = new ArrayList<>();
+        for (OrderTotal x:orderTotalList){
+            OrderTotalDto a = new OrderTotalDto();
+            a.setId(x.getId());
+            a.setAmountTotal(x.getAmountTotal());
+            a.setOrderTime(x.getOrderTime());
+            a.setCustomer(mapperCus.convertToDto(x.getCustomer()));
+            a.setCreatedAt(x.getCreatedAt());
+            a.setTableOrders(tableOrderMapper.convertToListDto(x.getTableOrders()));
+            a.setStatus(convert(x.getStatus()));
+            rs.add(a);
+        }
+        return rs;
+    }
+
+    private String convert(Integer x){
+        OrderDetails entity = new OrderDetails();
+        entity.setStatus(x);
+        OrderDetailsDto dto = new OrderDetailsDto();
+        if (entity.getStatus()==0){
+            dto.setStatus("Vừa thêm vào");
+        }
+        if (entity.getStatus()==1){
+            dto.setStatus("chờ xác nhận");
+        }
+        if (entity.getStatus()==2){
+            dto.setStatus("Đã xác nhận");
+        }
+        if (entity.getStatus()==3){
+            dto.setStatus("chờ đặt cọc");
+        }
+        if (entity.getStatus()==4){
+            dto.setStatus("chờ xác nhận cọc tiền");
+        }
+        if (entity.getStatus()==5){
+            dto.setStatus("Sắp mang ra");
+        }
+        if (entity.getStatus()==6){
+            dto.setStatus("Đang ăn");
+        }
+        if (entity.getStatus()==5){
+            dto.setStatus("Đã thanh toán");
+        }
+        if (entity.getStatus()==6){
+            dto.setStatus("Nhà hàng hủy");
+        }
+        return dto.getStatus();
     }
 
 }

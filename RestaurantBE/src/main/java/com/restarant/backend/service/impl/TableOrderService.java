@@ -12,9 +12,11 @@ import com.restarant.backend.repository.TablesRepository;
 import com.restarant.backend.service.ITableOrderService;
 import com.restarant.backend.service.ITableService;
 import com.restarant.backend.service.mapper.IConverterDto;
+import com.restarant.backend.service.utils.ConvertTime;
 import com.restarant.backend.service.utils.JwtServiceUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,8 @@ public class TableOrderService implements ITableOrderService {
     private final ITableService tableService;
     private final TablesRepository tablesRepository;
     private final JwtServiceUtils jwtServiceUtils;
+    @Autowired
+    ConvertTime convertTime;
 
     public TableOrderService(TableOrderRepository tableOrderRepository,
                              @Qualifier("tableOrderMapper") IConverterDto<TableOrder, TableOrderDto> mapper,
@@ -74,7 +78,15 @@ public class TableOrderService implements ITableOrderService {
         if(orderTotal == null){
             OrderTotal newOrderTotal = new OrderTotal();
             newOrderTotal.setCustomer(customer);
-            newOrderTotal.setOrderTime(dto.getOrderTime());
+            Long start = convertTime.validate(dto.getOrderTime());
+            Long end =0l;
+            if (dto.getEndTime()==null){
+                end = convertTime.addHour(start,3l);
+            }else {
+                end = convertTime.validate(dto.getEndTime());
+            }
+            newOrderTotal.setOrderTime(start);
+            newOrderTotal.setEndTime(end);
             newOrderTotal.setAmountTotal(new BigDecimal("0"));
             newOrderTotal.setStatus(OrderTotalStatus.ORDERING);
             orderTotal = orderTotalRepository.save(newOrderTotal);

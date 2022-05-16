@@ -98,11 +98,6 @@ public class OrderTotalController {
     public List<GetAllToTalOrder> getAllToTalOrders(){
         return orderTotalService.getAllOrderTotal();
     }
-//    @GetMapping("/orders")
-//    public List<OrderTotal> getAllOrders() {
-//        return orderTotalRepository.findAll();
-//    }
-
     @PutMapping("/confirm-customer-order-online/{id}")
     public String confirmCustomerOrderOnline(@PathVariable Long id){
         return orderTotalService.confirmCustomerOrderOnline(id);

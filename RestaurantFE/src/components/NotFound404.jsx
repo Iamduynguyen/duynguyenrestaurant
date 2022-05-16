@@ -1,12 +1,12 @@
 import Button from "@mui/material/Button";
 import React from "react";
 import HomeIcon from "@mui/icons-material/Home";
-// import styled from "styled-components";
+import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
-// const Container = styled.div`
-//   margin: 100px 0;
-// `;
+const Container = styled.div`
+  margin: 100px 0;
+`;
 
 const NotFound404 = () => {
   const navigation = useNavigate();

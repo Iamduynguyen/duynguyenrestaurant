@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetTableOrDer {
+public class GetTableOrder {
     private Long orderTableId;
     private Long orderId;
     private Long tablesId;

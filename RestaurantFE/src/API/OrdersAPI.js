@@ -33,6 +33,12 @@ const OrdersAPI = {
         return axiosClient.put(url);
     },
 
+    // createNewOrder
+    createOrder: (data) => {
+        const url = `/api/create-order-couter`;
+        return axiosClient.post(url, data);
+    },
+
     /**
      * OrderDetails
      */

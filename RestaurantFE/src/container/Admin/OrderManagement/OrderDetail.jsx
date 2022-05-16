@@ -237,7 +237,6 @@ const OrderDetail = (props) => {
           />
           <Table.Column
             title="Tên món"
-            // dataIndex="foodName"
             key="foodName"
             align="left"
             width={600}

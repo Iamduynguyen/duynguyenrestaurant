@@ -210,6 +210,11 @@ const OrderDetail = (props) => {
             size="small"
             color="secondary"
             startIcon={<AddRoundedIcon />}
+            onClick={() =>
+              navigation(
+                `/admin/orders-management/${props.foodsAtTable.orderId}/${props.foodsAtTable.tablesId}/add`
+              )
+            }
           >
             Thêm mới
           </Button>
@@ -232,10 +237,18 @@ const OrderDetail = (props) => {
           />
           <Table.Column
             title="Tên món"
-            dataIndex="foodName"
+            // dataIndex="foodName"
             key="foodName"
             align="left"
             width={600}
+            render={(record) => {
+              return (
+                <span>
+                  {record.foodName} <br />
+                  Size {record.size}
+                </span>
+              );
+            }}
           />
           <Table.Column
             title="Số lượng"

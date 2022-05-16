@@ -25,6 +25,7 @@ import OrderManagement from "./container/Admin/OrderManagement";
 import OrderDetail from "./container/Admin/OrderManagement/OrderDetail";
 import CreateOrder from "./container/Admin/OrderManagement/CreateOrder";
 import NotFound404 from "./components/NotFound404";
+import AddFood from "./container/Admin/OrderManagement/AddFood";
 
 const MuiTheme = createTheme({
   typography: {
@@ -84,6 +85,15 @@ const App = () => {
           path="orders-management/:orderId/:tableId"
           element={
             <OrderDetail
+              foodsAtTable={foodsAtTable}
+              setFoodsAtTable={setFoodsAtTable}
+            />
+          }
+        />
+        <Route
+          path="orders-management/:orderId/:tableId/add"
+          element={
+            <AddFood
               foodsAtTable={foodsAtTable}
               setFoodsAtTable={setFoodsAtTable}
             />

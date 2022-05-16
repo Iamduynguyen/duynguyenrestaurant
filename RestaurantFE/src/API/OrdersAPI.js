@@ -32,6 +32,16 @@ const OrdersAPI = {
         const url = `/api/cancel-order/${id}`;
         return axiosClient.put(url);
     },
+    // createNewOrder
+    createOrder: (data) => {
+        const url = `/api/create-order-couter`;
+        return axiosClient.post(url, data);
+    },
+    // add food to exist order
+    addFoodOrder: (data) => {
+        const url = `/api/add-order-details`;
+        return axiosClient.post(url, data);
+    },
 
     // createNewOrder
     createOrder: (data) => {

@@ -23,6 +23,7 @@ public class GetAllFoodOrder {
     private Long orderTableId;
     private Long foodDetailsId;
     private String foodName;
+    private String size;
     private Long quantity;
     private BigDecimal amount;
     private String note;

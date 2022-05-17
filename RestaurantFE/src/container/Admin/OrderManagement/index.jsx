@@ -148,14 +148,7 @@ export default function FoodsAdmin(props) {
   // Update food at table
   const updateFood = (data) => {
     props.setFoodsAtTable(data);
-    if (data.foodOrders.length === 0) {
-      ModalMessage.miniTopRightModal(
-        "info",
-        `Bàn ${data.tablesId}<br/> Chưa đặt đồ ăn`
-      );
-    } else {
-      navigation(`${data.orderId}/${data.tablesId}`);
-    }
+    navigation(`${data.orderId}/${data.tablesId}`);
   };
 
   useEffect(() => {
@@ -197,7 +190,7 @@ export default function FoodsAdmin(props) {
             onClick={() => navigation("create")}
             startIcon={<AddRoundedIcon />}
           >
-            Thêm mới
+            Tạo mới
           </Button>
         </div>
         <Table
@@ -258,6 +251,12 @@ export default function FoodsAdmin(props) {
                     variant="contained"
                     size="medium"
                     onClick={() => updateFood(item)}
+                    color={item.foodOrders.length === 0 ? "warning" : "primary"}
+                    title={
+                      item.foodOrders.length === 0
+                        ? "Chưa gọi món"
+                        : "Đã gọi món"
+                    }
                   >
                     {item.tablesId}
                   </Button>

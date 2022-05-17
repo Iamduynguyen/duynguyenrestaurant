@@ -6,6 +6,7 @@ import com.restarant.backend.entity.OrderTotal;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -13,6 +14,10 @@ public interface IOrderTotalService extends IServiceAdapter<OrderTotalDto> {
     String confirmCustomerGoRestaurant(Long id) throws InvalidDataExeception;
 
     List<GetAllToTalOrder> getAllOrderTotal();
+
+    String paymentVnpay(HttpServletRequest request, Long toTalOrderid) throws IOException;
+
+    String checkOutVnpay(String bankStatus, String bankTransactionId);
 
     String registrationOrderCounter (OrderCouterDto orderCouterDto, HttpServletRequest request);
 

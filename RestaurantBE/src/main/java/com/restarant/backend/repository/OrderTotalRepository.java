@@ -32,4 +32,5 @@ public interface OrderTotalRepository extends JpaRepository<OrderTotal, Long> {
     List<OrderTotal> getBystaus(@Param("status") Integer status);
 
     OrderTotal findByVoucherAndCustomerIdAndStatus(Long voucherId, Long customerId, Integer status);
+    OrderTotal findByVnpay_id(String vnpayId);
 }

@@ -1,5 +1,6 @@
 package com.restarant.backend.service.impl;
 
+import com.restarant.backend.config.Config;
 import com.restarant.backend.dto.*;
 import com.restarant.backend.entity.*;
 import com.restarant.backend.model.OrderTotalStatus;
@@ -12,14 +13,17 @@ import com.restarant.backend.service.utils.MailUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
@@ -152,6 +156,37 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
+    public String paymentVnpay(HttpServletRequest request, Long toTalOrderid) throws IOException {
+        OrderTotal orderTotal =orderTotalRepository.getById(toTalOrderid);
+        if(Objects.isNull(orderTotal.getId())){
+            return "FAIL";
+        }
+        String vnpay_id= Config.getRandomNumber(8);
+        orderTotal.setVnpay_id(vnpay_id);
+        try{
+            orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            return "FAIL";
+        }
+        return VNPAYService.payments(orderTotal.getDeposit().intValue(),vnpay_id,request);
+    }
+
+    @Override
+    public String checkOutVnpay(String bankStatus, String bankTransactionId){
+        OrderTotal orderTotal= orderTotalRepository.findByVnpay_id(bankTransactionId);
+        if(Objects.isNull(orderTotal)){
+            return "FAIL";
+        }
+        if (StringUtils.equalsIgnoreCase(bankStatus, "00")) {
+            orderTotal.setStatus(4);
+            orderTotalRepository.save(orderTotal);
+            return "SUCCESS";
+        }else {
+            return "FAIL";
+        }
+
+    }
+    @Override
     public String registrationOrderCounter(OrderCouterDto orderCouterDto, HttpServletRequest request) {
         try {
             Date now = new Date();
@@ -267,13 +302,13 @@ public class OrderTotalService implements IOrderTotalService {
             OrderTotal orderTotal = orderTotalRepository.getById(id);
             if (Objects.nonNull(orderTotal)) {
                 orderTotal.setStatus(2);
-                List<OrderDetails> lst = orderDetailsRepository.getByOrdertotalId(orderTotal.getId());
-                for (OrderDetails x:lst){
-                    if (x.getStatus()==1){
-                        x.setStatus(2);
-                    }
-                }
-                orderDetailsRepository.saveAll(lst);
+//                List<OrderDetails> lst = orderDetailsRepository.getByOrdertotalId(orderTotal.getId());
+//                for (OrderDetails x:lst){
+//                    if (x.getStatus()==1){
+//                        x.setStatus(2);
+//                    }
+//                }
+//                orderDetailsRepository.saveAll(lst);
                 orderTotal.setNote("Người xác nhận đơn hàng :"+ jwtServiceUtils.getUserName(request));
                 orderTotalRepository.save(orderTotal);
                 MailDto mailDto = new MailDto();

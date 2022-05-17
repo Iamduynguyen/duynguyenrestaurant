@@ -137,6 +137,7 @@ public class OrderTotalService implements IOrderTotalService {
                     getAllFoodOrder.setFoodName(y.getFoodDetalls().getFood().getName());
                     getAllFoodOrder.setSize(y.getFoodDetalls().getFoodsize());
                     getAllFoodOrder.setOrderTableId(y.getTableOrder().getId());
+                    getAllFoodOrder.setDiscount(y.getFoodDetalls().getDiscount());
                     getAllFoodOrder.setAmount(y.getAmount());
                     getAllFoodOrder.setQuantity(y.getQuantity());
                     getAllFoodOrder.setId(y.getId());

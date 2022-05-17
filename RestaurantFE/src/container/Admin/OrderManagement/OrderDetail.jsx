@@ -47,9 +47,10 @@ const OrderDetail = (props) => {
         const res = await OrdersAPI.addQty(data);
         console.log(res);
         if (res === "SUCCESS") {
-          ModalMessage.miniTopRightModal(
+          ModalMessage.middleModal(
             "success",
-            `Đã thêm ${qty} x ${foodOrders.foodName}`
+            `Hoá đơn ${props.foodsAtTable.orderId}<br>Bàn số ${props.foodsAtTable.tablesId}<br>Đã thêm ${qty} x ${foodOrders.foodName}`,
+            "oke"
           );
           navigation("/admin/orders-management");
         } else {
@@ -62,38 +63,48 @@ const OrderDetail = (props) => {
     }
   };
   const removeQty = async (foodOrders) => {
-    const { value: qty } = await Swal.fire({
-      title: `Món ${foodOrders.foodName}`,
-      input: "text",
-      inputLabel: "Nhập số lượng cần trừ",
-      inputPlaceholder: "Số lượng trừ đi",
-      confirmButtonText: "Trừ",
-      confirmButtonColor: "#c20000",
-    });
-    if (qty) {
-      if (!/^\d+$/.test(qty)) {
-        ModalMessage.miniTopRightModal(
-          "error",
-          `Số lượng vừa nhập<br>không hợp lệ!`
-        );
-      } else if (+qty > +foodOrders.quantity) {
-        ModalMessage.miniTopRightModal("error", `Vượt quá số lượng hiện tại!`);
-      } else {
-        const data = {
-          orderDetails: [{ orderDetailsId: foodOrders.id, quantity: qty }],
-        };
-        const res = await OrdersAPI.removeQty(data);
-        if (res === "SUCCESS") {
-          ModalMessage.middleModal(
-            "success",
-            `Đã trừ ${qty} x ${foodOrders.foodName}`
-          );
-          navigation("/admin/orders-management");
-        } else {
+    if (+foodOrders.quantity <= 1) {
+      ModalMessage.miniTopRightModal(
+        "error",
+        `Số lượng đạt giới hạn<br>Không thể trừ thêm!`
+      );
+    } else {
+      const { value: qty } = await Swal.fire({
+        title: `Món ${foodOrders.foodName}`,
+        input: "text",
+        inputLabel: "Nhập số lượng cần trừ",
+        inputPlaceholder: "Số lượng trừ đi",
+        confirmButtonText: "Trừ",
+        confirmButtonColor: "#c20000",
+      });
+      if (qty) {
+        if (!/^\d+$/.test(qty)) {
           ModalMessage.miniTopRightModal(
             "error",
-            `Lỗi<br/>Vui lòng thử lại sau!`
+            `Số lượng vừa nhập<br>không hợp lệ!`
           );
+        } else if (+qty > +foodOrders.quantity) {
+          ModalMessage.miniTopRightModal(
+            "error",
+            `Vượt quá số lượng hiện tại!`
+          );
+        } else {
+          const data = {
+            orderDetails: [{ orderDetailsId: foodOrders.id, quantity: qty }],
+          };
+          const res = await OrdersAPI.removeQty(data);
+          if (res === "SUCCESS") {
+            ModalMessage.middleModal(
+              "success",
+              `Hoá đơn ${props.foodsAtTable.orderId}<br>Bàn số ${props.foodsAtTable.tablesId}<br>Đã trừ ${qty} x ${foodOrders.foodName}`
+            );
+            navigation("/admin/orders-management");
+          } else {
+            ModalMessage.miniTopRightModal(
+              "error",
+              `Lỗi<br/>Vui lòng thử lại sau!`
+            );
+          }
         }
       }
     }
@@ -316,10 +327,10 @@ const OrderDetail = (props) => {
             render={(record) => {
               if (record !== null) {
                 return `${(
-                  (parseInt(record.amount, 10) *
-                    record.quantity *
+                  ((parseInt(record.amount, 10) *
                     (100 - parseInt(record.discount, 10))) /
-                  100
+                    100) *
+                  record.quantity
                 )
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;

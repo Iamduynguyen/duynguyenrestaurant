@@ -201,14 +201,24 @@ const AddFood = (props) => {
   return (
     <>
       <div className="adm-section">
-        <h3>Tạo mới hoá đơn</h3>
+        <h3>Thêm món mới</h3>
+        <p style={{ fontStyle: "italic" }}>
+          Mã hoá đơn {props.foodsAtTable.orderId}
+        </p>
+        <p style={{ fontStyle: "italic" }}>
+          Bàn số {props.foodsAtTable.tablesId}
+        </p>
       </div>
       <div className="table-header__btn">
         <Button
           variant="contained"
           size="small"
           color="secondary"
-          onClick={() => navigation("/admin/orders-management")}
+          onClick={() =>
+            navigation(
+              `/admin/orders-management/${props.foodsAtTable.orderId}/${props.foodsAtTable.tablesId}`
+            )
+          }
           startIcon={<ArrowBackRoundedIcon />}
         >
           Quay lại

@@ -216,7 +216,7 @@ const OrderDetail = (props) => {
               )
             }
           >
-            Thêm mới
+            Thêm món
           </Button>
         </div>
         <Table
@@ -239,7 +239,7 @@ const OrderDetail = (props) => {
             title="Tên món"
             key="foodName"
             align="left"
-            width={600}
+            width={450}
             render={(record) => {
               return (
                 <span>
@@ -285,6 +285,42 @@ const OrderDetail = (props) => {
             render={(text) => {
               if (text !== null) {
                 return `${text
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;
+              } else {
+                return `0 VNĐ`;
+              }
+            }}
+          />
+          <Table.Column
+            title="Giảm giá"
+            dataIndex="discount"
+            key="discount"
+            align="right"
+            width={150}
+            render={(text) => {
+              if (text !== null) {
+                return `${text
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} %`;
+              } else {
+                return `0 %`;
+              }
+            }}
+          />
+          <Table.Column
+            title="Tổng tiền"
+            key="amount"
+            align="right"
+            width={200}
+            render={(record) => {
+              if (record !== null) {
+                return `${(
+                  (parseInt(record.amount, 10) *
+                    record.quantity *
+                    (100 - parseInt(record.discount, 10))) /
+                  100
+                )
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;
               } else {

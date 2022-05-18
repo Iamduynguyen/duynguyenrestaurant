@@ -1,6 +1,7 @@
 package com.restarant.backend.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 @Data
 @Component
 @Entity
+@Where(clause = "delete_flag = 0")
 public class Account {
     private static final long serialVersionUID = 1L;
 
@@ -39,5 +41,7 @@ public class Account {
     //@JoinColumn(name = "customer_id")
     private Customer customer;
 
+    @Column(name = "delete_flag")
+    private Boolean deleteFlag;
 
 }

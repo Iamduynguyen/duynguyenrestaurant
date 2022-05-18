@@ -29,7 +29,7 @@ export default function FoodsAdmin(props) {
   };
   const staffConfirmDepositOnline = async (id) => {
     const { value: deposit } = await Swal.fire({
-      title: `Xác nhận đặt cọc hoá đơn ${id}`,
+      title: `Xác nhận hoá đơn ${id}`,
       input: "text",
       inputLabel: "Nhập số tiền đặt cọc",
       inputPlaceholder: "Tiền đặt cọc",
@@ -37,7 +37,20 @@ export default function FoodsAdmin(props) {
     });
     if (deposit !== undefined) {
       if (deposit === "") {
-        ModalMessage.miniTopRightModal("error", "Chưa nhập số tiền đặt cọc!");
+        const data = { id: id, deposit: +deposit };
+        const res = await OrdersAPI.staffConfirmDepositOnline(data);
+        if (res === "SUCCESS") {
+          ModalMessage.miniTopRightModal(
+            "success",
+            "Xác nhận đơn đặt thành công"
+          );
+        } else {
+          ModalMessage.miniTopRightModal(
+            "error",
+            `Lỗi<br/>Vui lòng thử lại sau!`
+          );
+        }
+        setResetData(!resetData);
       } else if (!/^\d+$/.test(deposit)) {
         ModalMessage.miniTopRightModal(
           "error",
@@ -287,31 +300,27 @@ export default function FoodsAdmin(props) {
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => staffConfirmOrderOnline(record.id)}
+                    onClick={() => staffConfirmDepositOnline(record.id)}
                   >
-                    Chờ nhân viên xác nhận order
+                    Chờ nhân viên
+                    <br />
+                    xác nhận
                   </Button>
                 );
               else if (record.status === 2)
                 return (
                   <Button variant="contained" color="warning">
-                    Chờ khách hàng đặt cọc
-                  </Button>
-                );
-              else if (record.status === 3)
-                return (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => staffConfirmDepositOnline(record.id)}
-                  >
-                    Chờ nhân viên xác nhận đặt cọc
+                    Chờ khách hàng
+                    <br />
+                    đặt cọc
                   </Button>
                 );
               else if (record.status === 4)
                 return (
                   <Button variant="contained" color="warning">
-                    Chờ khách hàng đến nhà hàng
+                    Chờ khách hàng
+                    <br />
+                    đến nhà hàng
                   </Button>
                 );
               else if (record.status === 5)

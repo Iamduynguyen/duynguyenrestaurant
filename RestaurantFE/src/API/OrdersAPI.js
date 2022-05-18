@@ -8,6 +8,7 @@ const OrdersAPI = {
         const url = "/api/orders";
         return axiosClient.get(url);
     },
+    // status 0 => 1
     confirmOrder1: (id) => {
         const url = `/api/order-total/customer-confirm1/${id}`;
         return axiosClient.get(url);

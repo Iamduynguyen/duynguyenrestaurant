@@ -4,6 +4,7 @@ import com.restarant.backend.dto.*;
 import com.restarant.backend.entity.OrderTotal;
 import com.restarant.backend.repository.OrderTotalRepository;
 import com.restarant.backend.service.IOrderTotalService;
+import com.restarant.backend.service.impl.OrderTotalService;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,9 @@ public class OrderTotalController {
 
     @Autowired
     private OrderTotalRepository orderTotalRepository;
+
+    @Autowired
+    OrderTotalService orderTotalService1;
 
     private final Logger log = LoggerFactory.getLogger(OrderTotalController.class);
 
@@ -114,6 +118,13 @@ public class OrderTotalController {
     public List<GetAllToTalOrder> getAllToTalOrders(){
         return orderTotalService.getAllOrderTotal();
     }
+
+    @GetMapping("/order-total/customer-confirm1/{id}")
+    public ResponseEntity<?> customerRequest1(@PathVariable Long id){
+        Boolean rs = orderTotalService1.customerConfirm1(id);
+        return ResponseEntity.ok(rs);
+    }
+
     @PutMapping("/confirm-customer-order-online/{id}")
     public String confirmCustomerOrderOnline(@PathVariable Long id){
         return orderTotalService.confirmCustomerOrderOnline(id);

@@ -40,6 +40,7 @@ const MuiTheme = createTheme({
 
 const App = () => {
   const [foodsAtTable, setFoodsAtTable] = useState([]);
+  const [orderStatus, setOrderStatus] = useState();
 
   return (
     <Routes>
@@ -69,6 +70,7 @@ const App = () => {
             <OrderManagement
               foodsAtTable={foodsAtTable}
               setFoodsAtTable={setFoodsAtTable}
+              setOrderStatus={setOrderStatus}
             />
           }
         />
@@ -87,6 +89,7 @@ const App = () => {
             <OrderDetail
               foodsAtTable={foodsAtTable}
               setFoodsAtTable={setFoodsAtTable}
+              orderStatus={orderStatus}
             />
           }
         />

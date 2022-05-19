@@ -26,7 +26,6 @@ const modalStyle = {
 };
 
 const AddFood = (props) => {
-  console.log(props.foodsAtTable);
   const navigation = useNavigate();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -168,19 +167,19 @@ const AddFood = (props) => {
 
     // Call API confirm
     const data = {
-      tableId: props.foodsAtTable.tablesId,
+      tableId: props.foodsAtTable.orderTableId,
       idFoodCounters: idFoodCounters,
     };
     const res = await OrdersAPI.addFoodOrder(data);
     if (res === "SUCCESS") {
-      Swal.fire(`Tạo hoá đơn thành công!✨✨`, "", "success").then(() => {
+      Swal.fire(`Thêm món thành công!✨✨`, "", "success").then(() => {
         onModalClose();
         navigation("/admin/orders-management");
       });
     } else if (res === "FAIL") {
       ModalMessage.middleModal(
         "error",
-        `Tạo hoá đơn thất bại!<br>Vui lòng thử lại sau!`
+        `Thêm món thất bại!<br>Vui lòng thử lại sau!`
       );
     }
   };

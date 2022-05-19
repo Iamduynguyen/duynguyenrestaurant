@@ -159,8 +159,9 @@ export default function FoodsAdmin(props) {
   };
 
   // Update food at table
-  const updateFood = (data) => {
+  const updateFood = (data, orderStatus) => {
     props.setFoodsAtTable(data);
+    props.setOrderStatus(orderStatus);
     navigation(`${data.orderId}/${data.tablesId}`);
   };
 
@@ -263,7 +264,7 @@ export default function FoodsAdmin(props) {
                     key={item.orderTableId}
                     variant="contained"
                     size="medium"
-                    onClick={() => updateFood(item)}
+                    onClick={() => updateFood(item, record.status)}
                     color={item.foodOrders.length === 0 ? "warning" : "primary"}
                     title={
                       item.foodOrders.length === 0

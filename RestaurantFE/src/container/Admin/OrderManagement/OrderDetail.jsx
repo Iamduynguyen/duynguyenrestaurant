@@ -158,8 +158,6 @@ const OrderDetail = (props) => {
   };
 
   useEffect(() => {
-    console.log(props.foodsAtTable);
-
     // Validate access when not matching tableId & orderId
     if (
       props.foodsAtTable.orderId !== +orderId &&
@@ -205,30 +203,34 @@ const OrderDetail = (props) => {
           >
             Quay lại
           </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            color="error"
-            startIcon={<DeleteForeverIcon />}
-            onClick={() => {
-              deleteOrderDetails(selectedRow);
-            }}
-          >
-            Xoá
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            color="secondary"
-            startIcon={<AddRoundedIcon />}
-            onClick={() =>
-              navigation(
-                `/admin/orders-management/${props.foodsAtTable.orderId}/${props.foodsAtTable.tablesId}/add`
-              )
-            }
-          >
-            Thêm món
-          </Button>
+          {props.orderStatus !== 6 && props.orderStatus !== -1 && (
+            <>
+              <Button
+                variant="outlined"
+                size="small"
+                color="error"
+                startIcon={<DeleteForeverIcon />}
+                onClick={() => {
+                  deleteOrderDetails(selectedRow);
+                }}
+              >
+                Xoá
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                color="secondary"
+                startIcon={<AddRoundedIcon />}
+                onClick={() =>
+                  navigation(
+                    `/admin/orders-management/${props.foodsAtTable.orderId}/${props.foodsAtTable.tablesId}/add`
+                  )
+                }
+              >
+                Thêm món
+              </Button>
+            </>
+          )}
         </div>
         <Table
           loading={loading}

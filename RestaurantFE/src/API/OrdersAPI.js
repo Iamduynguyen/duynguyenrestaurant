@@ -14,14 +14,14 @@ const OrdersAPI = {
         return axiosClient.get(url);
     },
     // status 1 => 2
-    staffConfirmOrderOnline: (id) => {
-        const url = `/api/confirm-order-online/${id}`;
-        return axiosClient.put(url);
-    },
-    // status 3 => 4
     staffConfirmDepositOnline: (data) => {
         const url = `/api/confirm-deposit-online`;
         return axiosClient.post(url, data);
+    },
+    // status 3 => 4
+    staffConfirmOrderOnline: (id) => {
+        const url = `/api/confirm-order-online/${id}`;
+        return axiosClient.put(url);
     },
     // status 5 => 6
     staffConfirmPayment: (data) => {

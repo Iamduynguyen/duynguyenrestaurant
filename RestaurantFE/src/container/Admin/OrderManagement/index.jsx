@@ -305,7 +305,7 @@ export default function FoodsAdmin(props) {
                   >
                     Chờ nhân viên
                     <br />
-                    xác nhận
+                    xác nhận đơn
                   </Button>
                 );
               else if (record.status === 2)
@@ -314,6 +314,18 @@ export default function FoodsAdmin(props) {
                     Chờ khách hàng
                     <br />
                     đặt cọc
+                  </Button>
+                );
+              else if (record.status === 3)
+                return (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => staffConfirmOrderOnline(record.id)}
+                  >
+                    Chờ nhân viên
+                    <br />
+                    xác nhận đặt cọc
                   </Button>
                 );
               else if (record.status === 4)

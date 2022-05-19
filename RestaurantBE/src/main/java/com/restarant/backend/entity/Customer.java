@@ -17,7 +17,7 @@ import java.util.*;
 @Entity
 @Table(name = "customer")
 @SQLDelete(sql = "UPDATE customer SET deleteflag = 1 WHERE id = ?")
-@Where(clause = "deleteflag = 0")
+//@Where(clause = "deleteflag = 0")
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;

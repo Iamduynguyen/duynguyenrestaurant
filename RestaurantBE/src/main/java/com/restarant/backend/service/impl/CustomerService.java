@@ -141,6 +141,6 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public List<Customer> getAllCustomer() {
-        return customerRepository.findAllByDeleteflag(Long.valueOf("0"));
+        return customerRepository.findAll();
     }
 }

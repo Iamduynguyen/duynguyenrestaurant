@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 @Component
 @Entity
-@Where(clause = "delete_flag = 0")
+//@Where(clause = "delete_flag = 0")
 public class Account {
     private static final long serialVersionUID = 1L;
 

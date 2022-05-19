@@ -16,6 +16,10 @@ const CustomerApi = {
     deleteCustomer: (id) => {
         const url = "/api/customer/" + id;
         return axiosClient.delete(url);
+    },
+    openCustomer: (id) => {
+        const url = "/api/customer/unlock/" + id;
+        return axiosClient.put(url);
     }
 };
 

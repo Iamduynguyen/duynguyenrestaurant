@@ -1,5 +1,6 @@
 package com.restarant.backend.service.impl;
 
+import com.restarant.backend.config.Config;
 import com.restarant.backend.dto.*;
 import com.restarant.backend.entity.*;
 import com.restarant.backend.model.OrderTotalStatus;
@@ -12,14 +13,17 @@ import com.restarant.backend.service.utils.MailUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
@@ -33,6 +37,8 @@ public class OrderTotalService implements IOrderTotalService {
     private FoodDetallsRepository foodDetallsRepository;
     @Autowired
     private VoucherRepository voucherRepository;
+    @Autowired
+    IConverterDto<Customer,CustomerDto> mapperCus;
     @Autowired
     private MailUtils mailUtils;
     @Autowired
@@ -89,6 +95,20 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
+    public String confirmCustomerGoRestaurant(Long id) throws InvalidDataExeception {
+        OrderTotal orderTotal =  orderTotalRepository.getById(id);
+        if(Objects.isNull(orderTotal)){
+            throw new InvalidDataExeception("Vui lòng thử lại.");
+        }
+        orderTotal.setStatus(5);
+        try{
+           orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            return "FAIL";
+        }
+        return "SUCCESS";
+    }
+    @Override
     public List<GetAllToTalOrder> getAllOrderTotal() {
         Type type = new TypeToken<List<GetAllToTalOrder>>() {
         }.getType();
@@ -119,7 +139,9 @@ public class OrderTotalService implements IOrderTotalService {
                     GetAllFoodOrder getAllFoodOrder = new GetAllFoodOrder();
                     getAllFoodOrder.setFoodDetailsId(y.getFoodDetalls().getId());
                     getAllFoodOrder.setFoodName(y.getFoodDetalls().getFood().getName());
+                    getAllFoodOrder.setSize(y.getFoodDetalls().getFoodsize());
                     getAllFoodOrder.setOrderTableId(y.getTableOrder().getId());
+                    getAllFoodOrder.setDiscount(y.getFoodDetalls().getDiscount());
                     getAllFoodOrder.setAmount(y.getAmount());
                     getAllFoodOrder.setQuantity(y.getQuantity());
                     getAllFoodOrder.setId(y.getId());
@@ -133,6 +155,37 @@ public class OrderTotalService implements IOrderTotalService {
         return getAllToTalOrders;
     }
 
+    @Override
+    public String paymentVnpay(HttpServletRequest request, Long toTalOrderid) throws IOException {
+        OrderTotal orderTotal =orderTotalRepository.getById(toTalOrderid);
+        if(Objects.isNull(orderTotal.getId())){
+            return "FAIL";
+        }
+        String vnpay_id= Config.getRandomNumber(8);
+        orderTotal.setVnpay_id(vnpay_id);
+        try{
+            orderTotalRepository.save(orderTotal);
+        }catch (Exception e){
+            return "FAIL";
+        }
+        return VNPAYService.payments(orderTotal.getDeposit().intValue(),vnpay_id,request);
+    }
+
+    @Override
+    public String checkOutVnpay(String bankStatus, String bankTransactionId){
+        OrderTotal orderTotal= orderTotalRepository.findByVnpay_id(bankTransactionId);
+        if(Objects.isNull(orderTotal)){
+            return "FAIL";
+        }
+        if (StringUtils.equalsIgnoreCase(bankStatus, "00")) {
+            orderTotal.setStatus(4);
+            orderTotalRepository.save(orderTotal);
+            return "SUCCESS";
+        }else {
+            return "FAIL";
+        }
+
+    }
     @Override
     public String registrationOrderCounter(OrderCouterDto orderCouterDto, HttpServletRequest request) {
         try {
@@ -199,6 +252,7 @@ public class OrderTotalService implements IOrderTotalService {
                 orderDetails1 = orderDetailsRepository.findByTableOrderIdAndFoodDetallsId(counterDto.getTableId(), foodCouter.getFoodId());
                 FoodDetails foodDetails = foodDetallsRepository.findById(foodCouter.getFoodId()).get();
                 if (Objects.isNull(orderDetails1)) {
+                    orderDetails1 = new OrderDetails();
                     orderDetails1.setQuantity((long) foodCouter.getQuantity());
                     orderDetails1.setAmount(foodDetails.getAmount().subtract(foodDetails.getDiscount()));
                     orderDetails1.setFoodDetalls(foodDetails);
@@ -248,7 +302,14 @@ public class OrderTotalService implements IOrderTotalService {
             OrderTotal orderTotal = orderTotalRepository.getById(id);
             if (Objects.nonNull(orderTotal)) {
                 orderTotal.setStatus(2);
-                orderTotal.setNote("Người xác nhận đơn hàng :" + jwtServiceUtils.getUserName(request));
+//                List<OrderDetails> lst = orderDetailsRepository.getByOrdertotalId(orderTotal.getId());
+//                for (OrderDetails x:lst){
+//                    if (x.getStatus()==1){
+//                        x.setStatus(2);
+//                    }
+//                }
+//                orderDetailsRepository.saveAll(lst);
+                orderTotal.setNote("Người xác nhận đơn hàng :"+ jwtServiceUtils.getUserName(request));
                 orderTotalRepository.save(orderTotal);
                 MailDto mailDto = new MailDto();
                 mailDto.setTo(orderTotal.getCustomer().getEmail());
@@ -504,6 +565,61 @@ public class OrderTotalService implements IOrderTotalService {
         orderTotal.setStatus(7);
         orderTotalRepository.save(orderTotal);
         return true;
+    }
+
+    public List<OrderTotalDto> getbystatus(Integer status){
+        System.out.println(status);
+        List<OrderTotal> orderTotalList = orderTotalRepository.getBystaus(status);
+        if (orderTotalList==null){
+            return null;
+        }
+        List<OrderTotalDto> rs = new ArrayList<>();
+        for (OrderTotal x:orderTotalList){
+            OrderTotalDto a = new OrderTotalDto();
+            a.setId(x.getId());
+            a.setAmountTotal(x.getAmountTotal());
+            a.setOrderTime(x.getOrderTime());
+            a.setCustomer(mapperCus.convertToDto(x.getCustomer()));
+            a.setCreatedAt(x.getCreatedAt());
+            a.setTableOrders(tableOrderMapper.convertToListDto(x.getTableOrders()));
+            a.setStatus(convert(x.getStatus()));
+            rs.add(a);
+        }
+        return rs;
+    }
+
+    private String convert(Integer x){
+        OrderDetails entity = new OrderDetails();
+        entity.setStatus(x);
+        OrderDetailsDto dto = new OrderDetailsDto();
+        if (entity.getStatus()==0){
+            dto.setStatus("Vừa thêm vào");
+        }
+        if (entity.getStatus()==1){
+            dto.setStatus("chờ xác nhận");
+        }
+        if (entity.getStatus()==2){
+            dto.setStatus("Đã xác nhận");
+        }
+        if (entity.getStatus()==3){
+            dto.setStatus("chờ đặt cọc");
+        }
+        if (entity.getStatus()==4){
+            dto.setStatus("chờ xác nhận cọc tiền");
+        }
+        if (entity.getStatus()==5){
+            dto.setStatus("Sắp mang ra");
+        }
+        if (entity.getStatus()==6){
+            dto.setStatus("Đang ăn");
+        }
+        if (entity.getStatus()==5){
+            dto.setStatus("Đã thanh toán");
+        }
+        if (entity.getStatus()==6){
+            dto.setStatus("Nhà hàng hủy");
+        }
+        return dto.getStatus();
     }
 
 }

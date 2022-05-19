@@ -8,19 +8,20 @@ const OrdersAPI = {
         const url = "/api/orders";
         return axiosClient.get(url);
     },
+    // status 0 => 1
     confirmOrder1: (id) => {
         const url = `/api/order-total/customer-confirm1/${id}`;
         return axiosClient.get(url);
     },
     // status 1 => 2
-    staffConfirmOrderOnline: (id) => {
-        const url = `/api/confirm-order-online/${id}`;
-        return axiosClient.put(url);
-    },
-    // status 3 => 4
     staffConfirmDepositOnline: (data) => {
         const url = `/api/confirm-deposit-online`;
         return axiosClient.post(url, data);
+    },
+    // status 3 => 4
+    staffConfirmOrderOnline: (id) => {
+        const url = `/api/confirm-order-online/${id}`;
+        return axiosClient.put(url);
     },
     // status 5 => 6
     staffConfirmPayment: (data) => {
@@ -31,6 +32,22 @@ const OrdersAPI = {
     deleteOrder: (id) => {
         const url = `/api/cancel-order/${id}`;
         return axiosClient.put(url);
+    },
+    // createNewOrder
+    createOrder: (data) => {
+        const url = `/api/create-order-couter`;
+        return axiosClient.post(url, data);
+    },
+    // add food to exist order
+    addFoodOrder: (data) => {
+        const url = `/api/add-order-details`;
+        return axiosClient.post(url, data);
+    },
+
+    // createNewOrder
+    createOrder: (data) => {
+        const url = `/api/create-order-couter`;
+        return axiosClient.post(url, data);
     },
 
     /**

@@ -10,7 +10,7 @@ const TableAPI = {
         return axiosClient.get(url);
     },
     getTablesAvailable: () => {
-        const url = "/api/tables/exist";
+        const url = "/api/tables/now";
         return axiosClient.get(url);
     },
     createTable: (table) => {

@@ -29,7 +29,7 @@ export default function FoodsAdmin(props) {
   };
   const staffConfirmDepositOnline = async (id) => {
     const { value: deposit } = await Swal.fire({
-      title: `Xác nhận đặt cọc hoá đơn ${id}`,
+      title: `Xác nhận hoá đơn ${id}`,
       input: "text",
       inputLabel: "Nhập số tiền đặt cọc",
       inputPlaceholder: "Tiền đặt cọc",
@@ -37,7 +37,20 @@ export default function FoodsAdmin(props) {
     });
     if (deposit !== undefined) {
       if (deposit === "") {
-        ModalMessage.miniTopRightModal("error", "Chưa nhập số tiền đặt cọc!");
+        const data = { id: id, deposit: +deposit };
+        const res = await OrdersAPI.staffConfirmDepositOnline(data);
+        if (res === "SUCCESS") {
+          ModalMessage.miniTopRightModal(
+            "success",
+            "Xác nhận đơn đặt thành công"
+          );
+        } else {
+          ModalMessage.miniTopRightModal(
+            "error",
+            `Lỗi<br/>Vui lòng thử lại sau!`
+          );
+        }
+        setResetData(!resetData);
       } else if (!/^\d+$/.test(deposit)) {
         ModalMessage.miniTopRightModal(
           "error",
@@ -146,16 +159,10 @@ export default function FoodsAdmin(props) {
   };
 
   // Update food at table
-  const updateFood = (data) => {
+  const updateFood = (data, orderStatus) => {
     props.setFoodsAtTable(data);
-    if (data.foodOrders.length === 0) {
-      ModalMessage.miniTopRightModal(
-        "info",
-        `Bàn ${data.tablesId}<br/> Chưa đặt đồ ăn`
-      );
-    } else {
-      navigation(`${data.orderId}/${data.tablesId}`);
-    }
+    props.setOrderStatus(orderStatus);
+    navigation(`${data.orderId}/${data.tablesId}`);
   };
 
   useEffect(() => {
@@ -197,7 +204,7 @@ export default function FoodsAdmin(props) {
             onClick={() => navigation("create")}
             startIcon={<AddRoundedIcon />}
           >
-            Thêm mới
+            Tạo mới
           </Button>
         </div>
         <Table
@@ -257,7 +264,13 @@ export default function FoodsAdmin(props) {
                     key={item.orderTableId}
                     variant="contained"
                     size="medium"
-                    onClick={() => updateFood(item)}
+                    onClick={() => updateFood(item, record.status)}
+                    color={item.foodOrders.length === 0 ? "primary" : "success"}
+                    title={
+                      item.foodOrders.length === 0
+                        ? "Chưa gọi món"
+                        : "Đã gọi món"
+                    }
                   >
                     {item.tablesId}
                   </Button>
@@ -288,15 +301,19 @@ export default function FoodsAdmin(props) {
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => staffConfirmOrderOnline(record.id)}
+                    onClick={() => staffConfirmDepositOnline(record.id)}
                   >
-                    Chờ nhân viên xác nhận order
+                    Chờ nhân viên
+                    <br />
+                    xác nhận đơn
                   </Button>
                 );
               else if (record.status === 2)
                 return (
                   <Button variant="contained" color="warning">
-                    Chờ khách hàng đặt cọc
+                    Chờ khách hàng
+                    <br />
+                    đặt cọc
                   </Button>
                 );
               else if (record.status === 3)
@@ -304,15 +321,19 @@ export default function FoodsAdmin(props) {
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => staffConfirmDepositOnline(record.id)}
+                    onClick={() => staffConfirmOrderOnline(record.id)}
                   >
-                    Chờ nhân viên xác nhận đặt cọc
+                    Chờ nhân viên
+                    <br />
+                    xác nhận đặt cọc
                   </Button>
                 );
               else if (record.status === 4)
                 return (
                   <Button variant="contained" color="warning">
-                    Chờ khách hàng đến nhà hàng
+                    Chờ khách hàng
+                    <br />
+                    đến nhà hàng
                   </Button>
                 );
               else if (record.status === 5)

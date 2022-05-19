@@ -10,7 +10,6 @@ import CheckIcon from "@mui/icons-material/Check";
 import Modal from "react-modal";
 import CategoriesAPI from "../../../API/CategoriesAPI";
 import FoodsApi from "../../../API/FoodsAPI";
-import TableAPI from "../../../API/TableAPI";
 import OrdersAPI from "../../../API/OrdersAPI";
 import ModalMessage from "../../../components/Modal/ModalMessage";
 import Swal from "sweetalert2";
@@ -26,28 +25,19 @@ const modalStyle = {
   },
 };
 
-const CreateOrder = () => {
+const AddFood = (props) => {
   const navigation = useNavigate();
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [tables, setTables] = useState([]);
   const [categories, setCategories] = useState([]);
   const [foods, setFoods] = useState([]);
   const [activeCategories, setActiveCategories] = useState("all");
 
-  const [selectedTables, setSelectedTables] = useState([]);
   const [selectedFoods, setSelectedFoods] = useState([]);
   const [selectedSize, setSelectedSize] = useState([]);
   const [tmpTextSize, setTmpTextSize] = useState("");
   const [tmpQty, setTmpQty] = useState(0);
   const [tmpListFood, setTmpListFood] = useState([]);
 
-  // API available Tables
-  const getTablesAvailable = async () => {
-    const res = await TableAPI.getTablesAvailable();
-    if (res) {
-      setTables(res);
-    }
-  };
   // API Categories
   const getCategories = async () => {
     const res = await CategoriesAPI.getAllCategories();
@@ -113,14 +103,6 @@ const CreateOrder = () => {
     });
   };
 
-  const setChoosedTables = (tableId) => {
-    if (selectedTables.indexOf(tableId) < 0) {
-      setSelectedTables([...selectedTables, tableId]);
-    } else {
-      setSelectedTables(selectedTables.filter((e) => e !== tableId));
-    }
-  };
-
   const setMinusTmpQty = (qty) => {
     if (qty > 1) {
       setTmpQty(qty - 1);
@@ -146,8 +128,11 @@ const CreateOrder = () => {
     };
 
     // Check food exist
-    const duplicate = tmpListFood.filter((e) => e.foodId === selectedSize.id);
-    if (duplicate.length !== 0) {
+    const duplicate1 = tmpListFood.filter((e) => e.foodId === selectedSize.id);
+    const duplicate2 = props.foodsAtTable.foodOrders.filter(
+      (e) => e.foodDetailsId === selectedSize.id
+    );
+    if (duplicate1.length !== 0 || duplicate2.length !== 0) {
       ModalMessage.miniTopRightModal(
         "error",
         `Món<br>${selectedFoods.name} - Size ${selectedSize.foodSize}<br> đã tồn tại trong hoá đơn!`
@@ -169,44 +154,33 @@ const CreateOrder = () => {
     }
   };
 
-  const onAddNewOrder = async () => {
-    if (selectedTables.length === 0) {
-      ModalMessage.miniTopRightModal("warning", "Bạn chưa chọn bàn!");
-    } else {
-      // Current selected food
-      let idFoodCounters = [];
-      tmpListFood.map((e) => {
-        const food = {
-          foodId: e.foodId,
-          quantity: e.quantity,
-        };
-        idFoodCounters.push(food);
-      });
+  const onAddFoodOrder = async () => {
+    // Current selected food
+    let idFoodCounters = [];
+    tmpListFood.map((e) => {
+      const food = {
+        foodId: e.foodId,
+        quantity: e.quantity,
+      };
+      idFoodCounters.push(food);
+    });
 
-      // Current selected table
-      let tableCounterDtos = [];
-      selectedTables.map((e) => {
-        const table = {
-          tableId: e,
-          idFoodCounters: idFoodCounters,
-        };
-        tableCounterDtos.push(table);
+    // Call API confirm
+    const data = {
+      tableId: props.foodsAtTable.orderTableId,
+      idFoodCounters: idFoodCounters,
+    };
+    const res = await OrdersAPI.addFoodOrder(data);
+    if (res === "SUCCESS") {
+      Swal.fire(`Thêm món thành công!✨✨`, "", "success").then(() => {
+        onModalClose();
+        navigation("/admin/orders-management");
       });
-
-      // Call API confirm
-      const data = { tableCounterDtos: tableCounterDtos };
-      const res = await OrdersAPI.createOrder(data);
-      if (res === "SUCCESS") {
-        Swal.fire(`Tạo hoá đơn thành công!✨✨`, "", "success").then(() => {
-          onModalClose();
-          navigation("/admin/orders-management");
-        });
-      } else if (res === "FAIL") {
-        ModalMessage.middleModal(
-          "error",
-          `Tạo hoá đơn thất bại!<br>Vui lòng thử lại sau!`
-        );
-      }
+    } else if (res === "FAIL") {
+      ModalMessage.middleModal(
+        "error",
+        `Thêm món thất bại!<br>Vui lòng thử lại sau!`
+      );
     }
   };
 
@@ -219,7 +193,6 @@ const CreateOrder = () => {
   };
 
   useEffect(() => {
-    getTablesAvailable();
     getCategories();
     getAllFood();
   }, []);
@@ -227,43 +200,31 @@ const CreateOrder = () => {
   return (
     <>
       <div className="adm-section">
-        <h3>Tạo mới hoá đơn</h3>
+        <h3>Thêm món mới</h3>
+        <p style={{ fontStyle: "italic" }}>
+          Mã hoá đơn {props.foodsAtTable.orderId}
+        </p>
+        <p style={{ fontStyle: "italic" }}>
+          Bàn số {props.foodsAtTable.tablesId}
+        </p>
       </div>
       <div className="table-header__btn">
         <Button
           variant="contained"
           size="small"
           color="secondary"
-          onClick={() => navigation("/admin/orders-management")}
+          onClick={() =>
+            navigation(
+              `/admin/orders-management/${props.foodsAtTable.orderId}/${props.foodsAtTable.tablesId}`
+            )
+          }
           startIcon={<ArrowBackRoundedIcon />}
         >
           Quay lại
         </Button>
       </div>
       <Grid container spacing={1}>
-        <Grid item xs={2}>
-          <div className="container">
-            <h2>Bàn hiện có</h2>
-            <div className="container-tables">
-              {tables.map((e) => {
-                return (
-                  <Button
-                    key={e.id}
-                    variant="contained"
-                    size="medium"
-                    color={
-                      selectedTables.indexOf(e.id) >= 0 ? "success" : "primary"
-                    }
-                    onClick={() => setChoosedTables(e.id)}
-                  >
-                    {e.id}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
-        </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={8}>
           <div className="container">
             <div className="container-categories">
               <button
@@ -433,7 +394,7 @@ const CreateOrder = () => {
                   variant="contained"
                   size="small"
                   color="secondary"
-                  onClick={() => onAddNewOrder()}
+                  onClick={() => onAddFoodOrder()}
                   startIcon={<CheckIcon />}
                   disabled={tmpListFood.length === 0 ? true : false}
                 >
@@ -617,4 +578,4 @@ const CreateOrder = () => {
   );
 };
 
-export default CreateOrder;
+export default AddFood;

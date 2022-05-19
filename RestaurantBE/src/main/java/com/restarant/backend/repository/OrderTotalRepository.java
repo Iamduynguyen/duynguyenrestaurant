@@ -19,7 +19,7 @@ public interface OrderTotalRepository extends JpaRepository<OrderTotal, Long> {
     @Query("select o from OrderDetails o where o.tableOrder.orderTotal.id = :id and o.status= :status")
     List<OrderDetails> getOrderdetailbyTotalAndStatus(@Param("id") Long id,@Param("status") Integer status);
 
-    @Query("SELECT o FROM OrderTotal o WHERE o.customer.id = :id AND o.status = 0")
+    @Query("SELECT o FROM OrderTotal o WHERE o.customer.id = :id AND o.status < 6 and o.status >-1")
     OrderTotal getOrderTotalByCustomerId(Long id);
 
     @Query("SELECT o FROM OrderTotal o WHERE o.customer.id = :id AND o.status = :status")
@@ -28,5 +28,10 @@ public interface OrderTotalRepository extends JpaRepository<OrderTotal, Long> {
     @Query("SELECT o FROM OrderTotal o ")
     List<OrderTotal> getListOrderTotalBetweenTime(long fromTime, long toTime, Integer status);
 
+    @Query("select o from OrderTotal o where o.status= :status")
+    List<OrderTotal> getBystaus(@Param("status") Integer status);
+
     OrderTotal findByVoucherAndCustomerIdAndStatus(Long voucherId, Long customerId, Integer status);
+    @Query("select o from OrderTotal o where o.vnpay_id=?1")
+    OrderTotal findByVnpay_id(String vnpayId);
 }

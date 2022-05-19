@@ -8,6 +8,14 @@ const CustomerApi = {
     saveInfoCustomer: (data) => {
         const url = "/api/customer";
         return axiosClient.post(url, data);
+    },
+    getListCustomer: () => {
+        const url = "/api/customers";
+        return axiosClient.get(url);
+    },
+    deleteCustomer: (id) => {
+        const url = "/api/customer/" + id;
+        return axiosClient.delete(url);
     }
 };
 

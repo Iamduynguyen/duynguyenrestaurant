@@ -265,7 +265,7 @@ export default function FoodsAdmin(props) {
                     variant="contained"
                     size="medium"
                     onClick={() => updateFood(item, record.status)}
-                    color={item.foodOrders.length === 0 ? "warning" : "primary"}
+                    color={item.foodOrders.length === 0 ? "primary" : "success"}
                     title={
                       item.foodOrders.length === 0
                         ? "Chưa gọi món"

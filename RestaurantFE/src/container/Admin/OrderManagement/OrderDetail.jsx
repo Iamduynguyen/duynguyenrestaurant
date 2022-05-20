@@ -312,7 +312,7 @@ const OrderDetail = (props) => {
             align="right"
             width={150}
             render={(text) => {
-              if (text !== null) {
+              if (text !== null && text !== undefined) {
                 return `${text
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} %`;
@@ -327,7 +327,7 @@ const OrderDetail = (props) => {
             align="right"
             width={200}
             render={(record) => {
-              if (record !== null) {
+              if (record !== null && record.amount !== null) {
                 return `${(
                   ((parseInt(record.amount, 10) *
                     (100 - parseInt(record.discount, 10))) /

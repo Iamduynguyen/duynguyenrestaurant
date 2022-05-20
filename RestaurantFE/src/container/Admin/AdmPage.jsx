@@ -10,6 +10,7 @@ import {
   ReadOutlined,
   PlusSquareOutlined,
   ChromeOutlined,
+  UserOutlined,
   BankOutlined,
   CalendarOutlined,
   SettingOutlined,
@@ -75,6 +76,16 @@ const AdmPage = () => {
       <Link to="/admin/orders">Đơn đặt bàn</Link>,
       "sub-order",
       <CalendarOutlined />
+    ),
+    getItem(
+      <Link to="/admin/customer">Khách hàng</Link>,
+      "sub-customer",
+      <UserOutlined />
+    ),
+    getItem(
+      <Link to="/admin/staff">Nhân viên</Link>,
+      "sub-staff",
+      <UserOutlined />
     ),
     getItem(
       <Link to="/admin/analist">Biểu đồ thống kê</Link>,

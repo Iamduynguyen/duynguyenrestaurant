@@ -120,9 +120,9 @@ public class CustomerController {
 
 
     @GetMapping("/customers")
-    public List<CustomerDto> getAllCustomers() {
+    public List<Customer> getAllCustomers() {
         log.debug("REST request to get all Customers");
-        return (List<CustomerDto>) customerService.getAll();
+        return customerService.getAllCustomer();
     }
 
     /**
@@ -170,7 +170,7 @@ public class CustomerController {
      * @param id the id of the customer to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/customers/{id}")
+    @DeleteMapping("/customer/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         log.debug("REST request to delete Customer : {}", id);
         try {

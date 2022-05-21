@@ -8,6 +8,18 @@ const StaffAPi = {
     getAllStaff: () => {
         const url = "/api/staff";
         return axiosClient.get(url);
+    },
+    getStaff: (id) => {
+        const url = `/api/staff/${id}`;
+        return axiosClient.get(url);
+    },
+    updateStaff: (id, data) => {
+        const url = `/api/staff/${id}`;
+        return axiosClient.put(url, data);
+    },
+    deleteStaff: (id) => {
+        const url = `/api/staff/${id}`;
+        return axiosClient.delete(url);
     }
 };
 

@@ -9,6 +9,7 @@ import StaffApi from "../../../API/StaffApi";
 import { Row, Table, Button as message } from "antd";
 import ModalMessage from "../../../components/Modal/ModalMessage";
 import Swal from "sweetalert2";
+import StaffAPi from "../../../API/StaffApi";
 
 export default function Staff(props) {
   const [loading, setLoading] = useState(true);
@@ -40,10 +41,10 @@ export default function Staff(props) {
     fetchData();
   }, [resetData]);
 
-  const lockCustomer = (id) => {
+  const deleteStaff = (id) => {
     Swal.fire({
-      title: `Xoá khách hàng`,
-      html: `Bạn có chắc chắn muốn xoá khách hàng này?`,
+      title: `Xoá nhân viên`,
+      html: `Bạn có chắc chắn muốn xóa nhân viên này?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#12a524",
@@ -54,16 +55,17 @@ export default function Staff(props) {
     }).then(async (result) => {
       console.log(result);
       if(result.isConfirmed){
-        await CustomerApi.deleteCustomer(id);
+        await StaffAPi.deleteStaff(id);
         Swal.fire({
           title: `Thành công`,
-          html: `Khóa tài khoản thành công!`,
+          html: `Xóa nhân viên thành công!`,
           icon: "success",
           confirmButtonColor: "#12a524",
-          confirmButtonText: "Xóa",
+          confirmButtonText: "Đóng",
           reverseButtons: true,
         });
       }
+      // await CustomerApi.getListCustomer();
       fetchData();
     });
   }
@@ -145,16 +147,20 @@ export default function Staff(props) {
                     variant="contained"
                     color="error"
                     startIcon={<LockOutlined />}
-                    onClick={() => lockCustomer(record.id)}
-                  >Xóa</Button>
-                  <Button
+                    onClick={() => deleteStaff(record.id)}
+                  >Xóa
+                  
+                  </Button> &ensp;
+                          <Link to={`/admin/staff/update-staff/${record.id}`}>
+                          <Button
                     variant="contained"
                     color="info"
                     startIcon={<LockOutlined />}
-                    onClick={() => lockCustomer(record.id)}
                   >
                     Sửa
                   </Button>
+        </Link>
+                  
                   </>
                 );
               }

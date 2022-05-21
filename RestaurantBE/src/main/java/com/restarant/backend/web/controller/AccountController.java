@@ -1,22 +1,26 @@
 package com.restarant.backend.web.controller;
 
 
+import com.restarant.backend.dto.ChangePasswordDto;
 import com.restarant.backend.entity.Account;
+import com.restarant.backend.entity.Customer;
+import com.restarant.backend.repository.AccountRepository;
 import com.restarant.backend.security.jwt.JwtUtils;
 import com.restarant.backend.security.services.UserDetailsImpl;
 import com.restarant.backend.service.IAccountService;
 import com.restarant.backend.dto.LoginRequest;
+import com.restarant.backend.service.utils.JwtServiceUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URISyntaxException;
 import java.security.Principal;
@@ -37,17 +41,21 @@ import java.util.stream.Collectors;
 public class AccountController {
 
     private final IAccountService accountService;
+    private final AccountRepository accountRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final JwtServiceUtils jwtServiceUtils;
     private final PasswordEncoder encoder;
 
     public AccountController(IAccountService accountService,
-                             AuthenticationManager authenticationManager,
+                             AccountRepository accountRepository, AuthenticationManager authenticationManager,
                              JwtUtils jwtUtils,
-                             PasswordEncoder encoder) {
+                             JwtServiceUtils jwtServiceUtils, PasswordEncoder encoder) {
         this.accountService = accountService;
+        this.accountRepository = accountRepository;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
+        this.jwtServiceUtils = jwtServiceUtils;
         this.encoder = encoder;
     }
 
@@ -85,5 +93,22 @@ public class AccountController {
     public ResponseEntity<?> getAccount(Principal principal){
         Account result = accountService.getAccountByLogin(principal.getName());
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/change-password")
+    public String changePassword(HttpServletRequest request, @RequestBody ChangePasswordDto changePasswordDto){
+        Customer customer = jwtServiceUtils.getCustomerByToken(request);
+        Account account = customer.getAccount();
+        System.out.println(changePasswordDto);
+        BCryptPasswordEncoder encode = new BCryptPasswordEncoder();
+        if(!encode.matches(changePasswordDto.getPasswordOld(), account.getPassword())){
+            return "PASS_FAIL";
+        } else if(!changePasswordDto.getPasswordNew().equals(changePasswordDto.getPasswordConfirm())){
+            return "PASS_NOT_EQUAL";
+        } else {
+            account.setPassword(encode.encode(changePasswordDto.getPasswordNew()));
+            accountRepository.save(account);
+            return "SUCCESS";
+        }
     }
 }

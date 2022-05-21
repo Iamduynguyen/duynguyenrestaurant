@@ -108,7 +108,7 @@ import {
             </div>
 
               <Form.Item>
-                <AntdButton htmlType="submit" className="my-btn my-btn--primary">Thêm món ăn</AntdButton>
+                <AntdButton htmlType="submit" className="my-btn my-btn--primary">Thêm nhân viên</AntdButton>
               </Form.Item>
             </Form>
           </div>

@@ -27,6 +27,8 @@ import CreateOrder from "./container/Admin/OrderManagement/CreateOrder";
 import Custommer from "./container/Admin/CustomerManagement";
 import Staff from "./container/Admin/Staff";
 import NewStaff from "./container/Admin/Staff/NewStaff";
+import UpdateStaff from "./container/Admin/Staff/UpdateStaff";
+
 // import NotFound404 from "./components/NotFound404";
 import AddFood from "./container/Admin/OrderManagement/AddFood";
 
@@ -68,6 +70,7 @@ const App = () => {
         <Route path="foods/fix-food/:id" element={<FixFoods />} />
         <Route path="/admin/foods/new-food" element={<NewFood />} />
         <Route path="/admin/staff/new-staff" element={<NewStaff />} />
+        <Route path="/admin/staff/update-staff/:id" element={<UpdateStaff />} />
         <Route path="tables" element={<TableAdmin />} />
         <Route path="orders" element={<ConfirmOrder />} />
         <Route

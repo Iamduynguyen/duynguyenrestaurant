@@ -11,6 +11,8 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import AuthAPI from "../../../API/AuthAPI";
+import Swal from "sweetalert2";
 
 export default function ChangePass() {
   const [passWord, setPassWord] = useState('');
@@ -22,14 +24,39 @@ export default function ChangePass() {
   const [validPass, setValidPass] = useState('');
   const [alert, setAlert] = useState(false);
 
-  const handlePassWord = () => {
-    if (newPassword == newConfPassword) {
-      setValidPass('');
-      console.log('Pass: ' + passWord, 'newPassword: ' + newPassword);
-      openAlert();
-    } else {
-      setValidPass('Mật khẩu không khớp');
+  const handlePassWord = async () => {
+    let changePassword = {
+      passwordOld: passWord,
+      passwordNew: newPassword,
+      passwordConfirm: newConfPassword
     }
+
+    let data = await AuthAPI.changePassword(changePassword)
+
+    if(data == 'SUCCESS'){
+      Swal.fire({title: 'Thành công!',
+      text: 'Thay đổi mật khẩu thành công!',
+      icon: 'success',
+      })
+  } else if(data == 'PASS_FAIL') {
+      Swal.fire({title: 'Lỗi!',
+      text: 'Mật khẩu cũ không chính xác!',
+      icon: 'error',
+      })
+  } else {
+    Swal.fire({title: 'Lỗi!',
+    text: 'Mật khẩu cũ và xác nhận mật khẩu phải giống nhau!',
+    icon: 'error',
+    })
+  }
+
+    // if (newPassword == newConfPassword) {
+    //   setValidPass('');
+    //   console.log('Pass: ' + passWord, 'newPassword: ' + newPassword);
+    //   openAlert();
+    // } else {
+    //   openAlert('Mật khẩu không khớp');
+    // }
   };
 
   const openAlert = () => {

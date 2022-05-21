@@ -110,7 +110,7 @@ public class OrderTotalController {
         RedirectView view = new RedirectView();
         String response = orderTotalService.checkOutVnpay(vnp_ResponseCode,vnp_TxnRef);
 //        view.addStaticAttribute("status",response);
-        view.setUrl("http://localhost:3000/check-out/result/"+response);
+        view.setUrl("http://localhost:3000/cart/"+response);
         return view;
     }
 

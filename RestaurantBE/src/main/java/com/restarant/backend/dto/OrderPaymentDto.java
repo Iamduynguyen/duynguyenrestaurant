@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * Description:
  *
@@ -18,4 +20,8 @@ import lombok.NoArgsConstructor;
 public class OrderPaymentDto {
     private Long orderId;
     private Long voucherId;
+    private String nameCust;
+    private String phoneNumberCust;
+    private BigDecimal returnCustMoney;
+    private BigDecimal custMoney;
 }

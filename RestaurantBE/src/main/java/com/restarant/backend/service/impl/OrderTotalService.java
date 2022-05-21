@@ -395,6 +395,10 @@ public class OrderTotalService implements IOrderTotalService {
                 orderTotal.setVoucher(paymentDto.getVoucherId());
             }
             orderTotal.setAmountTotal(amoutTotal);
+            orderTotal.setCustMoney(paymentDto.getCustMoney());
+            orderTotal.setReturnCustMoney(paymentDto.getReturnCustMoney());
+            orderTotal.setPhoneNumberCust(paymentDto.getPhoneNumberCust());
+            orderTotal.setNameCust(paymentDto.getNameCust());
             orderTotal.setStatus(6);
             if (Objects.nonNull(paymentDto.getVoucherId())) {
                 orderTotal.setVoucher(paymentDto.getVoucherId());

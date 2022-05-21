@@ -53,6 +53,20 @@ export default function DetailFood() {
     }
   };
 
+  const muahang = () => {
+    if(userOrder.length>0){
+      setOpenOrderFood(true);
+    }else{
+      Swal.fire({
+        title: 'Lỗi!',
+        text: 'Nhà hàng chỉ mở của từ 9h đến 23h \n Vui long chon lai',
+        icon: 'error',
+        confirmButtonText: 'Đóng'
+      })
+    }
+  };
+  
+
   const setQuantitya = (evt) => {
     console.log(evt.target)
   };
@@ -88,13 +102,15 @@ export default function DetailFood() {
       console.log(res1);
     };
     fetchData();
+    fetchDataUserOrder();
   }, [id]);
+  const fetchDataUserOrder = async () => {
+    const res = await BookTableAPI.getUserBookTable();
+    setUserOrder(res);
+    console.log(res);
+  };
   useEffect(() => {
-    const fetchDataUserOrder = async () => {
-      const res = await BookTableAPI.getUserBookTable();
-      setUserOrder(res);
-      console.log(res);
-    };
+
     fetchDataUserOrder();
   }, []);
   return (

@@ -29,6 +29,10 @@ const BookTableAPI = {
     const url = `/api/revenue?year=${year}`;
     return axiosClient.get(url);
   },
+  getStatusOrder: (id) => {
+    const url = `api/order-totals-status/${id}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default BookTableAPI;

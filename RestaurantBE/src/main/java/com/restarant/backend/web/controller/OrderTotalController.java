@@ -204,4 +204,10 @@ public class OrderTotalController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
+
+    @GetMapping("/order-totals-status/{id}")
+    public ResponseEntity<?> getStatus(@PathVariable Long id) {
+        Integer rs = orderTotalRepository.findById(id).get().getStatus();
+        return ResponseEntity.ok(rs);
+    }
 }

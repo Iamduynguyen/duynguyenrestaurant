@@ -76,6 +76,7 @@ public class AccountController {
         account.setTimereset(LocalDate.now());
         account.setCecret(UUID.randomUUID().toString());
         account.setRole("ROLE_USER");
+        account.setDeleteFlag(false);
         Account result = accountService.createAccount(account);
         return ResponseEntity.ok().body(result);
     }

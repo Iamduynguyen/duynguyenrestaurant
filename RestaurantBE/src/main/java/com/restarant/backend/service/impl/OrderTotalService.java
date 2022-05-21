@@ -302,13 +302,13 @@ public class OrderTotalService implements IOrderTotalService {
             OrderTotal orderTotal = orderTotalRepository.getById(id);
             if (Objects.nonNull(orderTotal)) {
                 orderTotal.setStatus(2);
-//                List<OrderDetails> lst = orderDetailsRepository.getByOrdertotalId(orderTotal.getId());
-//                for (OrderDetails x:lst){
-//                    if (x.getStatus()==1){
-//                        x.setStatus(2);
-//                    }
-//                }
-//                orderDetailsRepository.saveAll(lst);
+                List<OrderDetails> lst = orderDetailsRepository.getByOrdertotalId(orderTotal.getId());
+                for (OrderDetails x:lst){
+                    if (x.getStatus()==1){
+                        x.setStatus(2);
+                    }
+                }
+                orderDetailsRepository.saveAll(lst);
                 orderTotal.setNote("Người xác nhận đơn hàng :"+ jwtServiceUtils.getUserName(request));
                 orderTotalRepository.save(orderTotal);
                 MailDto mailDto = new MailDto();

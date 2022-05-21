@@ -9,6 +9,10 @@ const TableAPI = {
         const url = `/api/tables?start=${data}&end=${data}`;
         return axiosClient.get(url);
     },
+    getTableByStartandEnd: (start, end) => {
+        const url = `/api/tables?start=${start}&end=${end}`;
+        return axiosClient.get(url);
+    },
     getTablesAvailable: () => {
         const url = "/api/tables/now";
         return axiosClient.get(url);

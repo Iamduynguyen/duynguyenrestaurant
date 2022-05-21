@@ -37,7 +37,7 @@ export default function FoodsAdmin(props) {
     });
     if (deposit !== undefined) {
       if (deposit === "") {
-        const data = { id: id, deposit: +deposit };
+        const data = { id: id, deposit: deposit };
         const res = await OrdersAPI.staffConfirmDepositOnline(data);
         if (res === "SUCCESS") {
           ModalMessage.miniTopRightModal(

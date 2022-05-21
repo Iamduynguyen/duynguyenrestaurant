@@ -11,7 +11,7 @@ const Header = () => (
         classText="text-xl font-medium text-gray-700"
         title="Tìm kiếm hương vị mới"
       />
-      <h1 className="app__header-h1 ">Chìa Khóa Đang Ở Đây</h1>
+      <h1 className="app__header-h1 ">Gửi yêu thương trong từng món ăn</h1>
       <p className="p__opensans" style={{ margin: "2rem 0", color: "black" }}>
         Sit tellus lobortis sed senectus vivamus molestie. Condimentum volutpat
         morbi facilisis quam scelerisque sapien. Et, penatibus aliquam amet

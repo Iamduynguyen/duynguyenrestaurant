@@ -1,7 +1,10 @@
 package com.restarant.backend.web.controller;
 
 import com.restarant.backend.dto.*;
+import com.restarant.backend.entity.FoodDetails;
+import com.restarant.backend.entity.OrderDetails;
 import com.restarant.backend.entity.OrderTotal;
+import com.restarant.backend.repository.FoodDetallsRepository;
 import com.restarant.backend.repository.OrderTotalRepository;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.impl.OrderTotalService;
@@ -18,9 +21,9 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -32,6 +35,9 @@ public class OrderTotalController {
 
     @Autowired
     private OrderTotalRepository orderTotalRepository;
+
+    @Autowired
+    FoodDetallsRepository foodDetallsRepository;
 
     @Autowired
     OrderTotalService orderTotalService1;
@@ -162,8 +168,8 @@ public class OrderTotalController {
         return orderTotalService.confirmOrderOnline(id,request);
     }
     @PostMapping("/confirm-deposit-online")
-    public String confirmDepositOnline(@RequestBody ConfirmDepositOnline request){
-        return orderTotalService.confirmDepositOnline(request);
+    public String confirmDepositOnline(@RequestBody ConfirmDepositOnline request,HttpServletRequest req){
+        return orderTotalService.confirmDepositOnline(request,req);
     }
     @PutMapping("/cancel-order/{id}")
     public String cancelOrder(@PathVariable Long id){
@@ -207,7 +213,20 @@ public class OrderTotalController {
 
     @GetMapping("/order-totals-status/{id}")
     public ResponseEntity<?> getStatus(@PathVariable Long id) {
-        Integer rs = orderTotalRepository.findById(id).get().getStatus();
-        return ResponseEntity.ok(rs);
+        Map<String,Object> map = new HashMap<>();
+        OrderTotal rs = orderTotalRepository.findById(id).get();
+        Integer status = rs.getStatus();
+        BigDecimal deposit = rs.getDeposit();
+        map.put("status",status);
+        map.put("deposit",deposit);
+        return ResponseEntity.ok(map);
     }
+
+//    @GetMapping("/order-totals-thanhtoan/{id}")
+//    public ResponseEntity<?> getThanhtoan(@PathVariable Long id) {
+//        List<OrderDetails> orderDetails = orderTotalRepository.getFoodByOder(id);
+//
+//        return ResponseEntity.ok(lst);
+//    }
+
 }

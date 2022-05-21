@@ -2,6 +2,7 @@ package com.restarant.backend.web.controller;
 
 import com.restarant.backend.dto.OrderDetailsDto;
 import com.restarant.backend.dto.TableOrderDto;
+import com.restarant.backend.entity.OrderTotal;
 import com.restarant.backend.entity.TableOrder;
 import com.restarant.backend.repository.TableOrderRepository;
 import com.restarant.backend.service.ITableOrderService;
@@ -47,7 +48,16 @@ public class TableOrderController {
     @PostMapping("/table-orders")
     public ResponseEntity<?> createTableOrder(@RequestBody List<TableOrderDto> dto, HttpServletRequest request) {
         log.debug("REST request to save TableOrder : {}", dto);
+        if (dto==null){
+            return ResponseEntity.badRequest().body("chua chon ban");
+        }
 
+        for (TableOrderDto x:dto){
+            System.out.println(x.toString());
+            if (x.getOrderTime()==null||x.getEndTime()==null){
+                return ResponseEntity.badRequest().body(4);
+            }
+        }
         List<TableOrderDto> result = new ArrayList<>();
         for (TableOrderDto tableOrderDto : dto) {
             try {

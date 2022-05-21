@@ -1,8 +1,10 @@
 package com.restarant.backend.service.impl;
 
 import com.restarant.backend.dto.FavouriteFoodDto;
+import com.restarant.backend.entity.Account;
 import com.restarant.backend.entity.Customer;
 import com.restarant.backend.entity.FoodDetails;
+import com.restarant.backend.repository.AccountRepository;
 import com.restarant.backend.repository.CustomerRepository;
 import com.restarant.backend.repository.FoodDetallsRepository;
 import com.restarant.backend.service.ICustomerService;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class CustomerService implements ICustomerService {
 
     private final CustomerRepository customerRepository;
+    private final AccountRepository accountRepository;
     private final CustomerValidator customerValidate;
     private final FoodDetallsRepository foodDetallsRepository;
     private final IConverterDto<Customer, CustomerDto> mapper;
@@ -30,10 +33,11 @@ public class CustomerService implements ICustomerService {
 
 
     public CustomerService(CustomerRepository customerRepository,
-                           FoodDetallsRepository foodDetallsRepository,
+                           AccountRepository accountRepository, FoodDetallsRepository foodDetallsRepository,
                            @Qualifier("customerMapper") IConverterDto<Customer, CustomerDto> mapper,
                            JwtServiceUtils jwtServiceUtils) {
         this.customerRepository = customerRepository;
+        this.accountRepository = accountRepository;
         this.foodDetallsRepository = foodDetallsRepository;
         this.mapper = mapper;
         this.jwtServiceUtils = jwtServiceUtils;
@@ -66,6 +70,12 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public boolean deleteById(Long id) throws InvalidDataExeception {
+        Customer customer = customerRepository.getById(id);
+        Account account = customer.getAccount();
+        account.setDeleteFlag(true);
+        customer.setDeleteflag(Long.valueOf("1"));
+        customerRepository.save(customer);
+        accountRepository.save(account);
         return false;
     }
 
@@ -73,7 +83,6 @@ public class CustomerService implements ICustomerService {
     public List<CustomerDto> getAll() {
         return null;
     }
-
 
     @Override
     public List<CustomerDto> getAll(Pageable pageable) {
@@ -130,4 +139,8 @@ public class CustomerService implements ICustomerService {
 
     }
 
+    @Override
+    public List<Customer> getAllCustomer() {
+        return customerRepository.findAll();
+    }
 }

@@ -12,9 +12,11 @@ import com.restarant.backend.repository.TablesRepository;
 import com.restarant.backend.service.ITableOrderService;
 import com.restarant.backend.service.ITableService;
 import com.restarant.backend.service.mapper.IConverterDto;
+import com.restarant.backend.service.utils.ConvertTime;
 import com.restarant.backend.service.utils.JwtServiceUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -34,6 +37,8 @@ public class TableOrderService implements ITableOrderService {
     private final ITableService tableService;
     private final TablesRepository tablesRepository;
     private final JwtServiceUtils jwtServiceUtils;
+    @Autowired
+    ConvertTime convertTime;
 
     public TableOrderService(TableOrderRepository tableOrderRepository,
                              @Qualifier("tableOrderMapper") IConverterDto<TableOrder, TableOrderDto> mapper,
@@ -60,9 +65,6 @@ public class TableOrderService implements ITableOrderService {
         if(dto.getOrderTime() == null){
             throw new InvalidDataExeception("require field[order_time]");
         }
-        if(!tableService.isAvailable(dto.getTableId(), dto.getOrderTime())){
-            throw new InvalidDataExeception("Table are using!");
-        }
 
         Customer customer = jwtServiceUtils.getCustomerByToken(request);
         if(customer == null){
@@ -74,7 +76,9 @@ public class TableOrderService implements ITableOrderService {
         if(orderTotal == null){
             OrderTotal newOrderTotal = new OrderTotal();
             newOrderTotal.setCustomer(customer);
-            newOrderTotal.setOrderTime(dto.getOrderTime());
+            System.out.println(dto.getOrderTime()+" |time| "+dto.getEndTime());
+            newOrderTotal.setOrderTime(convertTime.validate(dto.getOrderTime()));
+            newOrderTotal.setEndTime(convertTime.validate(dto.getEndTime()));
             newOrderTotal.setAmountTotal(new BigDecimal("0"));
             newOrderTotal.setStatus(OrderTotalStatus.ORDERING);
             orderTotal = orderTotalRepository.save(newOrderTotal);
@@ -102,9 +106,27 @@ public class TableOrderService implements ITableOrderService {
         Customer customer = jwtServiceUtils.getCustomerByToken(request);
         List<TableOrder> result = new ArrayList<>();
         if(customer != null && customer.getId() != null){
-            OrderTotal orderTotal = orderTotalRepository.getOrderTotalByCustomerId(customer.getId());
-            if(orderTotal != null){
-                result.addAll(orderTotal.getTableOrders());
+            try {
+                OrderTotal orderTotal = orderTotalRepository.getOrderTotalByCustomerId(customer.getId());
+                if(orderTotal != null){
+                    result.addAll(orderTotal.getTableOrders());
+                }else {
+                    OrderTotal newOrderTotal = new OrderTotal();
+                    newOrderTotal.setCustomer(customer);
+                    newOrderTotal.setStatus(0);
+                    newOrderTotal.setDeleteflag(0l);
+                    newOrderTotal.setTableOrders(new HashSet<>());
+                    orderTotalRepository.save(newOrderTotal);
+                    return new ArrayList<>();
+                }
+            }catch (Exception e){
+                OrderTotal newOrderTotal = new OrderTotal();
+                newOrderTotal.setCustomer(customer);
+                newOrderTotal.setStatus(0);
+                newOrderTotal.setDeleteflag(0l);
+                newOrderTotal.setTableOrders(new HashSet<>());
+                orderTotalRepository.save(newOrderTotal);
+                return new ArrayList<>();
             }
         }
         return mapper.convertToListDto(result);

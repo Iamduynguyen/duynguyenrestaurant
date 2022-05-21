@@ -10,11 +10,13 @@ import {
   ReadOutlined,
   PlusSquareOutlined,
   ChromeOutlined,
+  UserOutlined,
   BankOutlined,
   CalendarOutlined,
   SettingOutlined,
   DollarCircleOutlined,
 } from "@ant-design/icons";
+import GroupIcon from '@mui/icons-material/Group';
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { getKey } from "../../Features/getAuth";
 
@@ -75,6 +77,16 @@ const AdmPage = () => {
       <Link to="/admin/orders">Đơn đặt bàn</Link>,
       "sub-order",
       <CalendarOutlined />
+    ),
+    getItem(
+      <Link to="/admin/customer">Khách hàng</Link>,
+      "sub-customer",
+      <UserOutlined />
+    ),
+    getItem(
+      <Link to="/admin/staff">Nhân viên</Link>,
+      "sub-staff",
+      <GroupIcon />
     ),
     getItem(
       <Link to="/admin/analist">Biểu đồ thống kê</Link>,

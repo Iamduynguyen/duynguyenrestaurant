@@ -92,6 +92,15 @@ public class TablesController {
         return tableService.getbytime(start1,end);
     }
 
+    @GetMapping("/tables/now")
+    public List<TableDto> getAllTables() {
+        log.debug("REST request to get all Tables");
+        Long start;
+        start = convertTime.validate(System.currentTimeMillis());
+        Long end = convertTime.addHour(start,3l);
+        return tableService.getbytime(start,end);
+    }
+
     /**
      * {@code GET  /tables/:id} : get the "id" tables.
      *

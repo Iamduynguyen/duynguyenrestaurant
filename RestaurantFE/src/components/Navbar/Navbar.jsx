@@ -37,7 +37,7 @@ const Navbar = () => {
   return (
     <nav className="app__navbar z-[999] fixed top-0 opacity-[90%]">
       <div className="app__navbar-logo">
-        <img src={images.gericht} alt="app__logo" />
+        <img style={{height:'65px'}} src={images.gericht} alt="app__logo" />
       </div>
       <ul className="app__navbar-links mb-0">
         <li className="p__opensans">

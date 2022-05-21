@@ -1,11 +1,16 @@
 package com.restarant.backend.web.controller;
 
 import com.restarant.backend.dto.FavouriteFoodDto;
+import com.restarant.backend.entity.Account;
 import com.restarant.backend.entity.Customer;
+import com.restarant.backend.repository.AccountRepository;
+import com.restarant.backend.repository.CustomerRepository;
 import com.restarant.backend.service.ICustomerService;
 import com.restarant.backend.dto.CustomerDto;
+import com.restarant.backend.service.utils.JwtServiceUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Set;
 
 
 @Slf4j
@@ -24,13 +28,21 @@ import java.util.Set;
 @CrossOrigin("*")
 public class CustomerController {
 
+    @Autowired
+    private JwtServiceUtils jwtServiceUtils;
+
     private static final String ENTITY_NAME = "customer";
 
 
     private final ICustomerService customerService;
 
-    public CustomerController(ICustomerService customerService) {
+    private final CustomerRepository customerRepository;
+    private final AccountRepository accountRepository;
+
+    public CustomerController(ICustomerService customerService, CustomerRepository customerRepository, AccountRepository accountRepository) {
         this.customerService = customerService;
+        this.customerRepository = customerRepository;
+        this.accountRepository = accountRepository;
     }
 
     /**
@@ -98,26 +110,27 @@ public class CustomerController {
      * @param id the id of the customer to save.
      * @param customer the customer to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated customer,
-     * or with status {@code 400 (Bad Request)} if the customer is not valid,
+     * or with status {@code 400 (Bad Request)} if the customer is not vanavlid,
      * or with status {@code 500 (Internal Server Error)} if the customer couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-//    @PutMapping("/customers/{id}")
-//    public ResponseEntity<?> updateCustomer(
-//        @PathVariable(value = "id", required = false) final Long id, @RequestBody Customer customer) throws URISyntaxException {
-//        log.debug("REST request to update Customer : {}, {}", id, customer);
-//        if (!customerService.isExistById(id)) {
-//            return ResponseEntity.badRequest().body("entity not exit");
-//        }
-//        Customer result = customerService.save(customer);
-//        return ResponseEntity.ok().body(result);
-//    }
+    @PutMapping("/customer/unlock/{id}")
+    public ResponseEntity<?> updateCustomer(
+        @PathVariable(value = "id", required = false) final Long id) throws URISyntaxException {
+        Customer customer = customerRepository.findById(id).get();
+        customer.setDeleteflag(Long.valueOf("0"));
+        Account account = customer.getAccount();
+        account.setDeleteFlag(false);
+        accountRepository.save(account);
+        customerRepository.save(customer);
+        return ResponseEntity.ok().body(customer);
+    }
 
 
     @GetMapping("/customers")
-    public List<CustomerDto> getAllCustomers() {
+    public List<Customer> getAllCustomers() {
         log.debug("REST request to get all Customers");
-        return (List<CustomerDto>) customerService.getAll();
+        return customerService.getAllCustomer();
     }
 
     /**
@@ -140,13 +153,32 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
+    @PostMapping("/customer")
+    public ResponseEntity<?> saveCustomer(HttpServletRequest request, @RequestBody CustomerDto customerDto) {
+        try {
+            CustomerDto customer = customerService.getById(request);
+            System.out.println(customerDto.toString());
+            if(customer == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            } else {
+                customer.setName(customerDto.getName());
+                customer.setPhoneNumber(customerDto.getPhoneNumber());
+                customerService.create(customerDto);
+            }
+            return ResponseEntity.ok(customer);
+        } catch (InvalidDataExeception e) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
     /**
      * {@code DELETE  /customers/:id} : delete the "id" customer.
      *
      * @param id the id of the customer to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/customers/{id}")
+    @DeleteMapping("/customer/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         log.debug("REST request to delete Customer : {}", id);
         try {

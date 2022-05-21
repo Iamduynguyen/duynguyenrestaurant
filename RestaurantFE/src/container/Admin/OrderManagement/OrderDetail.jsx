@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { Button, IconButton } from "@mui/material";
 import Swal from "sweetalert2";
 import ModalMessage from "../../../components/Modal/ModalMessage";
@@ -46,9 +47,10 @@ const OrderDetail = (props) => {
         const res = await OrdersAPI.addQty(data);
         console.log(res);
         if (res === "SUCCESS") {
-          ModalMessage.miniTopRightModal(
+          ModalMessage.middleModal(
             "success",
-            `Đã thêm ${qty} x ${foodOrders.foodName}`
+            `Hoá đơn ${props.foodsAtTable.orderId}<br>Bàn số ${props.foodsAtTable.tablesId}<br>Đã thêm ${qty} x ${foodOrders.foodName}`,
+            "oke"
           );
           navigation("/admin/orders-management");
         } else {
@@ -61,38 +63,48 @@ const OrderDetail = (props) => {
     }
   };
   const removeQty = async (foodOrders) => {
-    const { value: qty } = await Swal.fire({
-      title: `Món ${foodOrders.foodName}`,
-      input: "text",
-      inputLabel: "Nhập số lượng cần trừ",
-      inputPlaceholder: "Số lượng trừ đi",
-      confirmButtonText: "Trừ",
-      confirmButtonColor: "#c20000",
-    });
-    if (qty) {
-      if (!/^\d+$/.test(qty)) {
-        ModalMessage.miniTopRightModal(
-          "error",
-          `Số lượng vừa nhập<br>không hợp lệ!`
-        );
-      } else if (+qty > +foodOrders.quantity) {
-        ModalMessage.miniTopRightModal("error", `Vượt quá số lượng hiện tại!`);
-      } else {
-        const data = {
-          orderDetails: [{ orderDetailsId: foodOrders.id, quantity: qty }],
-        };
-        const res = await OrdersAPI.removeQty(data);
-        if (res === "SUCCESS") {
-          ModalMessage.middleModal(
-            "success",
-            `Đã trừ ${qty} x ${foodOrders.foodName}`
-          );
-          navigation("/admin/orders-management");
-        } else {
+    if (+foodOrders.quantity <= 1) {
+      ModalMessage.miniTopRightModal(
+        "error",
+        `Số lượng đạt giới hạn<br>Không thể trừ thêm!`
+      );
+    } else {
+      const { value: qty } = await Swal.fire({
+        title: `Món ${foodOrders.foodName}`,
+        input: "text",
+        inputLabel: "Nhập số lượng cần trừ",
+        inputPlaceholder: "Số lượng trừ đi",
+        confirmButtonText: "Trừ",
+        confirmButtonColor: "#c20000",
+      });
+      if (qty) {
+        if (!/^\d+$/.test(qty)) {
           ModalMessage.miniTopRightModal(
             "error",
-            `Lỗi<br/>Vui lòng thử lại sau!`
+            `Số lượng vừa nhập<br>không hợp lệ!`
           );
+        } else if (+qty > +foodOrders.quantity) {
+          ModalMessage.miniTopRightModal(
+            "error",
+            `Vượt quá số lượng hiện tại!`
+          );
+        } else {
+          const data = {
+            orderDetails: [{ orderDetailsId: foodOrders.id, quantity: qty }],
+          };
+          const res = await OrdersAPI.removeQty(data);
+          if (res === "SUCCESS") {
+            ModalMessage.middleModal(
+              "success",
+              `Hoá đơn ${props.foodsAtTable.orderId}<br>Bàn số ${props.foodsAtTable.tablesId}<br>Đã trừ ${qty} x ${foodOrders.foodName}`
+            );
+            navigation("/admin/orders-management");
+          } else {
+            ModalMessage.miniTopRightModal(
+              "error",
+              `Lỗi<br/>Vui lòng thử lại sau!`
+            );
+          }
         }
       }
     }
@@ -146,8 +158,6 @@ const OrderDetail = (props) => {
   };
 
   useEffect(() => {
-    console.log(props.foodsAtTable);
-
     // Validate access when not matching tableId & orderId
     if (
       props.foodsAtTable.orderId !== +orderId &&
@@ -166,8 +176,8 @@ const OrderDetail = (props) => {
             key: item.id,
             price: item.amountTotal,
             customerName: item.customer ? item.customer.name : "Không có",
-            orderTime: moment(new Date(item.orderTime).toString()).format(
-              "DD/MM/YYYY hh:mm:ss"
+            orderTime: moment(new Date(item.orderTime*1000).toString()).format(
+              "DD/MM/YYYY hh:mm"
             ),
           };
         })
@@ -187,22 +197,40 @@ const OrderDetail = (props) => {
           <Button
             variant="outlined"
             size="small"
-            color="error"
-            startIcon={<DeleteForeverIcon />}
-            onClick={() => {
-              deleteOrderDetails(selectedRow);
-            }}
-          >
-            Xoá
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
             color="secondary"
-            startIcon={<AddRoundedIcon />}
+            onClick={() => navigation("/admin/orders-management")}
+            startIcon={<ArrowBackRoundedIcon />}
           >
-            Thêm mới
+            Quay lại
           </Button>
+          {props.orderStatus !== 6 && props.orderStatus !== -1 && (
+            <>
+              <Button
+                variant="outlined"
+                size="small"
+                color="error"
+                startIcon={<DeleteForeverIcon />}
+                onClick={() => {
+                  deleteOrderDetails(selectedRow);
+                }}
+              >
+                Xoá
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                color="secondary"
+                startIcon={<AddRoundedIcon />}
+                onClick={() =>
+                  navigation(
+                    `/admin/orders-management/${props.foodsAtTable.orderId}/${props.foodsAtTable.tablesId}/add`
+                  )
+                }
+              >
+                Thêm món
+              </Button>
+            </>
+          )}
         </div>
         <Table
           loading={loading}
@@ -222,10 +250,17 @@ const OrderDetail = (props) => {
           />
           <Table.Column
             title="Tên món"
-            dataIndex="foodName"
             key="foodName"
             align="left"
-            width={600}
+            width={450}
+            render={(record) => {
+              return (
+                <span>
+                  {record.foodName} <br />
+                  Size {record.size}
+                </span>
+              );
+            }}
           />
           <Table.Column
             title="Số lượng"
@@ -263,6 +298,42 @@ const OrderDetail = (props) => {
             render={(text) => {
               if (text !== null) {
                 return `${text
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;
+              } else {
+                return `0 VNĐ`;
+              }
+            }}
+          />
+          <Table.Column
+            title="Giảm giá"
+            dataIndex="discount"
+            key="discount"
+            align="right"
+            width={150}
+            render={(text) => {
+              if (text !== null && text !== undefined) {
+                return `${text
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} %`;
+              } else {
+                return `0 %`;
+              }
+            }}
+          />
+          <Table.Column
+            title="Tổng tiền"
+            key="amount"
+            align="right"
+            width={200}
+            render={(record) => {
+              if (record !== null && record.amount !== null) {
+                return `${(
+                  ((parseInt(record.amount, 10) *
+                    (100 - parseInt(record.discount, 10))) /
+                    100) *
+                  record.quantity
+                )
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;
               } else {

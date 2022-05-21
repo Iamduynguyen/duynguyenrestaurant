@@ -1,5 +1,8 @@
 package com.restarant.backend.web;
 
+import com.restarant.backend.entity.OrderTotal;
+import com.restarant.backend.repository.OrderTotalRepository;
+import com.restarant.backend.service.impl.OrderTotalService;
 import com.restarant.backend.service.utils.ConvertTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,16 +19,20 @@ public class API {
 
     @Autowired
     ConvertTime convertTime;
+    @Autowired
+    OrderTotalRepository orderTotalRepository;
+    @Autowired
+    OrderTotalService a;
     @GetMapping("/ping")
     public String getA(){
         return "ping";
     }
 
     @GetMapping("/time")
-    public String getA(@RequestParam("t") Long time){
-        time = convertTime.validate(time);
-        Long x = convertTime.addHour(time,5l);
-        String a = convertTime.convertToLocalDateTime(x).toString();
-        return a+"\t"+convertTime.convertToLocalDateTime(time)+"\t"+time+"\t"+x;
+    public String getA(@RequestParam("t") Long id){
+        OrderTotal f= orderTotalRepository.findById(id).get();
+        a.changeTable(f);
+        return "a";
     }
+
 }

@@ -58,6 +58,8 @@ public class OrderDetailsService implements IOrderDetailsService {
             throw new InvalidDataExeception("The TableOrderId not found");
         }
         OrderDetails entity = new OrderDetails();
+        entity.setQuantity(dto.getQuantity());
+        entity.setAmount(dto.getFoodDetalls().getAmount());
         entity.setTableOrder(tableOrderRepository.findById(dto.getTableOrderId()).get());
         entity.setFoodDetalls(foodDetallsRepository.findById(dto.getFoodDetalls().getId()).get());
         entity.setStatus(0);

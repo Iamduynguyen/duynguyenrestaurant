@@ -1,7 +1,10 @@
 package com.restarant.backend.web.controller;
 
 import com.restarant.backend.dto.*;
+import com.restarant.backend.entity.FoodDetails;
+import com.restarant.backend.entity.OrderDetails;
 import com.restarant.backend.entity.OrderTotal;
+import com.restarant.backend.repository.FoodDetallsRepository;
 import com.restarant.backend.repository.OrderTotalRepository;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.impl.OrderTotalService;
@@ -9,15 +12,18 @@ import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -30,14 +36,17 @@ public class OrderTotalController {
     @Autowired
     private OrderTotalRepository orderTotalRepository;
 
+    @Autowired
+    FoodDetallsRepository foodDetallsRepository;
+
+    @Autowired
+    OrderTotalService orderTotalService1;
+
     private final Logger log = LoggerFactory.getLogger(OrderTotalController.class);
 
     private static final String ENTITY_NAME = "orderTotal";
 
     private final IOrderTotalService orderTotalService;
-
-    @Autowired
-    OrderTotalService orderTotalService1;
 
     public OrderTotalController(IOrderTotalService orderTotalService) {
         this.orderTotalService = orderTotalService;
@@ -98,18 +107,30 @@ public class OrderTotalController {
 //        log.debug("REST request to get all OrderTotals");
 //        return orderTotalRepository.findAll();
 //    }
+    @PutMapping("payment-vnpay/{id}")
+    public String paymentVnpay(HttpServletRequest request,@PathVariable Long id) throws IOException {
+        return orderTotalService.paymentVnpay(request, id);
+    }
+    @GetMapping("check-out-vnpay")
+    public RedirectView checkOutVnpay(@RequestParam String vnp_TxnRef, @RequestParam String vnp_ResponseCode){
+        RedirectView view = new RedirectView();
+        String response = orderTotalService.checkOutVnpay(vnp_ResponseCode,vnp_TxnRef);
+//        view.addStaticAttribute("status",response);
+        view.setUrl("http://localhost:3000/cart/"+response);
+        return view;
+    }
+
     @GetMapping("/orders")
     public List<GetAllToTalOrder> getAllToTalOrders(){
         return orderTotalService.getAllOrderTotal();
     }
-<<<<<<< HEAD
-    @GetMapping("/orders1")
-    public List<OrderTotal> getAllOrders() {
-        return orderTotalRepository.findAll();
+
+    @GetMapping("/order-total/customer-confirm1/{id}")
+    public ResponseEntity<?> customerRequest1(@PathVariable Long id){
+        Boolean rs = orderTotalService1.customerConfirm1(id);
+        return ResponseEntity.ok(rs);
     }
 
-=======
->>>>>>> b992cbea2be7492eed6fffaedeeb35aefb3c5c2d
     @PutMapping("/confirm-customer-order-online/{id}")
     public String confirmCustomerOrderOnline(@PathVariable Long id){
         return orderTotalService.confirmCustomerOrderOnline(id);
@@ -118,7 +139,10 @@ public class OrderTotalController {
     public String createCounter(@RequestBody OrderCouterDto request, HttpServletRequest httpServletRequest) {
         return orderTotalService.registrationOrderCounter(request, httpServletRequest);
     }
-
+    @PutMapping("/confirm-customer-go-restaurant/{id}")
+    public String confirmCustomerGoRestaurant(@PathVariable Long id) throws InvalidDataExeception {
+      return orderTotalService.confirmCustomerGoRestaurant(id);
+    }
     @PostMapping("/payment-order")
     public String payment(@RequestBody OrderPaymentDto paymentDto, HttpServletRequest request) {
         return orderTotalService.payment(paymentDto, request);
@@ -144,8 +168,8 @@ public class OrderTotalController {
         return orderTotalService.confirmOrderOnline(id,request);
     }
     @PostMapping("/confirm-deposit-online")
-    public String confirmDepositOnline(@RequestBody ConfirmDepositOnline request){
-        return orderTotalService.confirmDepositOnline(request);
+    public String confirmDepositOnline(@RequestBody ConfirmDepositOnline request,HttpServletRequest req){
+        return orderTotalService.confirmDepositOnline(request,req);
     }
     @PutMapping("/cancel-order/{id}")
     public String cancelOrder(@PathVariable Long id){
@@ -187,39 +211,22 @@ public class OrderTotalController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
-    @GetMapping("/order-total/customer-confirm1/{id}")
-    public ResponseEntity<?> customerRequest1(@PathVariable Long id){
-        Boolean rs = orderTotalService1.customerConfirm1(id);
-        return ResponseEntity.ok(rs);
+    @GetMapping("/order-totals-status/{id}")
+    public ResponseEntity<?> getStatus(@PathVariable Long id) {
+        Map<String,Object> map = new HashMap<>();
+        OrderTotal rs = orderTotalRepository.findById(id).get();
+        Integer status = rs.getStatus();
+        BigDecimal deposit = rs.getDeposit();
+        map.put("status",status);
+        map.put("deposit",deposit);
+        return ResponseEntity.ok(map);
     }
 
-    @GetMapping("/order-total/customer-confirm3/{id}")
-    public ResponseEntity<?> customerRequest2(@PathVariable Long id){
-        Boolean rs = orderTotalService1.customerConfirm3(id);
-        return ResponseEntity.ok(rs);
-    }
+//    @GetMapping("/order-totals-thanhtoan/{id}")
+//    public ResponseEntity<?> getThanhtoan(@PathVariable Long id) {
+//        List<OrderDetails> orderDetails = orderTotalRepository.getFoodByOder(id);
+//
+//        return ResponseEntity.ok(lst);
+//    }
 
-    @GetMapping("/order-total/customer-confirm6/{id}")
-    public ResponseEntity<?> customerRequest6(@PathVariable Long id){
-        Boolean rs = orderTotalService1.customerConfirm6(id);
-        return ResponseEntity.ok(rs);
-    }
-
-    @GetMapping("/order-total/staff-confirm2/{id}")
-    public ResponseEntity<?> staffConfirm2(@PathVariable Long id,HttpServletRequest request){
-        Boolean rs = orderTotalService1.staffConfirm2(id,request);
-        return ResponseEntity.ok(rs);
-    }
-
-    @GetMapping("/order-total/staff-confirm4/{id}")
-    public ResponseEntity<?> staffConfirm4(@PathVariable Long id,HttpServletRequest request){
-        Boolean rs = orderTotalService1.staffConfirm4(id,request);
-        return ResponseEntity.ok(rs);
-    }
-
-    @GetMapping("/order-total/staff-confirm5/{id}")
-    public ResponseEntity<?> staffConfirm5(@PathVariable Long id,HttpServletRequest request){
-        Boolean rs = orderTotalService1.staffConfirm5(id,request);
-        return ResponseEntity.ok(rs);
-    }
 }

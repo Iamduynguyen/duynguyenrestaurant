@@ -16,6 +16,7 @@ import {
   SettingOutlined,
   DollarCircleOutlined,
 } from "@ant-design/icons";
+import GroupIcon from '@mui/icons-material/Group';
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { getKey } from "../../Features/getAuth";
 
@@ -85,7 +86,7 @@ const AdmPage = () => {
     getItem(
       <Link to="/admin/staff">Nhân viên</Link>,
       "sub-staff",
-      <UserOutlined />
+      <GroupIcon />
     ),
     getItem(
       <Link to="/admin/analist">Biểu đồ thống kê</Link>,

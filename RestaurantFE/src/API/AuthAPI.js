@@ -9,6 +9,10 @@ const AuthAPI = {
     const url = '/service/register';
     return axiosClient.post(url, user);
   },
+  changePassword: (data) => {
+    const url = '/service/change-password';
+    return axiosClient.post(url, data);
+  },
 };
 
 export default AuthAPI;

@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import LockOutlined from "@mui/icons-material/Delete";
+import LockIcon from '@mui/icons-material/Lock';
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
@@ -8,6 +9,7 @@ import CustomerApi from "../../../API/CustomerApi";
 import { Row, Table, Button as message } from "antd";
 import ModalMessage from "../../../components/Modal/ModalMessage";
 import Swal from "sweetalert2";
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 
 export default function Customer(props) {
   const [loading, setLoading] = useState(true);
@@ -27,6 +29,7 @@ export default function Customer(props) {
             name: item.name,
             email: item.email,
             phone: item.phoneNumber,
+            deleteFlag: item.deleteflag
           };
         })
       );
@@ -41,12 +44,12 @@ export default function Customer(props) {
   const lockCustomer = (id) => {
     Swal.fire({
       title: `Xoá khách hàng`,
-      html: `Bạn có chắc chắn muốn xoá khách hàng này?`,
+      html: `Bạn có chắc chắn muốn khóa khách hàng này?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#12a524",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Xóa",
+      confirmButtonText: "Khóa",
       cancelButtonText: "Hủy bỏ",
       reverseButtons: true,
     }).then(async (result) => {
@@ -58,7 +61,36 @@ export default function Customer(props) {
           html: `Khóa tài khoản thành công!`,
           icon: "success",
           confirmButtonColor: "#12a524",
-          confirmButtonText: "Xóa",
+          confirmButtonText: "Đóng",
+          reverseButtons: true,
+        });
+      }
+      // await CustomerApi.getListCustomer();
+      fetchData();
+    });
+  }
+
+  const unLockCustomer = (id) => {
+    Swal.fire({
+      title: `Mở khóa khách hàng`,
+      html: `Bạn có muốn mở khóa cho khách hàng này?`,
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#12a524",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Mở",
+      cancelButtonText: "Hủy bỏ",
+      reverseButtons: true,
+    }).then(async (result) => {
+      console.log(result);
+      if(result.isConfirmed){
+        await CustomerApi.openCustomer(id);
+        Swal.fire({
+          title: `Thành công`,
+          html: `Mở khóa tài khoản thành công!`,
+          icon: "success",
+          confirmButtonColor: "#12a524",
+          confirmButtonText: "Đóng",
           reverseButtons: true,
         });
       }
@@ -125,19 +157,43 @@ export default function Customer(props) {
             title=""
             key="status"
             align="center"
-            width={100}
+            width={200}
             render={(record) => {
+              console.log('====================================');
+              console.log(record);
+              console.log('====================================');
               if (record.status !== -1 && record.status !== 6) {
-                return (
-                  <Button
-                    variant="contained"
-                    color="error"
-                    startIcon={<LockOutlined />}
-                    onClick={() => lockCustomer(record.id)}
-                  >
-                    Khóa
-                  </Button>
-                );
+                if(record.deleteFlag == 0){
+                  return (
+                    <>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      startIcon={<LockIcon />}
+                      onClick={() => lockCustomer(record.id)}
+                    >
+                      Khóa
+                    </Button>
+                    </>
+                    
+                  );
+                } else {
+                  return (
+                    <>
+                      <Button
+                      variant="contained"
+                      color="success"
+                      startIcon={<LockOpenIcon />}
+                      onClick={() => unLockCustomer(record.id)}
+                    >
+                      &ensp;Mở&ensp;
+                    </Button>
+                    </>
+                    
+                  );
+                  
+                }
+            
               }
             }}
           />

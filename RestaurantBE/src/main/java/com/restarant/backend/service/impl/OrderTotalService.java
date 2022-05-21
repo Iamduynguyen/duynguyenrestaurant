@@ -302,13 +302,13 @@ public class OrderTotalService implements IOrderTotalService {
             OrderTotal orderTotal = orderTotalRepository.getById(id);
             if (Objects.nonNull(orderTotal)) {
                 orderTotal.setStatus(2);
-//                List<OrderDetails> lst = orderDetailsRepository.getByOrdertotalId(orderTotal.getId());
-//                for (OrderDetails x:lst){
-//                    if (x.getStatus()==1){
-//                        x.setStatus(2);
-//                    }
-//                }
-//                orderDetailsRepository.saveAll(lst);
+                List<OrderDetails> lst = orderDetailsRepository.getByOrdertotalId(orderTotal.getId());
+                for (OrderDetails x:lst){
+                    if (x.getStatus()==1){
+                        x.setStatus(2);
+                    }
+                }
+                orderDetailsRepository.saveAll(lst);
                 orderTotal.setNote("Người xác nhận đơn hàng :"+ jwtServiceUtils.getUserName(request));
                 orderTotalRepository.save(orderTotal);
                 MailDto mailDto = new MailDto();
@@ -328,10 +328,22 @@ public class OrderTotalService implements IOrderTotalService {
     @Override
     public String confirmDepositOnline(ConfirmDepositOnline request) {
         try {
+            String msg = "";
             OrderTotal orderTotal = orderTotalRepository.getById(request.getId());
             orderTotal.setDeposit(request.getDeposit());
-            orderTotal.setStatus(4);
+            if(request.getDeposit().intValue()==0){
+                orderTotal.setStatus(4);
+            }else {
+                orderTotal.setStatus(2);
+                msg=" Mong quý khách để ý để đặt cọc bàn, số tiền  là"+request.getDeposit().toString();
+            }
             orderTotalRepository.save(orderTotal);
+            MailDto mailDto = new MailDto();
+            mailDto.setTo(orderTotal.getCustomer().getEmail());
+            mailDto.setBody("Chúng tôi đã xác nhận đặt bàn của quý khách."+msg+". <br> Mọi thắc mắc xin liên hệ  hotline : 0978825572. xin cảm ơn");
+            mailDto.setSubject("Xác nhận đơn hành thành công");
+            mailDto.setFrom("admin@gmail.com");
+            mailUtils.send(mailDto);
         } catch (Exception e) {
             e.printStackTrace();
             return "FAIL";

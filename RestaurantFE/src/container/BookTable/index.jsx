@@ -27,12 +27,25 @@ import Swal from 'sweetalert2'
 export default function BookTable() {
   const navigation = useNavigate();
   const [OrderDate, setOrderDate] = useState(moment());
+  const newtime = new Date();
+  const [TimstammStart, setTimstammStart] = useState();
+  const [TimstammEnd, setTimstammEnd] = useState();
+  var now = newtime;
+// var fourHoursLater = now.addHours(4);
+function addHoursToDate(date, hours) {
+  return new Date(new Date(date).setHours(date.getHours() + hours));
+}
+
+
   const [OrderTime, setOrderTime] = useState(
-    moment("2018-01-01T00:00:00.000Z")
+    moment(newtime)
   );
-  const [endtime, setEndtime] = useState(
-    moment("2018-01-01T00:00:00.000Z")
+  var x = addHoursToDate(new Date(OrderTime),3)
+  const [Endtime, setEndtime] = useState(
+    moment(x)
   );
+
+  
   const [SelectedTable, setSelectedTable] = useState([]);
   const [table, setTable] = useState();
   const [Order, setOrder] = useState(false);
@@ -49,31 +62,64 @@ export default function BookTable() {
   }, []);
 
   const gettime = async () => {
-    var time = new Date().getTime();
-    console.log(time)
-    const timeOrder = new Date(
-      OrderDate.format("L") + " " + OrderTime.format("LTS")
-    ).getTime();
-    const timeEnd = new Date(
-      OrderDate.format("L") + " " + endtime.format("LTS")
-    ).getTime();
-      console.log(timeOrder);
-      setOrder(true);
-    ;
+    console.log("start"+OrderTime);
+    console.log("end"+Endtime);
+    const timeOrder = convertdateandtimetotimstamp(OrderDate,OrderTime);
+    const timeEnd = convertdateandtimetotimstamp(OrderDate,Endtime);
+    console.log(timeOrder+'\t'+timeEnd);
+    console.log(new Date(OrderTime).getHours());
+    if(new Date(OrderTime).getHours()<9 ||new Date(Endtime).getHours()<9 || new Date(OrderTime).getHours()>23||new Date(Endtime).getHours()>23){
+      Swal.fire({
+        title: 'Lỗi!',
+        text: 'Nhà hàng chỉ mở của từ 9h đến 23h \n Vui long chon lai',
+        icon: 'error',
+        confirmButtonText: 'Đóng'
+      })
+    }else{
+      const res = await TableAPI.getTableByStartandEnd(timeOrder,timeEnd);
+    if(res){
+      setTable(res);
+      setOrder(true)
+    }
+    }
+    
+  }
+
+  const setDate = async (e) => {
+    setOrderDate(new Date(e));
+  }
+
+  const setTimeStart = async (e) => {
+    setOrderTime(new Date(e));
+    setEndtime(addHoursToDate(new Date(e),3))
+    console.log(OrderTime);
+    console.log(Endtime);
+  }
+
+  const setTimeEnd = async (e) => {
+    setEndtime(new Date(e));
+    setOrderTime(addHoursToDate(new Date(e),-3))
+    console.log(OrderTime);
+    console.log(Endtime);
+  }
+  function convertdateandtimetotimstamp(date,time) {
+    console.log(date);
+    console.log(new Date(date));
+    var x = new Date(date).getFullYear()+'/'+(new Date(date).getMonth()+1)+'/'+new Date(date).getDate();
+    var y = new Date(time).getHours()+':'+new Date(time).getMinutes()+':'+'00';
+    console.log(x+''+y);
+    console.log(new Date(x+' '+y));
+    return new Date(x+' '+y).getTime();
   }
 
   const confirmBookTables = async () => {
-    const timeOrder = new Date(
-      OrderDate.format("L") + " " + OrderTime.format("LTS")
-    ).getTime();
-    const timeEnd = new Date(
-      OrderDate.format("L") + " " + endtime.format("LTS")
-    ).getTime();
+    const timeOrder = convertdateandtimetotimstamp(OrderDate,OrderTime);
+    const timeEnd = convertdateandtimetotimstamp(OrderDate,Endtime);
     const dataBookTables = SelectedTable.map((table) => {
       return {
         tableId: table,
         orderTime: timeOrder,
-        endtime: endtime
+        endtime: timeEnd
       };
     });
     const res = await BookTableAPI.bookTable(dataBookTables);
@@ -105,7 +151,7 @@ export default function BookTable() {
                     label="Chọn ngày đặt"
                     inputFormat="DD/MM/YYYY"
                     value={OrderDate}
-                    onChange={(newValue) => setOrderDate(newValue)}
+                    onChange={(newValue) => setDate(newValue)}
                     renderInput={(params) => <TextField {...params} />}
                   />
                 </Box>
@@ -113,15 +159,15 @@ export default function BookTable() {
                   <MobileTimePicker
                     label="Chọn giờ đặt"
                     value={OrderTime}
-                    onChange={(newValue) => setOrderTime(newValue)}
+                    onChange={(newValue) => setTimeStart(newValue)}
                     renderInput={(params) => <TextField {...params} />}
                   />
                 </Box>
                 <Box>
                   <MobileTimePicker
                     label="Giờ kết thúc"
-                    value={endtime}
-                    onChange={(newValue) => setEndtime(newValue)}
+                    value={Endtime}
+                    onChange={(newValue) => setTimeEnd(newValue)}
                     renderInput={(params) => <TextField {...params} />}
                   />
                 </Box>

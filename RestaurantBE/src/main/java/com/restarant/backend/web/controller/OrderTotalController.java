@@ -109,8 +109,8 @@ public class OrderTotalController {
     public RedirectView checkOutVnpay(@RequestParam String vnp_TxnRef, @RequestParam String vnp_ResponseCode){
         RedirectView view = new RedirectView();
         String response = orderTotalService.checkOutVnpay(vnp_ResponseCode,vnp_TxnRef);
-        view.addStaticAttribute("status",response);
-        view.setUrl("http://localhost:8888/check-out/result");
+//        view.addStaticAttribute("status",response);
+        view.setUrl("http://localhost:3000/cart/"+response);
         return view;
     }
 
@@ -203,5 +203,11 @@ public class OrderTotalController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    @GetMapping("/order-totals-status/{id}")
+    public ResponseEntity<?> getStatus(@PathVariable Long id) {
+        Integer rs = orderTotalRepository.findById(id).get().getStatus();
+        return ResponseEntity.ok(rs);
     }
 }

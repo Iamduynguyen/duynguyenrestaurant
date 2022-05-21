@@ -109,8 +109,8 @@ public class OrderTotalController {
     public RedirectView checkOutVnpay(@RequestParam String vnp_TxnRef, @RequestParam String vnp_ResponseCode){
         RedirectView view = new RedirectView();
         String response = orderTotalService.checkOutVnpay(vnp_ResponseCode,vnp_TxnRef);
-        view.addStaticAttribute("status",response);
-        view.setUrl("http://localhost:8888/check-out/result");
+//        view.addStaticAttribute("status",response);
+        view.setUrl("http://localhost:3000/check-out/result/"+response);
         return view;
     }
 

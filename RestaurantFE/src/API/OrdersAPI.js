@@ -54,7 +54,7 @@ const OrdersAPI = {
         const url = `/api/create-order-couter`;
         return axiosClient.post(url, data);
     },
-    
+
     payman: (id) => {
         const url = `/api/payment-vnpay/${id}`;
         return axiosClient.put(url);
@@ -89,7 +89,10 @@ const OrdersAPI = {
         const url = `/api/order/order-detail-xacnhan/${id}`;
         return axiosClient.get(url);
     },
-
+    cancelTable: (id) => {
+        const url = `/api/table-orders/${id}`;
+        return axiosClient.delete(url);
+    },
 };
 
 export default OrdersAPI;

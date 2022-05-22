@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import { Button, IconButton } from "@mui/material";
 import Swal from "sweetalert2";
@@ -22,19 +23,13 @@ const OrderDetail = (props) => {
   const [selectedRow, setSelectedRow] = useState([]);
 
   const xacnhanOderdetail = async (id) => {
-      const rs = await OrdersAPI.xacnhanOderdetail(id);
-      if(rs==='success'){
-        ModalMessage.miniTopRightModal(
-          "success",
-          `Thành công!`
-        );
-      }else{
-        ModalMessage.miniTopRightModal(
-          "error",
-          `Lỗi<br/>Vui lòng thử lại sau!`
-        );
-      }
-  }
+    const rs = await OrdersAPI.xacnhanOderdetail(id);
+    if (rs === "success") {
+      ModalMessage.miniTopRightModal("success", `Thành công!`);
+    } else {
+      ModalMessage.miniTopRightModal("error", `Lỗi<br/>Vui lòng thử lại sau!`);
+    }
+  };
 
   // API OrderDetail
   const addQty = async (foodOrders) => {
@@ -124,6 +119,37 @@ const OrderDetail = (props) => {
       }
     }
   };
+  const cancelTable = async () => {
+    Swal.fire({
+      title: `Huỷ bàn ${props.foodsAtTable.tablesId}`,
+      html: `Bạn có chắc chắn muốn huỷ bàn này khỏi<br>hoá đơn ${props.foodsAtTable.orderId} không?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#12a524",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có, huỷ ngay!",
+      cancelButtonText: "Không, xem xét lại!",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const res = await OrdersAPI.cancelTable(
+          props.foodsAtTable.orderTableId
+        );
+        if (res === "SUCCESS") {
+          ModalMessage.miniTopRightModal(
+            "success",
+            `Huỷ bàn ${props.foodsAtTable.tablesId} thành công!`
+          );
+          navigation("/admin/orders-management");
+        } else {
+          ModalMessage.miniTopRightModal(
+            "error",
+            `Lỗi<br/>Vui lòng thử lại sau!`
+          );
+        }
+      }
+    });
+  };
   const deleteOrderDetails = async (data) => {
     if (data.length === 0) {
       ModalMessage.miniTopRightModal("warning", "Chưa chọn món cần xoá!");
@@ -172,8 +198,6 @@ const OrderDetail = (props) => {
     },
   };
 
-
-
   useEffect(() => {
     // Validate access when not matching tableId & orderId
     if (
@@ -193,9 +217,9 @@ const OrderDetail = (props) => {
             key: item.id,
             price: item.amountTotal,
             customerName: item.customer ? item.customer.name : "Không có",
-            orderTime: moment(new Date(item.orderTime*1000).toString()).format(
-              "DD/MM/YYYY hh:mm"
-            ),
+            orderTime: moment(
+              new Date(item.orderTime * 1000).toString()
+            ).format("DD/MM/YYYY hh:mm"),
           };
         })
       );
@@ -222,6 +246,17 @@ const OrderDetail = (props) => {
           </Button>
           {props.orderStatus !== 6 && props.orderStatus !== -1 && (
             <>
+              <Button
+                variant="outlined"
+                size="small"
+                color="error"
+                startIcon={<DoDisturbIcon />}
+                onClick={() => {
+                  cancelTable();
+                }}
+              >
+                Huỷ bàn
+              </Button>
               <Button
                 variant="outlined"
                 size="small"
@@ -358,15 +393,32 @@ const OrderDetail = (props) => {
               }
             }}
           />
-          <Table.Column title="Trạng thái" width={150} dataIndex="status"
-           key="note" />
-          <Table.Column title="Action" dataIndex="note"
-          render={(record) => {
-            return(
-              <button onClick={()=>xacnhanOderdetail(record.id)}  style={{padding:'5px',backgroundColor:'blue',color:'white',borderRadius:'5px'}}>Xác nhận</button>
-            )
-          }}
-           key="note" />
+          <Table.Column
+            title="Trạng thái"
+            width={150}
+            dataIndex="status"
+            key="note"
+          />
+          <Table.Column
+            title="Action"
+            dataIndex="note"
+            render={(record) => {
+              return (
+                <button
+                  onClick={() => xacnhanOderdetail(record.id)}
+                  style={{
+                    padding: "5px",
+                    backgroundColor: "blue",
+                    color: "white",
+                    borderRadius: "5px",
+                  }}
+                >
+                  Xác nhận
+                </button>
+              );
+            }}
+            key="note"
+          />
         </Table>
       </Row>
     </>

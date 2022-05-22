@@ -28,9 +28,9 @@ public interface TableOrderRepository extends JpaRepository<TableOrder, Long> {
     @Query("SELECT e FROM TableOrder e ")
     TableOrder getByOrderTimeAndTableId(long tableId, long startTime, long endTime);
 
-    @Query("select t from TableOrder t where t.orderTotal.orderTime > :start and t.orderTotal.orderTime < :end")
+    @Query("select t from TableOrder t where t.orderTotal.orderTime > :start and t.orderTotal.orderTime < :end and t.orderTotal.status>1")
     List<TableOrder> getBystart(@Param("start") Long start, @Param("end") Long end);
 
-    @Query("select t from TableOrder t where t.orderTotal.endTime > :start and t.orderTotal.orderTime < :end")
+    @Query("select t from TableOrder t where t.orderTotal.endTime > :start and t.orderTotal.orderTime < :end and t.orderTotal.status>1")
     List<TableOrder> getByEnd(@Param("start") Long start, @Param("end") Long end);
 }

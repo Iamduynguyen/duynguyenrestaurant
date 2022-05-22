@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 @Service("foodService")
@@ -66,6 +67,8 @@ public class FoodService implements IFoodService {
 
     @Override
     public List<FoodDto> getbyQuery(Pageable pageable, String query) {
+        query = query.toUpperCase(Locale.ROOT);
+        System.out.println(query);
         return mapper.convertToListDto(foodRepository.getByQuery(pageable,query).getContent());
     }
 

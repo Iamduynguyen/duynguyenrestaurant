@@ -21,7 +21,7 @@ public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Long
     @Query("select o from OrderDetails o where o.tableOrder = :key")
     Collection<OrderDetails> getByTableorde(@Param("key")TableOrder tableOrder);
 
-    @Query("select o from OrderDetails o where o.tableOrder.orderTotal.id= :id")
+    @Query("select o from OrderDetails o where o.tableOrder.orderTotal.id= :id and o.status>1")
     List<OrderDetails> getByOrdertotalId(@Param("id")Long id);
 
     @Query("select o from OrderDetails o where o.tableOrder.id= :id")

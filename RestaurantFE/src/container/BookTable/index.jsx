@@ -98,7 +98,7 @@ function addHoursToDate(date, hours) {
 
   const setTimeEnd = async (e) => {
     setEndtime(new Date(e));
-    setOrderTime(addHoursToDate(new Date(e),-3))
+    // setOrderTime(addHoursToDate(new Date(e),-3))
     console.log(OrderTime);
     console.log(Endtime);
   }
@@ -115,11 +115,12 @@ function addHoursToDate(date, hours) {
   const confirmBookTables = async () => {
     const timeOrder = convertdateandtimetotimstamp(OrderDate,OrderTime);
     const timeEnd = convertdateandtimetotimstamp(OrderDate,Endtime);
+    console.log(timeOrder+" |time ne| "+timeEnd);
     const dataBookTables = SelectedTable.map((table) => {
       return {
         tableId: table,
         orderTime: timeOrder,
-        endtime: timeEnd
+        endTime: timeEnd
       };
     });
     const res = await BookTableAPI.bookTable(dataBookTables);
@@ -132,6 +133,24 @@ function addHoursToDate(date, hours) {
         confirmButtonText: 'Đóng'
       })
     }
+    if(res.data==4){
+      Swal.fire({
+        title: 'Lỗi!',
+        text: 'Đặt bàn thất bại!',
+        icon: 'error',
+        confirmButtonText: 'Đóng'
+      })
+    }
+    console.log(res);
+    // if(res){
+    //   Swal.fire({
+    //     title: 'Thành công!',
+    //     text: 'Đặt bàn thành công \n hãy chọn món!',
+    //     icon: 'success',
+    //     confirmButtonText: 'Đóng'
+    //   })
+    //   // window.location.href = '/menu';
+    // }
   };
 
   return (

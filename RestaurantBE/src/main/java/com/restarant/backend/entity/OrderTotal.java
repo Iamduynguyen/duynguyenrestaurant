@@ -100,6 +100,17 @@ public class OrderTotal implements Serializable {
         return total;
     }
 
-
-
+    public String toString1() {
+        return "OrderTotal{" +
+                "id=" + id +
+                ", voucher=" + voucher +
+                ", amountTotal=" + amountTotal +
+                ", deleteflag=" + deleteflag +
+                ", status=" + status +
+                ", orderTime=" + orderTime +
+                ", endTime=" + endTime +
+                ", deposit=" + deposit +
+                ", note='" + note + '\'' +
+                '}';
+    }
 }

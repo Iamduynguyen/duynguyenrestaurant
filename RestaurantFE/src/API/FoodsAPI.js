@@ -2,6 +2,10 @@ import axiosClient from "./axiosClient";
 import upLoadAxiosClient from "./uploadClient";
 
 const FoodsApi = {
+    getByquery: (query,params) => {
+        const url = `/api/foodsby?query=${query}`;
+        return axiosClient.get(url, { params });
+    },
     getAllFoods: (params) => {
         const url = "/api/foods";
         return axiosClient.get(url, { params });

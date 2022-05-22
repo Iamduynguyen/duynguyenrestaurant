@@ -29,7 +29,7 @@ public interface IOrderTotalService extends IServiceAdapter<OrderTotalDto> {
 
     String confirmOrderOnline(Long id,HttpServletRequest request);
 
-    String confirmDepositOnline(ConfirmDepositOnline request);
+    String confirmDepositOnline(ConfirmDepositOnline request,HttpServletRequest req);
 
     String cancelOrder(Long id);
 

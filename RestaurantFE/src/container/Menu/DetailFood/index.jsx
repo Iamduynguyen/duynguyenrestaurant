@@ -32,6 +32,7 @@ import FoodsApi from "../../../API/FoodsAPI";
 import SubHeading from "../../../components/SubHeading/SubHeading";
 import styles from "../menu.module.css";
 import "./../style.css";
+import Swal from 'sweetalert2'
 
 export default function DetailFood() {
   const [FoodsData, setFoodsData] = useState("");
@@ -40,7 +41,7 @@ export default function DetailFood() {
   const [allFoodsData, setAllFoodsData] = useState([]);
   const [openOrderFood, setOpenOrderFood] = useState(false);
   const [addFoodToTable, setAddFoodToTable] = useState([]);
-  const [quantity, setQuantity] = useState([]);
+  const [quantity, setQuantity] = useState(1);
   const [userOrder, setUserOrder] = useState([]);
   const discount = (price, discount) => {
     return (parseInt(price, 10) * (100 - parseInt(discount, 10))) / 100;
@@ -54,28 +55,34 @@ export default function DetailFood() {
   };
 
   const muahang = () => {
-    if(userOrder.length>0){
+    if (userOrder.length > 0) {
       setOpenOrderFood(true);
-    }else{
+    } else {
       Swal.fire({
-        title: 'Lỗi!',
-        text: 'Nhà hàng chỉ mở của từ 9h đến 23h \n Vui long chon lai',
-        icon: 'error',
-        confirmButtonText: 'Đóng'
-      })
+        title: `Cảnh báo`,
+        html: `Bạn hãy đặt bàn trước`,
+        icon: "warning",
+        confirmButtonColor: "#12a524",
+        confirmButtonText: "OK",
+        reverseButtons: true,
+      }).then(async (result) => {
+        window.location.href = '/book-table';
+      });
+
     }
   };
-  
+
 
   const setQuantitya = (evt) => {
-    console.log(evt.target)
+    setQuantity(evt.target.value);
+    console.log(quantity);
   };
 
   const confirmOrderFoods = async () => {
     setOpenOrderFood(false);
     const order = addFoodToTable.map((item) => {
       return {
-        quantity: 1,
+        quantity: quantity,
         tableOrderId: item,
         foodDetalls: {
           id: FoodDetailData.id,
@@ -83,8 +90,19 @@ export default function DetailFood() {
       };
     });
     const res = await BookTableAPI.ordersDetails(order);
-    console.log(order);
+    console.log("alo");
     setAddFoodToTable([]);
+    Swal.fire({
+      title: `Thành công`,
+      html: `Đặt món thành công, vào giỏ hàng`,
+      icon: "success",
+      confirmButtonColor: "#12a524",
+      confirmButtonText: "OK",
+      reverseButtons: true,
+    }).then(async (result) => {
+      window.location.href = '/cart';
+    });
+
   };
   let { id } = useParams();
   useEffect(() => {
@@ -102,15 +120,14 @@ export default function DetailFood() {
       console.log(res1);
     };
     fetchData();
-    fetchDataUserOrder();
   }, [id]);
-  const fetchDataUserOrder = async () => {
-    const res = await BookTableAPI.getUserBookTable();
-    setUserOrder(res);
-    console.log(res);
-  };
+  
   useEffect(() => {
-
+    const fetchDataUserOrder = async () => {
+      const res = await BookTableAPI.getUserBookTable();
+      setUserOrder(res);
+      console.log(res);
+    };
     fetchDataUserOrder();
   }, []);
   return (
@@ -171,7 +188,7 @@ export default function DetailFood() {
           </Grid>
           <div className=" mt-[70px]  ">
             <div className="pl-[80px] ">
-              <p className="text-[36px] font-medium text-[#F8B400]" style={{maxWidth: '530px'}}>
+              <p className="text-[36px] font-medium text-[#F8B400]" style={{ maxWidth: '530px' }}>
                 {FoodsData?.name}
               </p>
               <div className="">
@@ -215,7 +232,7 @@ export default function DetailFood() {
                   </Box>
                 )}
               </div>
-              <p className="text-[16px] text-[#999] mt-[20px] italic" style={{maxWidth: '530px'}}>
+              <p className="text-[16px] text-[#999] mt-[20px] italic" style={{ maxWidth: '530px' }}>
                 {FoodsData?.title}
               </p>
               <div className="mt-[30px]">
@@ -255,13 +272,14 @@ export default function DetailFood() {
                   </Button>
                 ))}
                 <br />
-                <label>So luong</label><input type="number" id="quantity" min={1} onChange={()=>setQuantitya(Event)} style={{border:'1px solid blue',marginLeft:'10px'}} ></input>
+                <label>Số lượng</label>
+                <input type="number" id="quantity" min={1} onChange={(Event) => setQuantitya(Event)} style={{ border: '1px solid', marginLeft: '10px', width: '60px', borderRadius: '6px' }} defaultValue='1' ></input>
               </div>
               <div className="mt-[30px]">
                 <button
-                  onClick={() => setOpenOrderFood(true)}
+                  onClick={() => muahang()}
                   className="bg-[#2e7ebb] hover:bg-[#2c6a9a] flex items-center text-white rounded-[3px] px-[15px] py-[7px]"
-                  // style
+                // style
                 >
                   <p style={{ fontSize: 15 }} className="mr-1">
                     Thêm vào giỏ hàng
@@ -426,17 +444,16 @@ export default function DetailFood() {
                           <p className={`p__cormorant ${styles.price}`}>
                             {item.foodDetails[0]?.discount != 0
                               ? discount(
-                                  item.foodDetails[0]?.amount,
-                                  item.foodDetails[0]?.discount
-                                ) + " VND"
+                                item.foodDetails[0]?.amount,
+                                item.foodDetails[0]?.discount
+                              ) + " VND"
                               : item.foodDetails[0]?.amount + " VND"}
                           </p>
                           <p
-                            className={`p__cormorant ${styles.discountText} ${
-                              item.foodDetails[0]?.discount != 0
+                            className={`p__cormorant ${styles.discountText} ${item.foodDetails[0]?.discount != 0
                                 ? styles.discountPrice
                                 : ""
-                            }`}
+                              }`}
                           >
                             {item.foodDetails[0]?.discount != 0
                               ? item.foodDetails[0]?.amount + " VND"

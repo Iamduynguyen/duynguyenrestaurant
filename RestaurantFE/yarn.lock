@@ -1335,9 +1335,9 @@
     "is-date-object" "^1.0.1"
     "is-symbol" "^1.0.2"
 
-"esbuild-windows-32@0.14.36":
-  "integrity" "sha512-bIar+A6hdytJjZrDxfMBUSEHHLfx3ynoEZXx/39nxy86pX/w249WZm8Bm0dtOAByAf4Z6qV0LsnTIJHiIqbw0w=="
-  "resolved" "https://registry.npmjs.org/esbuild-windows-32/-/esbuild-windows-32-0.14.36.tgz"
+"esbuild-windows-64@0.14.36":
+  "integrity" "sha512-+p4MuRZekVChAeueT1Y9LGkxrT5x7YYJxYE8ZOTcEfeUUN43vktSn6hUNsvxzzATrSgq5QqRdllkVBxWZg7KqQ=="
+  "resolved" "https://registry.npmjs.org/esbuild-windows-64/-/esbuild-windows-64-0.14.36.tgz"
   "version" "0.14.36"
 
 "esbuild@^0.14.27":

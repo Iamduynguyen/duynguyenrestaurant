@@ -71,24 +71,24 @@ export default function Cart() {
   const fetchData = async () => {
     const res = await BookTableAPI.getUserBookTable();
     const resOrder= await BookTableAPI.getStatusOrder(res[0].orderTotalId)
-    
+    let status1= resOrder.status;
     console.log(res);
     console.log(resOrder);
-    if(resOrder==1){
+    if(status1==0){
       setOrderstatus("Vừa thêm vào")
-    } else if(resOrder==2){
+    } else if(status1==1){
       setOrderstatus("Chờ xác nhận")
     }
-    else if(resOrder==3){
+    else if(status1==2){
       setOrderstatus("Chờ đặt cọc")
     }
-    else if(resOrder==3){
+    else if(status1==3){
       setOrderstatus("Chờ xác nhận đặt cọc")
     }
-    else if(resOrder==4){
+    else if(status1==4){
       setOrderstatus("Chờ bạn đến nhà hàng")
     }
-    else if(resOrder==5){
+    else if(status1==5){
       setOrderstatus("Đang ăn")
     }
     if (res.length !== 0) {

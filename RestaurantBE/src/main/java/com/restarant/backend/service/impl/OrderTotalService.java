@@ -43,12 +43,15 @@ public class OrderTotalService implements IOrderTotalService {
     private MailUtils mailUtils;
     @Autowired
     private JwtServiceUtils jwtServiceUtils;
+    @Autowired
+    TableService tableService;
     private final OrderTotalRepository orderTotalRepository;
     private final IConverterDto<OrderTotal, OrderTotalDto> mapper;
     private final IConverterDto<TableOrder, TableOrderDto> tableOrderMapper;
     private final CustomerRepository customerRepository;
     private final TableOrderRepository tableOrderRepository;
-    private final TablesRepository tablesRepository;
+    @Autowired
+    TablesRepository tablesRepository;
     private final ModelMapper MODEL_MAPPER = new ModelMapper();
 
     public OrderTotalService(OrderTotalRepository orderTotalRepository,
@@ -112,7 +115,7 @@ public class OrderTotalService implements IOrderTotalService {
     public List<GetAllToTalOrder> getAllOrderTotal() {
         Type type = new TypeToken<List<GetAllToTalOrder>>() {
         }.getType();
-        List<OrderTotal> orderTotalList = orderTotalRepository.findAll();
+        List<OrderTotal> orderTotalList = orderTotalRepository.getAllBysort();
         List<GetAllToTalOrder> getAllToTalOrders = MODEL_MAPPER.map(orderTotalList, type);
         for (GetAllToTalOrder x : getAllToTalOrders) {
             if (Objects.nonNull(x.getVoucher())) {
@@ -186,6 +189,54 @@ public class OrderTotalService implements IOrderTotalService {
         }
 
     }
+
+
+
+    public Boolean changeTable(OrderTotal orderTotal){
+        System.out.println(orderTotal.toString1());
+        List<Tables> tables = new ArrayList<>();
+        List<TableOrder> tableOrders = new ArrayList<>();
+        for (TableOrder x:orderTotal.getTableOrders()){
+            tableOrders.add(x);
+            tables.add(x.getTables());
+        }
+
+        List<TableDto> tableDtos = tableService.getbytime(orderTotal.getOrderTime(),orderTotal.getEndTime());
+        System.out.println("solouongban"+tableDtos.size());
+        List<Long> tbIdActive = new ArrayList<>();
+        for (TableDto x:tableDtos){
+            if (x.getStatus()==0){
+                tbIdActive.add(x.getId());
+                System.out.println("ban trong "+x.getId());
+            }
+        }
+        int i= 0;
+        int j= 0;
+        for (TableDto t:tableDtos){
+            for (Tables q:tables){
+                if (t.getStatus()==1){
+                    System.out.println("ban k trong "+t.getId());
+                    if (q.getId()==t.getId()){
+                        System.out.println("loi ban "+t.getId());
+                        if (j>tbIdActive.size()){
+                            System.out.println("fail");
+                            return false;
+                        }
+                        Tables newTb = tablesRepository.findById(tbIdActive.get(j)).get();
+                        TableOrder k = tableOrders.get(i);
+                        k.setTables(newTb);
+                        tableOrderRepository.save(k);
+                        orderTotal.setNote("Tự động thay đổi số bàn "+t.getId()+" thành số bàn "+newTb.getId());
+                        System.out.println("Tự động thay đổi số bàn "+t.getId()+" thành số bàn "+newTb.getId());
+                        orderTotalRepository.save(orderTotal);
+                        j++;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     @Override
     public String registrationOrderCounter(OrderCouterDto orderCouterDto, HttpServletRequest request) {
         try {
@@ -326,18 +377,33 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
-    public String confirmDepositOnline(ConfirmDepositOnline request) {
+    public String confirmDepositOnline(ConfirmDepositOnline request,HttpServletRequest req) {
+        String staffID = jwtServiceUtils.getUserName(req);
         try {
             String msg = "";
             OrderTotal orderTotal = orderTotalRepository.getById(request.getId());
             orderTotal.setDeposit(request.getDeposit());
             if(request.getDeposit().intValue()==0){
                 orderTotal.setStatus(4);
+                orderTotal.setNote("nhân viên "+staffID+" đã xác nhận đơn hàng không yêu cầu đặt cọc");
+                List<OrderDetails> lst1 = orderTotalRepository.getOrderdetailbyTotalAndStatus(orderTotal.getId(),1);
+                for (OrderDetails x:lst1){
+                    x.setStatus(2);
+                    x.setAmount(x.getFoodDetalls().getAmount().subtract(x.getFoodDetalls().getDiscount()));
+                }
+                orderTotalRepository.save(orderTotal);
+                changeTable(orderTotal);
+                orderDetailsRepository.saveAll(lst1);
             }else {
                 orderTotal.setStatus(2);
+                List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(orderTotal.getId(),1);
+                lst.forEach(o->o.setStatus(2));
+                orderTotal.setNote("nhân viên "+staffID+" đã yêu cầu đặt cọc "+request.getDeposit().toString()+" vnđ");
+                orderTotalRepository.save(orderTotal);
+                changeTable(orderTotal);
+                orderDetailsRepository.saveAll(lst);
                 msg=" Mong quý khách để ý để đặt cọc bàn, số tiền  là"+request.getDeposit().toString();
             }
-            orderTotalRepository.save(orderTotal);
             MailDto mailDto = new MailDto();
             mailDto.setTo(orderTotal.getCustomer().getEmail());
             mailDto.setBody("Chúng tôi đã xác nhận đặt bàn của quý khách."+msg+". <br> Mọi thắc mắc xin liên hệ  hotline : 0978825572. xin cảm ơn");
@@ -454,16 +520,37 @@ public class OrderTotalService implements IOrderTotalService {
 
     public Boolean customerConfirm1(Long id) {
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+        List<OrderDetails> lst2 = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 2);
+
         List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(id, 0);
         if (orderTotal == null) {
             return false;
         } else if (lst == null) {
             return false;
         }
-        for (OrderDetails x : lst) {
-            x.setStatus(1);
+        List<Long> ids= new ArrayList<>();
+        if (orderTotal.getStatus()>3){
+            for (OrderDetails y:lst2){
+                for (OrderDetails x : lst) {
+                    x.setStatus(2);
+                    x.setAmount(x.getFoodDetalls().getAmount().subtract(x.getFoodDetalls().getDiscount()));
+                    if (y.getFoodDetalls().getId()==x.getFoodDetalls().getId()){
+                        if (y.getAmount()==x.getAmount()){
+                            y.setQuantity(y.getQuantity()+x.getQuantity());
+                            ids.add(x.getId());
+                        }
+                    }
+                }
+            }
+        }else {
+            for (OrderDetails x : lst) {
+                x.setStatus(1);
+            }
         }
         orderDetailsRepository.saveAll(lst);
+        for (Long x:ids){
+            orderTotalRepository.deleteById(x);
+        }
         orderTotal.setStatus(1);
         orderTotalRepository.save(orderTotal);
         return true;

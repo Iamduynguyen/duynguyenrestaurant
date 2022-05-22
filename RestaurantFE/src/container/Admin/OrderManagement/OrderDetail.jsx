@@ -176,8 +176,8 @@ const OrderDetail = (props) => {
             key: item.id,
             price: item.amountTotal,
             customerName: item.customer ? item.customer.name : "Không có",
-            orderTime: moment(new Date(item.orderTime).toString()).format(
-              "DD/MM/YYYY hh:mm:ss"
+            orderTime: moment(new Date(item.orderTime*1000).toString()).format(
+              "DD/MM/YYYY hh:mm"
             ),
           };
         })

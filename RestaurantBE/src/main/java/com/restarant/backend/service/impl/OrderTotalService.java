@@ -50,8 +50,6 @@ public class OrderTotalService implements IOrderTotalService {
     @Autowired
     private JwtServiceUtils jwtServiceUtils;
     @Autowired
-    ConvertTime convertTime;
-    @Autowired
     TableService tableService;
     private final OrderTotalRepository orderTotalRepository;
     private final IConverterDto<OrderTotal, OrderTotalDto> mapper;
@@ -499,6 +497,10 @@ public class OrderTotalService implements IOrderTotalService {
             if (Objects.nonNull(paymentDto.getVoucherId())) {
                 orderTotal.setVoucher(paymentDto.getVoucherId());
             }
+            orderTotal.setCustMoney(paymentDto.getCustMoney());
+            orderTotal.setReturnCustMoney(paymentDto.getReturnCustMoney());
+            orderTotal.setNameCust(paymentDto.getNameCust());
+            orderTotal.setPhoneNumberCust(paymentDto.getPhoneNumberCust());
             orderTotal.setEndTime(new Date().getTime());
             orderTotal.setNote(orderTotal.getNote() + " ; " + "Người thu tiền " + jwtServiceUtils.getUserName(request));
             orderTotalRepository.save(orderTotal);

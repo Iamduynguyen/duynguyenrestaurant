@@ -37,7 +37,7 @@ export default function FoodsAdmin(props) {
     });
     if (deposit !== undefined) {
       if (deposit === "") {
-        const data = { id: id, deposit: deposit };
+        const data = { id: id, deposit: +deposit };
         const res = await OrdersAPI.staffConfirmDepositOnline(data);
         if (res === "SUCCESS") {
           ModalMessage.miniTopRightModal(
@@ -74,35 +74,64 @@ export default function FoodsAdmin(props) {
       }
     }
   };
-  const staffConfirmPayment = async (id) => {
-    Swal.fire({
-      title: `Xác nhận thanh toán<br>Hoá đơn ${id}`,
-      text: "",
+  const staffConfirmPayment = async (input) => {
+    console.log(input);
+
+    const { value: formValues } = await Swal.fire({
+      title: `Xác nhận thanh toán<br>Hoá đơn ${input.id}<br>${input.price
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`,
       icon: "info",
+      html:
+        '<input id="custMoney" class="swal2-input" placeholder="Nhập số tiền khách trả">' +
+        '<input id="voucher" class="swal2-input" placeholder="Mã voucher (Nếu có)">',
+      focusConfirm: false,
       showCancelButton: true,
       confirmButtonColor: "#12a524",
       cancelButtonColor: "#d33",
       confirmButtonText: "Xác nhận",
       cancelButtonText: "Huỷ bỏ",
       reverseButtons: true,
-      input: "text",
-      inputPlaceholder: "Mã voucher (Nếu có)",
-      preConfirm: (voucherId) => {
-        tempVoucherId = voucherId;
+      preConfirm: () => {
+        return {
+          custMoney: document.getElementById("custMoney").value,
+          voucher: document.getElementById("voucher").value,
+        };
       },
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const data = { orderId: id, voucherId: tempVoucherId };
-        if (tempVoucherId !== "" && !/^\d+$/.test(tempVoucherId)) {
+    });
+
+    if (!formValues.custMoney) {
+      ModalMessage.middleModal("error", `Vui lòng nhập số tiền khách trả!`);
+    } else {
+      // Validate input money
+      if (!/^\d+$/.test(formValues.custMoney)) {
+        ModalMessage.middleModal(
+          "error",
+          `Số tiền vừa nhập không hợp lệ!<br>Vui lòng chỉ nhập số!`
+        );
+      } else if (+formValues.custMoney < input.price) {
+        ModalMessage.middleModal(
+          "error",
+          `Số tiền vừa nhập không đủ!<br>Vui lòng nhập lại!`
+        );
+      } else {
+        // Validate input voucher
+        if (formValues.voucher !== "" && !/^\d+$/.test(formValues.voucher)) {
           ModalMessage.middleModal(
             "error",
-            `Mã voucher "${data.voucherId}"<br>không hợp lệ!<br>Vui lòng chỉ nhập số!`
+            `Mã voucher "${formValues.voucher}"<br>không hợp lệ!<br>Vui lòng chỉ nhập số!`
           );
         } else {
+          // Collect data confirm payment
+          const data = {
+            orderId: input.id,
+            voucherId: formValues.voucher,
+            nameCust: input.customer?.name,
+            phoneNumberCust: input.customer?.phoneNumber,
+            returnCustMoney: +formValues.custMoney - input.price,
+            custMoney: formValues.custMoney,
+          };
           const res = await OrdersAPI.staffConfirmPayment(data);
-
-          console.log(res);
-
           if (res === "NO ITEM ORDERED") {
             ModalMessage.middleModal("info", `Chưa có món ăn được đặt!`);
           } else if (res === "VOUCHER NOT") {
@@ -116,9 +145,15 @@ export default function FoodsAdmin(props) {
               `Mã voucher ${data.voucherId} đã được áp dụng trước đó!`
             );
           } else if (res === "SUCCESS") {
+            let returnCustMoney = "";
+            if (data.returnCustMoney !== 0) {
+              returnCustMoney = `<br>Số tiền hoàn trả ${data.returnCustMoney
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;
+            }
             ModalMessage.middleModal(
               "success",
-              `Thanh toán<br>Hoá đơn ${id} hoàn tất!`
+              `Thanh toán<br>Hoá đơn ${data.orderId} hoàn tất!${returnCustMoney}`
             );
           } else {
             ModalMessage.middleModal("error", `Lỗi! Vui lòng thử lại sau!`);
@@ -126,8 +161,9 @@ export default function FoodsAdmin(props) {
           setResetData(!resetData);
         }
       }
-    });
+    }
   };
+
   const deleteOrder = async (id) => {
     Swal.fire({
       title: `Huỷ<br>Hoá đơn ${id}`,
@@ -178,9 +214,9 @@ export default function FoodsAdmin(props) {
               key: item.id,
               price: item.amountTotal,
               customerName: item.customer ? item.customer.name : "Không có",
-              orderTime: moment(new Date(item.orderTime*1000).toString()).format(
-                "DD/MM/YYYY hh:mm:ss"
-              ),
+              orderTime: moment(
+                new Date(item.orderTime * 1000).toString()
+              ).format("DD/MM/YYYY hh:mm:ss"),
             };
           })
         );
@@ -341,7 +377,7 @@ export default function FoodsAdmin(props) {
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => staffConfirmPayment(record.id)}
+                    onClick={() => staffConfirmPayment(record)}
                   >
                     Đang phục vụ
                   </Button>

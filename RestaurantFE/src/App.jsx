@@ -28,8 +28,7 @@ import Custommer from "./container/Admin/CustomerManagement";
 import Staff from "./container/Admin/Staff";
 import NewStaff from "./container/Admin/Staff/NewStaff";
 import UpdateStaff from "./container/Admin/Staff/UpdateStaff";
-
-// import NotFound404 from "./components/NotFound404";
+import NotFound404 from "./components/NotFound404";
 import AddFood from "./container/Admin/OrderManagement/AddFood";
 
 const MuiTheme = createTheme({
@@ -114,7 +113,7 @@ const App = () => {
           }
         />
       </Route>
-      {/* <Route path="/404" element={<NotFound404 />} /> */}
+      <Route path="/404" element={<NotFound404 />} />
     </Routes>
   );
 };

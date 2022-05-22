@@ -74,9 +74,11 @@ export default function FoodsAdmin(props) {
       }
     }
   };
-  const staffConfirmPayment = async (id) => {
+  const staffConfirmPayment = async (input) => {
+    console.log(input);
+
     Swal.fire({
-      title: `Xác nhận thanh toán<br>Hoá đơn ${id}`,
+      title: `Xác nhận thanh toán<br>Hoá đơn ${input.id}`,
       text: "",
       icon: "info",
       showCancelButton: true,
@@ -92,39 +94,45 @@ export default function FoodsAdmin(props) {
       },
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const data = { orderId: id, voucherId: tempVoucherId };
-        if (tempVoucherId !== "" && !/^\d+$/.test(tempVoucherId)) {
-          ModalMessage.middleModal(
-            "error",
-            `Mã voucher "${data.voucherId}"<br>không hợp lệ!<br>Vui lòng chỉ nhập số!`
-          );
-        } else {
-          const res = await OrdersAPI.staffConfirmPayment(data);
+        const data = {
+          orderId: input.id,
+          voucherId: tempVoucherId,
+          nameCust: input.customer.name,
+          phoneNumberCust: input.customer.phoneNumber,
+          returnCustMoney: 0,
+          custMoney: 0,
+        };
 
-          console.log(res);
-
-          if (res === "NO ITEM ORDERED") {
-            ModalMessage.middleModal("info", `Chưa có món ăn được đặt!`);
-          } else if (res === "VOUCHER NOT") {
-            ModalMessage.middleModal(
-              "error",
-              `Mã voucher ${data.voucherId} không tồn tại!`
-            );
-          } else if (res === "VOUCHER EXITS") {
-            ModalMessage.middleModal(
-              "error",
-              `Mã voucher ${data.voucherId} đã được áp dụng trước đó!`
-            );
-          } else if (res === "SUCCESS") {
-            ModalMessage.middleModal(
-              "success",
-              `Thanh toán<br>Hoá đơn ${id} hoàn tất!`
-            );
-          } else {
-            ModalMessage.middleModal("error", `Lỗi! Vui lòng thử lại sau!`);
-          }
-          setResetData(!resetData);
-        }
+        console.log(data);
+        // if (tempVoucherId !== "" && !/^\d+$/.test(tempVoucherId)) {
+        //   ModalMessage.middleModal(
+        //     "error",
+        //     `Mã voucher "${data.voucherId}"<br>không hợp lệ!<br>Vui lòng chỉ nhập số!`
+        //   );
+        // } else {
+        //   const res = await OrdersAPI.staffConfirmPayment(data);
+        //   if (res === "NO ITEM ORDERED") {
+        //     ModalMessage.middleModal("info", `Chưa có món ăn được đặt!`);
+        //   } else if (res === "VOUCHER NOT") {
+        //     ModalMessage.middleModal(
+        //       "error",
+        //       `Mã voucher ${data.voucherId} không tồn tại!`
+        //     );
+        //   } else if (res === "VOUCHER EXITS") {
+        //     ModalMessage.middleModal(
+        //       "error",
+        //       `Mã voucher ${data.voucherId} đã được áp dụng trước đó!`
+        //     );
+        //   } else if (res === "SUCCESS") {
+        //     ModalMessage.middleModal(
+        //       "success",
+        //       `Thanh toán<br>Hoá đơn ${data.id} hoàn tất!`
+        //     );
+        //   } else {
+        //     ModalMessage.middleModal("error", `Lỗi! Vui lòng thử lại sau!`);
+        //   }
+        //   setResetData(!resetData);
+        // }
       }
     });
   };
@@ -178,9 +186,9 @@ export default function FoodsAdmin(props) {
               key: item.id,
               price: item.amountTotal,
               customerName: item.customer ? item.customer.name : "Không có",
-              orderTime: moment(new Date(item.orderTime*1000).toString()).format(
-                "DD/MM/YYYY hh:mm:ss"
-              ),
+              orderTime: moment(
+                new Date(item.orderTime * 1000).toString()
+              ).format("DD/MM/YYYY hh:mm:ss"),
             };
           })
         );
@@ -341,7 +349,7 @@ export default function FoodsAdmin(props) {
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => staffConfirmPayment(record.id)}
+                    onClick={() => staffConfirmPayment(record)}
                   >
                     Đang phục vụ
                   </Button>

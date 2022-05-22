@@ -211,6 +211,8 @@ public class OrderTotalService implements IOrderTotalService {
         for (OrderDetails j : lst) {
             tong = tong.add(j.getAmount());
         }
+        x.setAmountTotal(tong);
+        orderTotalRepository.save(x);
         return tong;
     }
 

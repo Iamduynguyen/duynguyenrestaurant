@@ -2,14 +2,20 @@ package com.restarant.backend.web.controller;
 
 import com.restarant.backend.dto.OrderDetailsDto;
 import com.restarant.backend.dto.TableOrderDto;
+import com.restarant.backend.entity.OrderDetails;
 import com.restarant.backend.entity.OrderTotal;
 import com.restarant.backend.entity.TableOrder;
+import com.restarant.backend.repository.OrderDetailsRepository;
+import com.restarant.backend.repository.OrderTotalRepository;
 import com.restarant.backend.repository.TableOrderRepository;
+import com.restarant.backend.repository.TablesRepository;
 import com.restarant.backend.service.ITableOrderService;
+import com.restarant.backend.service.impl.OrderTotalService;
 import com.restarant.backend.service.impl.TableOrderService;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +41,17 @@ public class TableOrderController {
     private static final String ENTITY_NAME = "tableOrder";
 
     private final ITableOrderService tableOrderService;
+    @Autowired
+    OrderTotalRepository orderTotalRepository;
+
+    @Autowired
+    TableOrderRepository tablesRepository;
+
+    @Autowired
+    OrderTotalService orderTotalService;
+
+    @Autowired
+    OrderDetailsRepository orderDetailsRepository;
 
     public TableOrderController(ITableOrderService tableOrderService) {
         this.tableOrderService = tableOrderService;
@@ -117,6 +135,7 @@ public class TableOrderController {
         return (List<TableOrderDto>) tableOrderService.getAll(pageable);
     }
 
+
     //
 //    /**
 //     * {@code GET  /table-orders/:id} : get the "id" tableOrder.
@@ -143,9 +162,13 @@ public class TableOrderController {
 //     */
     @DeleteMapping("/table-orders/{id}")
     public ResponseEntity<?> deleteTableOrder(@PathVariable Long id) {
-        log.debug("REST request to delete tableOrder : {}", id);
+        TableOrder tableOrder = tablesRepository.findById(id).get();
+        OrderTotal orderTotal = tableOrder.getOrderTotal();
         try {
             if (tableOrderService.deleteById(id)) {
+                List<OrderDetails> orderDetails = orderDetailsRepository.getByOrderTableId(id);
+                orderDetailsRepository.deleteAll(orderDetails);
+                orderTotalService.tinhtongtien(orderTotal);
                 return ResponseEntity.ok().body("Delete success!");
             }
         } catch (InvalidDataExeception e) {

@@ -5,6 +5,7 @@ import com.restarant.backend.dto.OrderDetailsDto;
 import com.restarant.backend.entity.OrderDetails;
 import com.restarant.backend.repository.OrderDetailsRepository;
 import com.restarant.backend.service.IOrderDetailsService;
+import com.restarant.backend.service.impl.OrderTotalService;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,9 @@ public class OrderDetailsController {
     private static final String ENTITY_NAME = "orderDetails";
     @Autowired
     OrderDetailsRepository orderDetailsRepository;
+
+    @Autowired
+    OrderTotalService orderTotalService;
 
     private final IOrderDetailsService orderDetailsService;
 
@@ -163,6 +167,7 @@ public class OrderDetailsController {
             OrderDetails orderDetails = orderDetailsRepository.findById(id).get();
             orderDetails.setStatus(2);
             orderDetailsRepository.save(orderDetails);
+            orderTotalService.tinhtongtien(orderDetails.getTableOrder().getOrderTotal());
         }catch (Exception e){
             return "fail";
         }

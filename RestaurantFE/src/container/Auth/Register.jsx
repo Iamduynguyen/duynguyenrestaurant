@@ -20,6 +20,9 @@ export default function Register() {
       password: password,
     };
     const res = await AuthAPI.register(data);
+    // if(res == 'EMAIL_EXIT'){
+    //   setValidAPI("Địa chỉ email này đã được đăng kí!");
+    // } else
     if (res.id !== undefined) {
       Swal.fire("Đăng ký thành công!", "Nhấn OK để đăng nhập", "success").then(
         async () => {

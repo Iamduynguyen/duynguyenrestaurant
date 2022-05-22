@@ -72,6 +72,14 @@ const OrdersAPI = {
         const url = `/api/delete-all-details-ids`;
         return axiosClient.post(url, data);
     },
+    getHistoryOrder: () => {
+        const url = `/api/order/history`;
+        return axiosClient.get(url);
+    },
+    getHistoryOrderDetail: (id) => {
+        const url = `/api/order/order-detail/${id}`;
+        return axiosClient.get(url);
+    },
 };
 
 export default OrdersAPI;

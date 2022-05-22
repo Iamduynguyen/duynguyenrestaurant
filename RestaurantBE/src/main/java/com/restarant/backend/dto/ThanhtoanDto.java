@@ -8,33 +8,17 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
 
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ThanhtoanDto implements Serializable {
-    private Long foodDetails;
-    private Integer sl;
-
-    public ThanhtoanDto(Long foodDetails, Integer sl) {
-        this.foodDetails = foodDetails;
-        this.sl = sl;
-    }
-
-    public ThanhtoanDto() {
-    }
-
-    public Long getFoodDetails() {
-        return foodDetails;
-    }
-
-    public void setFoodDetails(Long foodDetails) {
-        this.foodDetails = foodDetails;
-    }
-
-    public Integer getSl() {
-        return sl;
-    }
-
-    public void setSl(Integer sl) {
-        this.sl = sl;
-    }
+    private Long id;
+    private BigDecimal amountTotal;
+    private String foodName;
+    private String foodSize;
+    private Long sl;
+    private BigDecimal tongtien;
 }

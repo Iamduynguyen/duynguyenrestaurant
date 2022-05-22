@@ -412,7 +412,7 @@ const AddFood = (props) => {
         onRequestClose={onModalClose}
         style={modalStyle}
         ariaHideApp={false}
-        contentLabel="Example Modal"
+        contentLabel="Food detail Modal"
       >
         <div className="header">
           <h1>Chi tiết món ăn</h1>

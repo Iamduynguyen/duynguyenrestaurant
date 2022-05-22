@@ -43,6 +43,17 @@ export default function FoodsAdmin(props) {
     }
     setResetData(!resetData);
   };
+
+
+  const xacsnhandennhahang = async (id) => {
+    const res = await OrdersAPI.staffConfirmKhden(id);
+    if (res === "SUCCESS") {
+      ModalMessage.miniTopRightModal("success", "Xác nhận đơn thành công");
+    } else {
+      ModalMessage.miniTopRightModal("error", `Lỗi<br/>Vui lòng thử lại sau!`);
+    }
+  };
+
   const staffConfirmDepositOnline = async (id) => {
     const { value: deposit } = await Swal.fire({
       title: `Xác nhận hoá đơn ${id}`,
@@ -224,6 +235,7 @@ export default function FoodsAdmin(props) {
   useEffect(() => {
     const fetchData = async () => {
       const res = await OrdersAPI.getAllOrders();
+      console.log(res);
       if (res) {
         setTableData(
           res.map((item, index) => {
@@ -399,7 +411,7 @@ export default function FoodsAdmin(props) {
                 );
               else if (record.status === 4)
                 return (
-                  <Button variant="contained" color="warning">
+                  <Button onClick={()=>xacsnhandennhahang(record.id)} variant="contained" color="warning">
                     Chờ khách hàng
                     <br />
                     đến nhà hàng

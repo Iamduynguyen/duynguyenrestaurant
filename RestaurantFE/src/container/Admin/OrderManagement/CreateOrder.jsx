@@ -41,9 +41,15 @@ const CreateOrder = () => {
   const [tmpQty, setTmpQty] = useState(0);
   const [tmpListFood, setTmpListFood] = useState([]);
 
+
   // API available Tables
   const getTablesAvailable = async () => {
-    const res = await TableAPI.getTablesAvailable();
+    let start = (new Date().getTime()+'').substring(0,10);
+    let x = new Date().setHours(new Date().getHours()+3)/1000;
+    console.log(x);
+    var end = (x+"").substring(0,10);
+    const res = await TableAPI.getTableByStartandEnd(start,end);
+    console.log(res);
     if (res) {
       setTables(res);
     }

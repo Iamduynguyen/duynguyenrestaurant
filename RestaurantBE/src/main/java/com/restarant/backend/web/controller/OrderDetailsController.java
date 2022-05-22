@@ -8,6 +8,7 @@ import com.restarant.backend.service.IOrderDetailsService;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,8 @@ public class OrderDetailsController {
     private final Logger log = LoggerFactory.getLogger(OrderDetailsController.class);
 
     private static final String ENTITY_NAME = "orderDetails";
+    @Autowired
+    OrderDetailsRepository orderDetailsRepository;
 
     private final IOrderDetailsService orderDetailsService;
 
@@ -152,6 +155,18 @@ public class OrderDetailsController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    @GetMapping("/order/order-detail-xacnhan/{id}")
+    public String getAllOrderDetails(@PathVariable Long id) {
+        try {
+            OrderDetails orderDetails = orderDetailsRepository.findById(id).get();
+            orderDetails.setStatus(2);
+            orderDetailsRepository.save(orderDetails);
+        }catch (Exception e){
+            return "fail";
+        }
+        return "success";
     }
 
 }

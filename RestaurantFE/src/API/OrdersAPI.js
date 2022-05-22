@@ -23,6 +23,11 @@ const OrdersAPI = {
         const url = `/api/confirm-order-online/${id}`;
         return axiosClient.put(url);
     },
+    //status 4-5
+    staffConfirmKhden: (id) => {
+        const url = `/api/order-totals-khachden/${id}`;
+        return axiosClient.get(url);
+    },
     // status 5 => 6
     staffConfirmPayment: (data) => {
         const url = `/api/payment-order`;
@@ -80,6 +85,11 @@ const OrdersAPI = {
         const url = `/api/order/order-detail/${id}`;
         return axiosClient.get(url);
     },
+    xacnhanorderdetail: (id) => {
+        const url = `/api/order/order-detail-xacnhan/${id}`;
+        return axiosClient.get(url);
+    },
+
 };
 
 export default OrdersAPI;

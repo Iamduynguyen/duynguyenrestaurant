@@ -28,4 +28,5 @@ public class GetAllFoodOrder {
     private BigDecimal discount;
     private BigDecimal amount;
     private String note;
+    private String status;
 }

@@ -24,7 +24,11 @@ export default function Cart() {
   const [countPrice, setCountPrice] = useState([])
   const [statusPay, setstatusPay] = useState("");
   const [socketUrl, setSocketUrl] = useState("localhost:8787");
-  const [messageHistory, setMessageHistory] = useState([]);
+  const [thanhtoan, setthanhtoan] = useState([]);
+  const [ngay, setNgay] = useState("");
+  const [gioan, setGioan] = useState("");
+  const [gioEnd, setGioEnd] = useState("");
+  const [tiencoc, setTiencoc] = useState("");
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
   let { status } = useParams();
   const confirmOrder1 = async (id) => {
@@ -43,6 +47,8 @@ export default function Cart() {
     console.log(data);
     setpayman(data)
   }
+
+
 
   const chapnhan = () => {
     console.log(payman);
@@ -70,8 +76,17 @@ export default function Cart() {
 
   const fetchData = async () => {
     const res = await BookTableAPI.getUserBookTable();
-    const resOrder= await BookTableAPI.getStatusOrder(res[0].orderTotalId)
+    const resOrder= await BookTableAPI.getInforOrder(res[0].orderTotalId)
+    const resThanhtoan = await BookTableAPI.getInforThanhtoan(res[0].orderTotalId)
+    console.log(resThanhtoan);
+    setthanhtoan(resThanhtoan);
     let status1= resOrder.status;
+    setNgay(resOrder.ngay)
+    setGioan(resOrder.gioan)
+    setGioEnd(resOrder.gionghi)
+    setTiencoc(resOrder.tiencoc)
+    setSum(resOrder.tongtienhoadon);
+    
     console.log(res);
     console.log(resOrder);
     if(status1==0){
@@ -262,6 +277,9 @@ export default function Cart() {
             <Grid item xs={4}>
               <Paper elevation={24}>
                 <Stack spacing={2} p={2}>
+                <p style={{ textAlign: "center" , fontWeight: 'bold', color : 'white',fontSize: 'large'}} className="cart-text">
+                    Thời gian đặt: Ngày: {ngay} <br/> từ {gioan} đến {gioEnd}
+                  </p>
                 <p style={{ textAlign: "center" , fontWeight: 'bold', color : 'green',fontSize: 'large'}} className="cart-text">
                     Trạng thái: {Orderstatus}
                   </p>
@@ -270,25 +288,9 @@ export default function Cart() {
                   </p>
                   <Divider />
                   <Stack spacing={2}>
-                    {foodOrder?.map((item, index) => (
+                    {thanhtoan?.map((item, index) => (
                       <Box key={index}>
-                        <p className="cart-text">{`${index+1}, ${
-                          item.foodDetalls.foodName
-                        } | ${
-                          item.foodDetalls.discount == 0
-                            ? item.foodDetalls.amount
-                            : discount(
-                                item.foodDetalls.amount,
-                                item.foodDetalls.discount
-                              )
-                        } * ${item.quantity} = ${
-                          item.foodDetalls.discount == 0
-                            ? item.foodDetalls.amount * item.quantity
-                            : discount(
-                                item.foodDetalls.amount,
-                                item.foodDetalls.discount
-                              ) * item.quantity
-                        } VND`}</p>
+                        <p className="cart-text">{`${index+1}, ${item.foodName} | size ${item.foodSize} | ${item.amountTotal} x ${item.sl} = ${item.tongtien} VND`}</p>
                       </Box>
                     ))}
                     {xacnhanBtn && (<Box id="confirm" width="100%" textAlign="center">
@@ -318,7 +320,7 @@ export default function Cart() {
                       className="p__cormorant"
                     >
                       Tổng thanh toán:{" "}
-                      <span style={{ color: "#dcca87" }}>{sumPrice} VND</span>
+                      <span style={{ color: "#dcca87" }}>{sum} VND</span>
                     </p>
                     <Divider />
                     <Box
@@ -343,9 +345,12 @@ export default function Cart() {
         <Dialog open={openOrderFood} onClose={() => setOpenOrderFood(false)}>
           <DialogTitle sx={{ textAlign: "center",width : '550px',height: '270px', backgroundColor: 'LightYellow' }}>
             <h2 style={{ textAlign: "center",color :'black',fontWeight: 'bold'}}>Xac nhan dat coc</h2>
+            <br />
+            <h2 style={{ textAlign: "center",color :'black',fontWeight: 'bold'}}>Bạn cần đặt cọc {tiencoc} vnd</h2>
+            <h4 style={{ textAlign: "center",color :'black',fontWeight: 'bold'}}>Hoặc Thanh toán online qua VNPAY</h4>
           </DialogTitle>
           <DialogActions>
-            <Button onClick={() => setOpenOrderFood(false)}  >Disagree</Button>
+            <Button onClick={() => setOpenOrderFood(false)}  >Hủy</Button>
             <Button  onClick={() => chapnhan()} autoFocus>
               Agree
             </Button>

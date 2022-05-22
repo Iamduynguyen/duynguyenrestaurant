@@ -21,6 +21,21 @@ const OrderDetail = (props) => {
   const [tableData, setTableData] = useState([]);
   const [selectedRow, setSelectedRow] = useState([]);
 
+  const xacnhanOderdetail = async (id) => {
+      const rs = await OrdersAPI.xacnhanOderdetail(id);
+      if(rs==='success'){
+        ModalMessage.miniTopRightModal(
+          "success",
+          `Thành công!`
+        );
+      }else{
+        ModalMessage.miniTopRightModal(
+          "error",
+          `Lỗi<br/>Vui lòng thử lại sau!`
+        );
+      }
+  }
+
   // API OrderDetail
   const addQty = async (foodOrders) => {
     const { value: qty } = await Swal.fire({
@@ -157,6 +172,8 @@ const OrderDetail = (props) => {
     },
   };
 
+
+
   useEffect(() => {
     // Validate access when not matching tableId & orderId
     if (
@@ -252,7 +269,7 @@ const OrderDetail = (props) => {
             title="Tên món"
             key="foodName"
             align="left"
-            width={450}
+            width={400}
             render={(record) => {
               return (
                 <span>
@@ -294,7 +311,7 @@ const OrderDetail = (props) => {
             dataIndex="amount"
             key="amount"
             align="right"
-            width={200}
+            width={150}
             render={(text) => {
               if (text !== null) {
                 return `${text
@@ -325,7 +342,7 @@ const OrderDetail = (props) => {
             title="Tổng tiền"
             key="amount"
             align="right"
-            width={200}
+            width={150}
             render={(record) => {
               if (record !== null && record.amount !== null) {
                 return `${(
@@ -341,7 +358,15 @@ const OrderDetail = (props) => {
               }
             }}
           />
-          <Table.Column title="Ghi chú" dataIndex="note" key="note" />
+          <Table.Column title="Trạng thái" width={150} dataIndex="status"
+           key="note" />
+          <Table.Column title="Action" dataIndex="note"
+          render={(record) => {
+            return(
+              <button onClick={()=>xacnhanOderdetail(record.id)}  style={{padding:'5px',backgroundColor:'blue',color:'white',borderRadius:'5px'}}>Xác nhận</button>
+            )
+          }}
+           key="note" />
         </Table>
       </Row>
     </>

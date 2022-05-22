@@ -156,6 +156,12 @@ public class OrderTotalService implements IOrderTotalService {
                     getAllFoodOrder.setAmount(y.getAmount());
                     getAllFoodOrder.setQuantity(y.getQuantity());
                     getAllFoodOrder.setId(y.getId());
+                    if (y.getStatus()==1){
+                        getAllFoodOrder.setStatus("Chờ xác nhận");
+                    }
+                    if (y.getStatus()==2){
+                        getAllFoodOrder.setStatus("Đã xác nhận");
+                    }
                     foodOrders.add(getAllFoodOrder);
                 }
                 getTableOrder.setFoodOrders(foodOrders);
@@ -594,35 +600,13 @@ public class OrderTotalService implements IOrderTotalService {
         } else if (lst == null) {
             return false;
         }
-        List<Long> ids = new ArrayList<>();
-        if (orderTotal.getStatus() > 3) {
-            for (OrderDetails y : lst2) {
-                for (OrderDetails x : lst) {
-                    x.setStatus(2);
-                    x.setAmount(x.getFoodDetalls().getAmount().subtract(x.getFoodDetalls().getDiscount()));
-                    if (y.getFoodDetalls().getId() == x.getFoodDetalls().getId()&&y.getAmount() == x.getAmount()) {
-                            y.setQuantity(y.getQuantity() + x.getQuantity());
-                            ids.add(x.getId());
-                    }else {
-                        BigDecimal dis = x.getFoodDetalls().getAmount().multiply(x.getFoodDetalls().getDiscount()).divide(new BigDecimal("100"));
-                        BigDecimal giam = x.getFoodDetalls().getAmount().subtract(dis);
-                        x.setAmount(giam);
-                        x.setStatus(2);
-                    }
-                }
-            }
-        } else {
-            for (OrderDetails x : lst) {
-                BigDecimal dis = x.getFoodDetalls().getAmount().multiply(x.getFoodDetalls().getDiscount()).divide(new BigDecimal("100"));
-                BigDecimal giam = x.getFoodDetalls().getAmount().subtract(dis);
-                x.setAmount(giam);
-                x.setStatus(1);
-            }
+        for (OrderDetails x : lst) {
+            BigDecimal dis = x.getFoodDetalls().getAmount().multiply(x.getFoodDetalls().getDiscount()).divide(new BigDecimal("100"));
+            BigDecimal giam = x.getFoodDetalls().getAmount().subtract(dis);
+            x.setAmount(giam);
+            x.setStatus(1);
         }
         orderDetailsRepository.saveAll(lst);
-        for (Long x : ids) {
-            orderTotalRepository.deleteById(x);
-        }
         orderTotal.setStatus(1);
         orderTotalRepository.save(orderTotal);
         return true;

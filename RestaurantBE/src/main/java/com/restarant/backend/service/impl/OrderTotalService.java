@@ -7,6 +7,7 @@ import com.restarant.backend.model.OrderTotalStatus;
 import com.restarant.backend.repository.*;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.mapper.IConverterDto;
+import com.restarant.backend.service.utils.ConvertTime;
 import com.restarant.backend.service.utils.JwtServiceUtils;
 import com.restarant.backend.service.utils.MailDto;
 import com.restarant.backend.service.utils.MailUtils;
@@ -26,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -41,6 +44,9 @@ public class OrderTotalService implements IOrderTotalService {
     IConverterDto<Customer, CustomerDto> mapperCus;
     @Autowired
     private MailUtils mailUtils;
+
+    @Autowired
+    private ConvertTime convertTime;
     @Autowired
     private JwtServiceUtils jwtServiceUtils;
     @Autowired
@@ -74,6 +80,7 @@ public class OrderTotalService implements IOrderTotalService {
 
     @Override
     public OrderTotalDto update(Long id, OrderTotalDto dto) throws InvalidDataExeception {
+
         return null;
     }
 
@@ -525,6 +532,50 @@ public class OrderTotalService implements IOrderTotalService {
             total = total.add(orderTotal.getAmountTotal());
         }
         return total;
+    }
+
+    @Override
+    public List<OrderHistoryDto> getHistoryOrder(Long customerId) {
+        List<OrderHistoryDto> orderHistorys = new ArrayList<>();
+        List<OrderTotal> orderTotals = orderTotalRepository.getAllOrderTotalByCustomerId(customerId);
+        orderTotals.forEach(o -> {
+            OrderHistoryDto orderHistoryDto = new OrderHistoryDto();
+            StringBuilder orderTables = new StringBuilder();
+            LocalDateTime startTime = convertTime.convertToLocalDateTime(o.getOrderTime());
+            orderHistoryDto.setDate(startTime.getDayOfMonth() + "/" + startTime.getMonthValue() + "/" + startTime.getYear());
+            LocalDateTime endTime = convertTime.convertToLocalDateTime(o.getEndTime());
+            orderHistoryDto.setStartTime(startTime.getHour() + ":" + startTime.getMinute());
+            orderHistoryDto.setEndTime(endTime.getHour() + ":" + endTime.getMinute());
+            orderHistoryDto.setId(o.getId());
+            o.getTableOrders().forEach(t -> {
+                orderTables.append(t.getTables().getId() + ", ");
+            });
+            orderHistoryDto.setTables(orderTables.toString().substring(0, orderTables.length()-2));
+            orderHistoryDto.setAmountTotal(o.getAmountTotal().toString());
+            orderHistoryDto.setPaymentType(o.getVnpay_id() == null ? "Tiền mặt" : "Thanh toán thẻ");
+            orderHistoryDto.setId(o.getId());
+            orderHistorys.add(orderHistoryDto);
+        });
+        return orderHistorys;
+    }
+
+    @Override
+    public List<OrderHistoryDetailDto> getOrderDetailsByOrderId(Long orderId) {
+        List<OrderHistoryDetailDto> orderHistoryDetailDtos = new ArrayList<>();
+        List<TableOrder> tableOrders = tableOrderRepository.getAllByTotalId(orderId);
+        tableOrders.forEach(o -> {
+            List<OrderDetails> orderDetails = orderDetailsRepository.getByOrderTableId(o.getId());
+            orderDetails.forEach(a -> {
+                orderHistoryDetailDtos.add(OrderHistoryDetailDto.builder()
+                        .tableId(String.valueOf(o.getTables().getId()))
+                        .foodName(a.getFoodDetalls().getFood().getName())
+                        .foodImage(a.getFoodDetalls().getFoodMedias().get(0).getFoodurl())
+                        .quantity(a.getQuantity() == null ? "0" : a.getQuantity().toString())
+                        .amount(a.getAmount() == null ? "0" : a.getAmount().toString())
+                        .build());
+            });
+        });
+        return orderHistoryDetailDtos;
     }
 
 

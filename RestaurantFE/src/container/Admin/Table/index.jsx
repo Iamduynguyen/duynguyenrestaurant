@@ -148,9 +148,10 @@ export default function TableAdmin() {
           >
             <div className="">{index + 1}</div>
             <div className="">Table {item.id}</div>
-            <div className="text-gray-400">
-              {item.status === 0 ? "" : " Bàn không khả dụng"}
+            <div className="text-gray-400 text-red">
+              {item.status == 0 ? "Khả dụng" : "Không khả dụng"}
             </div>
+
             <div className="flex justify-end">
               <Stack direction="row" spacing={1} position="absolute">
                 <Button
@@ -237,7 +238,7 @@ export default function TableAdmin() {
         <DialogTitle>{`Chi tiết bàn ${tableDetail?.id}`}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            <Typography>Bàn 1</Typography>
+            <Typography>{`Bàn ${tableDetail.id} - Số ghế ${tableDetail.numberOfChair}`}</Typography>
           </DialogContentText>
         </DialogContent>
       </Dialog>

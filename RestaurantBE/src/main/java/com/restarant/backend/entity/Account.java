@@ -1,6 +1,9 @@
 package com.restarant.backend.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +14,9 @@ import java.time.LocalDate;
 @Data
 @Component
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 //@Where(clause = "delete_flag = 0")
 public class Account {
     private static final long serialVersionUID = 1L;

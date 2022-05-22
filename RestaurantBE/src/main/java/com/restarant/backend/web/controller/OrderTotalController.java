@@ -8,6 +8,7 @@ import com.restarant.backend.repository.FoodDetallsRepository;
 import com.restarant.backend.repository.OrderTotalRepository;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.impl.OrderTotalService;
+import com.restarant.backend.service.utils.ConvertTime;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -41,6 +43,8 @@ public class OrderTotalController {
 
     @Autowired
     OrderTotalService orderTotalService1;
+    @Autowired
+    ConvertTime convertTime;
 
     private final Logger log = LoggerFactory.getLogger(OrderTotalController.class);
 
@@ -116,7 +120,7 @@ public class OrderTotalController {
         RedirectView view = new RedirectView();
         String response = orderTotalService.checkOutVnpay(vnp_ResponseCode,vnp_TxnRef);
 //        view.addStaticAttribute("status",response);
-        view.setUrl("http://localhost:3000/cart/"+response);
+        view.setUrl("http://viprestaurant.cf/cart/"+response);
         return view;
     }
 
@@ -219,14 +223,63 @@ public class OrderTotalController {
         BigDecimal deposit = rs.getDeposit();
         map.put("status",status);
         map.put("deposit",deposit);
+        LocalDateTime x = convertTime.convertToLocalDateTime(rs.getOrderTime());
+        LocalDateTime y = convertTime.convertToLocalDateTime(rs.getEndTime());
+        String date = x.getDayOfMonth()+"/"+ x.getMonth().getValue()+"/"+x.getYear();
+        String gioan = x.getHour()+":"+x.getMinute();
+        String gionghi = y.getHour()+":"+y.getMinute();
+        map.put("start", convertTime.convertLocalDateTimeToDateUsingInstant(x));
+        map.put("end",convertTime.convertLocalDateTimeToDateUsingInstant(y));
+        map.put("gioan",gioan);
+        map.put("gionghi",gionghi);
+        map.put("ngay",date);
+        map.put("date",x.getDayOfMonth()+"/"+ x.getMonth()+"/"+x.getYear());
+        map.put("tiencoc",rs.getDeposit());
+        map.put("tongtienhoadon",rs.getAmountTotal());
         return ResponseEntity.ok(map);
     }
 
-//    @GetMapping("/order-totals-thanhtoan/{id}")
-//    public ResponseEntity<?> getThanhtoan(@PathVariable Long id) {
-//        List<OrderDetails> orderDetails = orderTotalRepository.getFoodByOder(id);
-//
-//        return ResponseEntity.ok(lst);
-//    }
+    @GetMapping("/order-totals-thanhtoan/{id}")
+    public ResponseEntity<?> getThanhtoan(@PathVariable Long id) {
+        List<OrderDetails> orderDetails = orderTotalRepository.getTinhtong(id);
+        List<ThanhtoanDto> rs = new ArrayList<>();
+        for (OrderDetails x:orderDetails){
+            ThanhtoanDto dto = new ThanhtoanDto();
+            dto.setId(x.getId());
+            if (x.getAmount()==null){
+                dto.setAmountTotal(new BigDecimal("0"));
+            }else {
+                dto.setAmountTotal(x.getAmount());
+            }
+            dto.setSl(x.getQuantity());
+            if (x.getFoodDetalls().getFood().getName().length()>15){
+                dto.setFoodName(x.getFoodDetalls().getFood().getName().substring(0,15)+"...");
+            }else {
+                dto.setFoodName(x.getFoodDetalls().getFood().getName());
+            }
+            dto.setFoodSize(x.getFoodDetalls().getFoodsize());
+            BigDecimal tong ;
+            try {
+                tong=dto.getAmountTotal().multiply(new BigDecimal(dto.getSl()));
+            }catch (Exception e){
+                tong = new BigDecimal("0");
+            }
+            dto.setTongtien(tong);
+            rs.add(dto);
+        }
+        return ResponseEntity.ok(rs);
+    }
+
+    @GetMapping("/order-totals-khachden/{id}")
+    public ResponseEntity<?> xacnhanKhachden(@PathVariable Long id) {
+        try {
+            OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+            orderTotal.setStatus(5);
+            orderTotalRepository.save(orderTotal);
+            return ResponseEntity.ok("SUCCESS");
+        }catch (Exception e){
+            return ResponseEntity.ok("Fail");
+        }
+    }
 
 }

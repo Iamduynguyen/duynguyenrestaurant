@@ -67,11 +67,16 @@ public class TableOrderService implements ITableOrderService {
         }
 
         Customer customer = jwtServiceUtils.getCustomerByToken(request);
+        System.out.println(customer.toString());
         if(customer == null){
             throw new InvalidDataExeception("user not login");
         }
         // create Order Total
-        OrderTotal orderTotal = orderTotalRepository.getOrderTotalByCustomerId(customer.getId());
+        OrderTotal orderTotal = new OrderTotal();
+        try {
+            orderTotal = orderTotalRepository.getOrderTotalByCustomerId(customer.getId());
+        }catch (Exception e){
+            orderTotal = null;        }
 
         if(orderTotal == null){
             OrderTotal newOrderTotal = new OrderTotal();
@@ -80,22 +85,22 @@ public class TableOrderService implements ITableOrderService {
             newOrderTotal.setOrderTime(convertTime.validate(dto.getOrderTime()));
             newOrderTotal.setEndTime(convertTime.validate(dto.getEndTime()));
             newOrderTotal.setAmountTotal(new BigDecimal("0"));
-            newOrderTotal.setStatus(OrderTotalStatus.ORDERING);
+            newOrderTotal.setStatus(0);
             orderTotal = orderTotalRepository.save(newOrderTotal);
         }
 
         if(orderTotal == null){
             return null;
         }
-
+        if (orderTotal.getStatus()<3){
+            orderTotal.setOrderTime(convertTime.validate(dto.getOrderTime()));
+            orderTotal.setEndTime(convertTime.validate(dto.getEndTime()));
+        }
         dto.setOrderTotalId(orderTotal.getId());
         TableOrder tableOrder = mapper.convertToEntity(dto);
         TableOrder result = tableOrderRepository.save(tableOrder);
 
-        Tables tables = new Tables();
-        tables.setId(result.getTables().getId());
-        //tables.setStatus(1L);
-        tablesRepository.save(tables);
+        System.out.println(result.toString());
 
         return mapper.convertToDto(result);
 

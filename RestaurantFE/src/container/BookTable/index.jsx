@@ -59,7 +59,23 @@ function addHoursToDate(date, hours) {
       console.log(res);
     };
     fetchData();
+    getOrderTime();
   }, []);
+
+ 
+
+  const getOrderTime = async () => {
+      const res = await BookTableAPI.getUserBookTable();
+      if(res.length>0){
+        const resOrder= await BookTableAPI.getInforOrder(res[0].orderTotalId);
+        var dateStart = new Date(resOrder.start * 1000);
+        var dateEnd = new Date(resOrder.end * 1000);
+        setOrderTime(dateStart);
+        setEndtime(dateEnd);
+        setDate(resOrder.date);
+        console.log(OrderTime);
+      }  
+    }
 
   const gettime = async () => {
     console.log("start"+OrderTime);
@@ -142,15 +158,15 @@ function addHoursToDate(date, hours) {
       })
     }
     console.log(res);
-    // if(res){
-    //   Swal.fire({
-    //     title: 'Thành công!',
-    //     text: 'Đặt bàn thành công \n hãy chọn món!',
-    //     icon: 'success',
-    //     confirmButtonText: 'Đóng'
-    //   })
-    //   // window.location.href = '/menu';
-    // }
+    if(res.length>0){
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Đặt bàn thành công \n hãy chọn món!',
+        icon: 'success',
+        confirmButtonText: 'Đóng'
+      })
+      // window.location.href = '/menu';
+    }
   };
 
   return (

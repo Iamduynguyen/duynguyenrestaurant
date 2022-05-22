@@ -7,6 +7,7 @@ import com.restarant.backend.model.OrderTotalStatus;
 import com.restarant.backend.repository.*;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.mapper.IConverterDto;
+import com.restarant.backend.service.utils.ConvertTime;
 import com.restarant.backend.service.utils.JwtServiceUtils;
 import com.restarant.backend.service.utils.MailDto;
 import com.restarant.backend.service.utils.MailUtils;
@@ -43,6 +44,8 @@ public class OrderTotalService implements IOrderTotalService {
     private MailUtils mailUtils;
     @Autowired
     private JwtServiceUtils jwtServiceUtils;
+    @Autowired
+    ConvertTime convertTime;
     @Autowired
     TableService tableService;
     private final OrderTotalRepository orderTotalRepository;
@@ -252,8 +255,9 @@ public class OrderTotalService implements IOrderTotalService {
         try {
             Date now = new Date();
             OrderTotal orderTotal = new OrderTotal();
-            orderTotal.setCreatedAt(now.getTime());
-            orderTotal.setOrderTime(now.getTime());
+            orderTotal.setCreatedAt(convertTime.validate(System.currentTimeMillis()));
+            orderTotal.setOrderTime(convertTime.validate(System.currentTimeMillis()));
+            orderTotal.setEndTime(convertTime.addHour(orderTotal.getOrderTime(),3l));
             orderTotal.setStatus(5);
             // todo tạm bỏ
             orderTotal.setNote("Người tạo hóa đơn là : " + jwtServiceUtils.getUserName(request));
@@ -294,7 +298,7 @@ public class OrderTotalService implements IOrderTotalService {
             foodDetails = foodDetallsRepository.findById(foodCouter.getFoodId()).get();
             orderDetails.setFoodDetalls(foodDetails);
             orderDetails.setAmount(foodDetails.getAmount().subtract(foodDetails.getDiscount()));
-//                    orderDetails.setStatus(5);
+                    orderDetails.setStatus(2);
             orderDetailsList.add(orderDetails);
 //                    orderDetailsRepository.save(orderDetails);
         }

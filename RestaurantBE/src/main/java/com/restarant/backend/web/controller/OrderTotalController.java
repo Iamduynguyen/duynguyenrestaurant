@@ -1,10 +1,12 @@
 package com.restarant.backend.web.controller;
 
 import com.restarant.backend.dto.*;
+import com.restarant.backend.entity.Customer;
 import com.restarant.backend.entity.OrderTotal;
 import com.restarant.backend.repository.OrderTotalRepository;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.impl.OrderTotalService;
+import com.restarant.backend.service.utils.JwtServiceUtils;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,8 @@ public class OrderTotalController {
 
     @Autowired
     private OrderTotalRepository orderTotalRepository;
+    @Autowired
+    private JwtServiceUtils jwtServiceUtils;
 
     @Autowired
     OrderTotalService orderTotalService1;
@@ -203,5 +207,16 @@ public class OrderTotalController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    @GetMapping("/order/history")
+    public ResponseEntity<?> getHistoryOrdered(HttpServletRequest request){
+        Customer customer = jwtServiceUtils.getCustomerByToken(request);
+        return ResponseEntity.ok(orderTotalService.getHistoryOrder(customer.getId()));
+    }
+
+    @GetMapping("/order/order-detail/{orderId}")
+    public ResponseEntity<?> getOrderDetailed(@PathVariable Long orderId){
+        return ResponseEntity.ok(orderTotalService.getOrderDetailsByOrderId(orderId));
     }
 }

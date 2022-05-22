@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account,Long> {
-    @Query(value = "select a from Account a where a.login =:login")
+    @Query(value = "select a from Account a where a.login =:login and a.deleteFlag = false ")
     Account getByLogin(@Param("login") String login);
 }

@@ -90,7 +90,12 @@ const Navbar = () => {
                   Thông tin cá nhân
                 </Link>
               </li>
-              {getKey("role") === "ROLE_ADMIN" ? (
+              <li className="py-[10px] ">
+                <Link to="/history" className="w-full block">
+                  Lịch sử đặt bàn
+                </Link>
+              </li>
+              {getKey("role") === "ROLE_ADMIN" || getKey("role") === "ROLE_STAFF" ? (
                 <>
                   <li className="py-[10px] ">
                     <Link to="/admin" className="w-full block">

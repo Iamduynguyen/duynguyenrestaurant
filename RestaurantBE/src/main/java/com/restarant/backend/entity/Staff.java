@@ -1,6 +1,9 @@
 package com.restarant.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,6 +15,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "staff")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Staff implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -36,6 +42,9 @@ public class Staff implements Serializable {
 
     @Column(name = "deleteflag")
     private Long deleteflag = 0L;
+
+    @Column(name = "account_id")
+    private Long accountId;
 
     @OneToMany(mappedBy = "staff")
     @JsonIgnoreProperties(value = { "tableOrders", "payment", "customer", "staff" }, allowSetters = true)
@@ -182,5 +191,13 @@ public class Staff implements Serializable {
             ", gender='" + getGender() + "'" +
             ", deleteflag=" + getDeleteflag() +
             "}";
+    }
+
+    public Long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
     }
 }

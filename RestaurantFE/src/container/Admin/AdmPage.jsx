@@ -83,6 +83,8 @@ const AdmPage = () => {
       "sub-customer",
       <UserOutlined />
     ),
+
+    
     getItem(
       <Link to="/admin/staff">Nhân viên</Link>,
       "sub-staff",
@@ -97,8 +99,14 @@ const AdmPage = () => {
     getItem("Cài đặt", "sub-setting", <SettingOutlined />),
   ];
 
+  if(getKey("role") === "ROLE_STAFF"){
+    menuItems.splice(7, 1);
+    menuItems.splice(7, 1);
+    // menuItems.splice(0, 1);
+  }
+
   useEffect(() => {
-    if (getKey("role") !== "ROLE_ADMIN") {
+    if (getKey("role") !== "ROLE_ADMIN" && getKey("role") !== "ROLE_STAFF") {
       navigate("/");
     } else {
       switch (location.pathname) {
@@ -124,7 +132,7 @@ const AdmPage = () => {
       }
     }
   }, []);
-  if (getKey("role") !== "ROLE_ADMIN") {
+  if (getKey("role") !== "ROLE_ADMIN" && getKey("role") !== "ROLE_STAFF") {
     return <></>;
   }
   return (

@@ -66,6 +66,11 @@ public class OrderTotal implements Serializable {
     @Column(name = "return_money_cust")
     private BigDecimal returnCustMoney;
 
+    @Column(name="cust_phone")
+    private String phoneNumberCust;
+
+    @Column(name="cust_name")
+    private String nameCust;
 
 
     @OneToMany(mappedBy = "orderTotal", cascade = CascadeType.ALL)
@@ -95,6 +100,17 @@ public class OrderTotal implements Serializable {
         return total;
     }
 
-
-
+    public String toString1() {
+        return "OrderTotal{" +
+                "id=" + id +
+                ", voucher=" + voucher +
+                ", amountTotal=" + amountTotal +
+                ", deleteflag=" + deleteflag +
+                ", status=" + status +
+                ", orderTime=" + orderTime +
+                ", endTime=" + endTime +
+                ", deposit=" + deposit +
+                ", note='" + note + '\'' +
+                '}';
+    }
 }

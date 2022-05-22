@@ -1,7 +1,9 @@
 package com.restarant.backend.repository;
 
+import com.restarant.backend.entity.FoodDetails;
 import com.restarant.backend.entity.OrderDetails;
 import com.restarant.backend.entity.OrderTotal;
+import io.swagger.models.auth.In;
 import org.hibernate.criterion.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,4 +39,11 @@ public interface OrderTotalRepository extends JpaRepository<OrderTotal, Long> {
 
     @Query("SELECT o FROM OrderTotal o WHERE o.customer.id = :id")
     List<OrderTotal> getAllOrderTotalByCustomerId(Long id);
+
+    @Query("select o from OrderDetails o where o.tableOrder.orderTotal.id=:id and o.status=2")
+    List<OrderDetails> getTinhtong(@Param("id")Long id);
+  
+    @Query("select o from OrderTotal o where o.status>0 order by o.orderTime desc ")
+    List<OrderTotal> getAllBysort();
+
 }

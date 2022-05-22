@@ -2,11 +2,15 @@ package com.restarant.backend.web.controller;
 
 import com.restarant.backend.dto.*;
 import com.restarant.backend.entity.Customer;
+import com.restarant.backend.entity.FoodDetails;
+import com.restarant.backend.entity.OrderDetails;
 import com.restarant.backend.entity.OrderTotal;
+import com.restarant.backend.repository.FoodDetallsRepository;
 import com.restarant.backend.repository.OrderTotalRepository;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.impl.OrderTotalService;
 import com.restarant.backend.service.utils.JwtServiceUtils;
+import com.restarant.backend.service.utils.ConvertTime;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +24,10 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -38,7 +43,12 @@ public class OrderTotalController {
     private JwtServiceUtils jwtServiceUtils;
 
     @Autowired
+    FoodDetallsRepository foodDetallsRepository;
+
+    @Autowired
     OrderTotalService orderTotalService1;
+    @Autowired
+    ConvertTime convertTime;
 
     private final Logger log = LoggerFactory.getLogger(OrderTotalController.class);
 
@@ -113,8 +123,8 @@ public class OrderTotalController {
     public RedirectView checkOutVnpay(@RequestParam String vnp_TxnRef, @RequestParam String vnp_ResponseCode){
         RedirectView view = new RedirectView();
         String response = orderTotalService.checkOutVnpay(vnp_ResponseCode,vnp_TxnRef);
-        view.addStaticAttribute("status",response);
-        view.setUrl("http://localhost:8888/check-out/result");
+//        view.addStaticAttribute("status",response);
+        view.setUrl("http://viprestaurant.cf/cart/"+response);
         return view;
     }
 
@@ -166,8 +176,8 @@ public class OrderTotalController {
         return orderTotalService.confirmOrderOnline(id,request);
     }
     @PostMapping("/confirm-deposit-online")
-    public String confirmDepositOnline(@RequestBody ConfirmDepositOnline request){
-        return orderTotalService.confirmDepositOnline(request);
+    public String confirmDepositOnline(@RequestBody ConfirmDepositOnline request,HttpServletRequest req){
+        return orderTotalService.confirmDepositOnline(request,req);
     }
     @PutMapping("/cancel-order/{id}")
     public String cancelOrder(@PathVariable Long id){
@@ -219,4 +229,72 @@ public class OrderTotalController {
     public ResponseEntity<?> getOrderDetailed(@PathVariable Long orderId){
         return ResponseEntity.ok(orderTotalService.getOrderDetailsByOrderId(orderId));
     }
+  
+    @GetMapping("/order-totals-status/{id}")
+    public ResponseEntity<?> getStatus(@PathVariable Long id) {
+        Map<String,Object> map = new HashMap<>();
+        OrderTotal rs = orderTotalRepository.findById(id).get();
+        Integer status = rs.getStatus();
+        BigDecimal deposit = rs.getDeposit();
+        map.put("status",status);
+        map.put("deposit",deposit);
+        LocalDateTime x = convertTime.convertToLocalDateTime(rs.getOrderTime());
+        LocalDateTime y = convertTime.convertToLocalDateTime(rs.getEndTime());
+        String date = x.getDayOfMonth()+"/"+ x.getMonth().getValue()+"/"+x.getYear();
+        String gioan = x.getHour()+":"+x.getMinute();
+        String gionghi = y.getHour()+":"+y.getMinute();
+        map.put("start", convertTime.convertLocalDateTimeToDateUsingInstant(x));
+        map.put("end",convertTime.convertLocalDateTimeToDateUsingInstant(y));
+        map.put("gioan",gioan);
+        map.put("gionghi",gionghi);
+        map.put("ngay",date);
+        map.put("date",x.getDayOfMonth()+"/"+ x.getMonth()+"/"+x.getYear());
+        map.put("tiencoc",rs.getDeposit());
+        map.put("tongtienhoadon",rs.getAmountTotal());
+        return ResponseEntity.ok(map);
+    }
+
+    @GetMapping("/order-totals-thanhtoan/{id}")
+    public ResponseEntity<?> getThanhtoan(@PathVariable Long id) {
+        List<OrderDetails> orderDetails = orderTotalRepository.getTinhtong(id);
+        List<ThanhtoanDto> rs = new ArrayList<>();
+        for (OrderDetails x:orderDetails){
+            ThanhtoanDto dto = new ThanhtoanDto();
+            dto.setId(x.getId());
+            if (x.getAmount()==null){
+                dto.setAmountTotal(new BigDecimal("0"));
+            }else {
+                dto.setAmountTotal(x.getAmount());
+            }
+            dto.setSl(x.getQuantity());
+            if (x.getFoodDetalls().getFood().getName().length()>15){
+                dto.setFoodName(x.getFoodDetalls().getFood().getName().substring(0,15)+"...");
+            }else {
+                dto.setFoodName(x.getFoodDetalls().getFood().getName());
+            }
+            dto.setFoodSize(x.getFoodDetalls().getFoodsize());
+            BigDecimal tong ;
+            try {
+                tong=dto.getAmountTotal().multiply(new BigDecimal(dto.getSl()));
+            }catch (Exception e){
+                tong = new BigDecimal("0");
+            }
+            dto.setTongtien(tong);
+            rs.add(dto);
+        }
+        return ResponseEntity.ok(rs);
+    }
+
+    @GetMapping("/order-totals-khachden/{id}")
+    public ResponseEntity<?> xacnhanKhachden(@PathVariable Long id) {
+        try {
+            OrderTotal orderTotal = orderTotalRepository.findById(id).get();
+            orderTotal.setStatus(5);
+            orderTotalRepository.save(orderTotal);
+            return ResponseEntity.ok("SUCCESS");
+        }catch (Exception e){
+            return ResponseEntity.ok("Fail");
+        }
+    }
+
 }

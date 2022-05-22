@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -64,46 +65,42 @@ public class TableOrderService implements ITableOrderService {
         if(dto.getOrderTime() == null){
             throw new InvalidDataExeception("require field[order_time]");
         }
-        if(!tableService.isAvailable(dto.getTableId(), dto.getOrderTime())){
-            throw new InvalidDataExeception("Table are using!");
-        }
 
         Customer customer = jwtServiceUtils.getCustomerByToken(request);
+        System.out.println(customer.toString());
         if(customer == null){
             throw new InvalidDataExeception("user not login");
         }
         // create Order Total
-        OrderTotal orderTotal = orderTotalRepository.getOrderTotalByCustomerId(customer.getId());
+        OrderTotal orderTotal = new OrderTotal();
+        try {
+            orderTotal = orderTotalRepository.getOrderTotalByCustomerId(customer.getId());
+        }catch (Exception e){
+            orderTotal = null;        }
 
         if(orderTotal == null){
             OrderTotal newOrderTotal = new OrderTotal();
             newOrderTotal.setCustomer(customer);
-            Long start = convertTime.validate(dto.getOrderTime());
-            Long end =0l;
-            if (dto.getEndTime()==null){
-                end = convertTime.addHour(start,3l);
-            }else {
-                end = convertTime.validate(dto.getEndTime());
-            }
-            newOrderTotal.setOrderTime(start);
-            newOrderTotal.setEndTime(end);
+            System.out.println(dto.getOrderTime()+" |time| "+dto.getEndTime());
+            newOrderTotal.setOrderTime(convertTime.validate(dto.getOrderTime()));
+            newOrderTotal.setEndTime(convertTime.validate(dto.getEndTime()));
             newOrderTotal.setAmountTotal(new BigDecimal("0"));
-            newOrderTotal.setStatus(OrderTotalStatus.ORDERING);
+            newOrderTotal.setStatus(0);
             orderTotal = orderTotalRepository.save(newOrderTotal);
         }
 
         if(orderTotal == null){
             return null;
         }
-
+        if (orderTotal.getStatus()<3){
+            orderTotal.setOrderTime(convertTime.validate(dto.getOrderTime()));
+            orderTotal.setEndTime(convertTime.validate(dto.getEndTime()));
+        }
         dto.setOrderTotalId(orderTotal.getId());
         TableOrder tableOrder = mapper.convertToEntity(dto);
         TableOrder result = tableOrderRepository.save(tableOrder);
 
-        Tables tables = new Tables();
-        tables.setId(result.getTables().getId());
-        //tables.setStatus(1L);
-        tablesRepository.save(tables);
+        System.out.println(result.toString());
 
         return mapper.convertToDto(result);
 
@@ -114,9 +111,27 @@ public class TableOrderService implements ITableOrderService {
         Customer customer = jwtServiceUtils.getCustomerByToken(request);
         List<TableOrder> result = new ArrayList<>();
         if(customer != null && customer.getId() != null){
-            OrderTotal orderTotal = orderTotalRepository.getOrderTotalByCustomerId(customer.getId());
-            if(orderTotal != null){
-                result.addAll(orderTotal.getTableOrders());
+            try {
+                OrderTotal orderTotal = orderTotalRepository.getOrderTotalByCustomerId(customer.getId());
+                if(orderTotal != null){
+                    result.addAll(orderTotal.getTableOrders());
+                }else {
+                    OrderTotal newOrderTotal = new OrderTotal();
+                    newOrderTotal.setCustomer(customer);
+                    newOrderTotal.setStatus(0);
+                    newOrderTotal.setDeleteflag(0l);
+                    newOrderTotal.setTableOrders(new HashSet<>());
+                    orderTotalRepository.save(newOrderTotal);
+                    return new ArrayList<>();
+                }
+            }catch (Exception e){
+                OrderTotal newOrderTotal = new OrderTotal();
+                newOrderTotal.setCustomer(customer);
+                newOrderTotal.setStatus(0);
+                newOrderTotal.setDeleteflag(0l);
+                newOrderTotal.setTableOrders(new HashSet<>());
+                orderTotalRepository.save(newOrderTotal);
+                return new ArrayList<>();
             }
         }
         return mapper.convertToListDto(result);

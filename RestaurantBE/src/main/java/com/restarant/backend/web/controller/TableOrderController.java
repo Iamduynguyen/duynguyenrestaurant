@@ -51,6 +51,13 @@ public class TableOrderController {
         if (dto==null){
             return ResponseEntity.badRequest().body("chua chon ban");
         }
+
+        for (TableOrderDto x:dto){
+            System.out.println(x.toString());
+            if (x.getOrderTime()==null||x.getEndTime()==null){
+                return ResponseEntity.badRequest().body(4);
+            }
+        }
         List<TableOrderDto> result = new ArrayList<>();
         for (TableOrderDto tableOrderDto : dto) {
             try {

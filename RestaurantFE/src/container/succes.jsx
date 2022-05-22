@@ -27,9 +27,6 @@ import CreateOrder from "./container/Admin/OrderManagement/CreateOrder";
 import Custommer from "./container/Admin/CustomerManagement";
 import Staff from "./container/Admin/Staff";
 import NewStaff from "./container/Admin/Staff/NewStaff";
-import UpdateStaff from "./container/Admin/Staff/UpdateStaff";
-import History from "./container/History";
-
 // import NotFound404 from "./components/NotFound404";
 import AddFood from "./container/Admin/OrderManagement/AddFood";
 
@@ -57,11 +54,9 @@ const App = () => {
         <Route path="/menu" element={<Menu />} />
         <Route path="/menu/:id" element={<DetailFood />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/cart/:status" element={<Cart />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/user-settings" element={<UserSettings />} />
-        <Route path="/history" element={<History />} />
         <Route path="/check-out/result/:status" element={<UserSettings />} />
       </Route>
       <Route path="/admin" element={<AdminLayout />}>
@@ -74,7 +69,6 @@ const App = () => {
         <Route path="foods/fix-food/:id" element={<FixFoods />} />
         <Route path="/admin/foods/new-food" element={<NewFood />} />
         <Route path="/admin/staff/new-staff" element={<NewStaff />} />
-        <Route path="/admin/staff/update-staff/:id" element={<UpdateStaff />} />
         <Route path="tables" element={<TableAdmin />} />
         <Route path="orders" element={<ConfirmOrder />} />
         <Route

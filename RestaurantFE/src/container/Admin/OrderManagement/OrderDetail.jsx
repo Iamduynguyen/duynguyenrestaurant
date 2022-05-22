@@ -176,8 +176,8 @@ const OrderDetail = (props) => {
             key: item.id,
             price: item.amountTotal,
             customerName: item.customer ? item.customer.name : "Không có",
-            orderTime: moment(new Date(item.orderTime).toString()).format(
-              "DD/MM/YYYY hh:mm:ss"
+            orderTime: moment(new Date(item.orderTime*1000).toString()).format(
+              "DD/MM/YYYY hh:mm"
             ),
           };
         })
@@ -312,7 +312,7 @@ const OrderDetail = (props) => {
             align="right"
             width={150}
             render={(text) => {
-              if (text !== null) {
+              if (text !== null && text !== undefined) {
                 return `${text
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} %`;
@@ -327,7 +327,7 @@ const OrderDetail = (props) => {
             align="right"
             width={200}
             render={(record) => {
-              if (record !== null) {
+              if (record !== null && record.amount !== null) {
                 return `${(
                   ((parseInt(record.amount, 10) *
                     (100 - parseInt(record.discount, 10))) /

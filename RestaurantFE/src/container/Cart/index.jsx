@@ -1,29 +1,32 @@
-import { Button, Container, Divider, Grid, Paper, Stack } from "@mui/material";
+import { Button, Container, Divider, Grid, Paper, Stack,  DialogContent,
+  DialogTitle, Dialog,  DialogActions } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import BookTableAPI from "../../API/BookTableAPI";
 import OrdersAPI from "../../API/OrdersAPI";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 import ModalMessage from "../../components/Modal/ModalMessage";
+import Swal from 'sweetalert2'
 
 export default function Cart() {
   const navigate = useNavigate();
-
+  const [openOrderFood, setOpenOrderFood] = useState(false);
   const [dataUser, setDataUser] = useState([]);
   const [foodOrder, setFoodOrder] = useState([]);
   const [xacnhanBtn, setXacnhanBtn] = useState(false);
   const [datcocBtn, setDatcocBtn] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [sumPrice, setSumPrice] = useState("");
-
+  const [Orderstatus, setOrderstatus] = useState("");
+  const [payman, setpayman] = useState();
   const [sum, setSum] = useState(0);
   const [countPrice, setCountPrice] = useState([])
-
+  const [statusPay, setstatusPay] = useState("");
   const [socketUrl, setSocketUrl] = useState("localhost:8787");
   const [messageHistory, setMessageHistory] = useState([]);
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
-
+  let { status } = useParams();
   const confirmOrder1 = async (id) => {
     const res = await OrdersAPI.confirmOrder1(id);
     if (res) {
@@ -35,13 +38,59 @@ export default function Cart() {
     }
   };
 
+  const fetchpayment = async () => {
+    const data = await OrdersAPI.payman(orderId);
+    console.log(data);
+    setpayman(data)
+  }
+
+  const chapnhan = () => {
+    console.log(payman);
+    const data = payman;
+    if (data.code === '00') {
+      console.log(2)
+      if (window.vnpay) {
+          vnpay.open({width: 768, height: 600, url: x.data});
+          console.log("ok1")
+      } else {
+          window.location.href = data.data;
+          console.log("ok2")
+      }
+      setOpenOrderFood(false);
+  }
+  };
+
   const discount = (price, discount) => {
     return (parseInt(price, 10) * (100 - parseInt(discount, 10))) / 100;
+  };
+  const datcoc = async () => {
+    fetchpayment();
+    setOpenOrderFood(true);
   };
 
   const fetchData = async () => {
     const res = await BookTableAPI.getUserBookTable();
+    const resOrder= await BookTableAPI.getStatusOrder(res[0].orderTotalId)
+    let status1= resOrder.status;
     console.log(res);
+    console.log(resOrder);
+    if(status1==0){
+      setOrderstatus("Vừa thêm vào")
+    } else if(status1==1){
+      setOrderstatus("Chờ xác nhận")
+    }
+    else if(status1==2){
+      setOrderstatus("Chờ đặt cọc")
+    }
+    else if(status1==3){
+      setOrderstatus("Chờ xác nhận đặt cọc")
+    }
+    else if(status1==4){
+      setOrderstatus("Chờ bạn đến nhà hàng")
+    }
+    else if(status1==5){
+      setOrderstatus("Đang ăn")
+    }
     if (res.length !== 0) {
       setDataUser(res);
 
@@ -73,13 +122,29 @@ export default function Cart() {
       if(countXacnhan > 0) {
         setXacnhanBtn(true);
       }
-      if(countDatcoc > 0) {
+      if(true) {
         setDatcocBtn(true);
       }
     }
   };
 
   useEffect(() => {
+    console.log(status);
+    if(status==='SUCCESS'){
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Thanh toán đơn hàng thành công',
+        icon: 'succes',
+        confirmButtonText: 'Đóng'
+      })
+    }else  if(status==='FAIL'){
+      Swal.fire({
+        title: 'Lỗi!',
+        text: 'Thanh toán thất bại',
+        icon: 'error',
+        confirmButtonText: 'Đóng'
+      })
+    }
     fetchData();
   }, []);
   // var stompClient = require('./websocket-listener')
@@ -197,6 +262,9 @@ export default function Cart() {
             <Grid item xs={4}>
               <Paper elevation={24}>
                 <Stack spacing={2} p={2}>
+                <p style={{ textAlign: "center" , fontWeight: 'bold', color : 'green',fontSize: 'large'}} className="cart-text">
+                    Trạng thái: {Orderstatus}
+                  </p>
                   <p style={{ textAlign: "center" }} className="cart-text">
                     Chi tiết hoá đơn:
                   </p>
@@ -236,7 +304,7 @@ export default function Cart() {
                     <Divider />
                     {datcocBtn && (<Box id="datcoc" width="100%" textAlign="center">
                       <Button
-                        onClick={() => confirmOrder1(orderId)}
+                        onClick={() => datcoc()}
                         variant="contained"
                         color="info"
                         size="big"
@@ -270,6 +338,19 @@ export default function Cart() {
             </Grid>
           </Grid>
         </Container>
+      )}
+        {openOrderFood && (
+        <Dialog open={openOrderFood} onClose={() => setOpenOrderFood(false)}>
+          <DialogTitle sx={{ textAlign: "center",width : '550px',height: '270px', backgroundColor: 'LightYellow' }}>
+            <h2 style={{ textAlign: "center",color :'black',fontWeight: 'bold'}}>Xac nhan dat coc</h2>
+          </DialogTitle>
+          <DialogActions>
+            <Button onClick={() => setOpenOrderFood(false)}  >Disagree</Button>
+            <Button  onClick={() => chapnhan()} autoFocus>
+              Agree
+            </Button>
+          </DialogActions>
+        </Dialog>
       )}
     </>
   );

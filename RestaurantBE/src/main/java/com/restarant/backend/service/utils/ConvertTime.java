@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.TimeZone;
 
 @Service
@@ -17,6 +18,16 @@ public class ConvertTime {
         System.out.println(time);
         return time;
     }
+
+    public Date convertLocalDateTimeToDateUsingInstant(LocalDateTime dateToConvert) {
+        return java.util.Date
+                .from(dateToConvert.atZone(ZoneId.systemDefault())
+                        .toInstant());
+    }
+
+//    public Date convertTodate(Long x){
+//        return new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date (x));
+//    }
 
     public LocalDateTime convertToLocalDateTime(Long time){
         LocalDateTime result = LocalDateTime.ofInstant(Instant.ofEpochSecond(time),

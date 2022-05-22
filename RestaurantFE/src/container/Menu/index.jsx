@@ -23,31 +23,66 @@ import MenuHeaderImage from "../../assets/MenuHeader.jpg";
 import SubHeading from "../../components/SubHeading/SubHeading";
 import styles from "./menu.module.css";
 import "./style.css";
+import CategoryAPI from "../../API/CategoriesAPI";
 
 export default function Menu() {
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
   const [FoodsData, setFoodsData] = useState([]);
   const [NumberPage, setNumberPage] = useState(0);
   const [page, setPage] = useState(0);
+  const [query, setquery] = useState('');
   const discount = (price, discount) => {
     return (parseInt(price, 10) * (100 - parseInt(discount, 10))) / 100;
+  };
+  const params = {
+    page: page,
+    size: 6,
   };
   const handleChangePage = (e, value) => {
     setPage(value - 1);
     window.scrollTo(0, 500);
   };
+  const fetchData = async () => {
+    const res = await FoodsApi.getAllFoods(params);
+    setFoodsData(res);
+    console.log(res);
+    const res1 = await FoodsApi.getPageFoods();
+    setNumberPage(Math.floor(res1.totalElement / 6 + 1));
+  };
+
+  const changeData = async (query) => {
+    const res = await FoodsApi.getByquery(query,params);
+    setFoodsData(res);
+    console.log(res);
+    const res1 = await FoodsApi.getPageFoods();
+    setNumberPage(Math.floor(res1.totalElement / 6 + 1));
+  };
+
+  const search = (e) => {
+    var query = e.target.value;
+    console.log(query);
+    if(query===''){
+      fetchData();
+    }else{
+      changeData(query);
+    }
+  };
+
+  const choseCategory = (id) => {
+    if(id<0){
+      fetchData();
+    }else{
+      changeData(id);
+    }
+  };
+
+  const fetchcategory = async () => {
+    const res = await CategoryAPI.getAllCategories();
+    setCategories(res);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const params = {
-        page: page,
-        size: 6,
-      };
-      const res = await FoodsApi.getAllFoods(params);
-      setFoodsData(res);
-      console.log(res);
-      const res1 = await FoodsApi.getPageFoods();
-      setNumberPage(Math.floor(res1.totalElement / 6 + 1));
-    };
+    fetchcategory();
     fetchData();
   }, [page]);
   return (
@@ -109,7 +144,26 @@ export default function Menu() {
         </p>
       </Box>
       <Container>
-        <Grid container spacing={5} mt={4}>
+      <div className="container-categories">
+           <button onClick={()=>choseCategory(-1)}>
+                TẤT CẢ
+              </button>
+              {categories.map((e) => {
+                return (
+                  <button
+                  onClick={()=>choseCategory(e.id)}
+                    key={e.id}>
+                    {e.name}
+                  </button>
+                );
+              })}
+              <input style={{width:'250px',boxSizing:'border-box', border:'solid white 2px', backgroundColor:'white', paddingLeft:'10px',marginLeft:'120px',borderRadius:'8px'}}
+              className='form-control' onChange={(Event)=>search(Event)} type="text" placeholder="nhập ..." />
+            </div>
+            <div>
+              
+            </div>
+        <Grid container spacing={5} mt={4} >
           {FoodsData?.map((item, index) => (
             <Grid item key={index} md={4} sm={6} xs={12}>
               <Card
@@ -128,6 +182,7 @@ export default function Menu() {
                 ) : null}
                 <div className="block_img">
                   <CardMedia
+                  onClick={() => navigate(`/menu/${item.id}`)}
                     className={styles.CardFoodMedia}
                     component="img"
                     height="220"

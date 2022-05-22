@@ -94,8 +94,10 @@ public class FoodController {
         log.debug("REST request to get all Foods");
         List<FoodDto> result = foodservice.getAll(pageable);
         for (FoodDto x:result){
-            if (x.getFoodDetails().size()>0){
-                x.setAvtUrl(x.getFoodDetails().get(0).getFoodMedias().get(0).getFoodUrl());
+            if (!x.getFoodDetails().isEmpty()){
+                if(!x.getFoodDetails().get(0).getFoodMedias().isEmpty()) {
+                    x.setAvtUrl(x.getFoodDetails().get(0).getFoodMedias().get(0).getFoodUrl());
+                }
             }
         }
         return ResponseEntity.ok(result);

@@ -18,7 +18,7 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface FoodRepository extends JpaRepository<Food, Long> {
-    @Query("select f from Food f where f.name = :query or f.category.name = :query or f.title = :query")
+    @Query("select f from Food f where UPPER(f.name) like CONCAT('%',:query,'%') or UPPER(f.category.name) like CONCAT('%',:query,'%') or UPPER(f.title) like CONCAT('%',:query,'%')")
     Page<Food> getByQuery(Pageable pageable,@Param("query") String query);
 
     @Query("select f from Food f where f.category.id = :query")

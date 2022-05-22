@@ -45,7 +45,7 @@ public class TableOrderController {
     OrderTotalRepository orderTotalRepository;
 
     @Autowired
-    TableOrderRepository tablesRepository;
+    TableOrderRepository tablesOderRepository;
 
     @Autowired
     OrderTotalService orderTotalService;
@@ -162,10 +162,10 @@ public class TableOrderController {
 //     */
     @DeleteMapping("/table-orders/{id}")
     public ResponseEntity<?> deleteTableOrder(@PathVariable Long id) {
-        TableOrder tableOrder = tablesRepository.findById(id).get();
+        TableOrder tableOrder = tablesOderRepository.findById(id).get();
         OrderTotal orderTotal = tableOrder.getOrderTotal();
         try {
-                orderTotalRepository.deleteById(id);
+                tablesOderRepository.deleteById(id);
                 List<OrderDetails> orderDetails = orderDetailsRepository.getByOrderTableId(id);
                 orderDetailsRepository.deleteAll(orderDetails);
                 orderTotalService.tinhtongtien(orderTotal);

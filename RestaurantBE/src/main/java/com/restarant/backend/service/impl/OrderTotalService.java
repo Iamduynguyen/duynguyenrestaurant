@@ -414,24 +414,33 @@ public class OrderTotalService implements IOrderTotalService {
                 orderTotal.setNote("nhân viên " + staffID + " đã xác nhận đơn hàng không yêu cầu đặt cọc");
                 List<OrderDetails> lst1 = orderTotalRepository.getOrderdetailbyTotalAndStatus(orderTotal.getId(), 1);
                 for (OrderDetails x : lst1) {
+                    BigDecimal dis = x.getFoodDetalls().getAmount().multiply(x.getFoodDetalls().getDiscount()).divide(new BigDecimal("100"));
+                    BigDecimal giam = x.getFoodDetalls().getAmount().subtract(dis);
+                    x.setAmount(giam);
                     x.setStatus(2);
-                    x.setAmount(x.getFoodDetalls().getAmount().subtract(x.getFoodDetalls().getDiscount()));
+                    orderDetailsRepository.save(x);
                 }
                 orderTotalRepository.save(orderTotal);
                 changeTable(orderTotal);
-                orderDetailsRepository.saveAll(lst1);
+                tinhtongtien(orderTotal);
             } else {
                 orderTotal.setStatus(2);
                 List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(orderTotal.getId(), 1);
-                lst.forEach(o -> o.setStatus(2));
+                for (OrderDetails x : lst) {
+                    BigDecimal dis = x.getFoodDetalls().getAmount().multiply(x.getFoodDetalls().getDiscount()).divide(new BigDecimal("100"));
+                    BigDecimal giam = x.getFoodDetalls().getAmount().subtract(dis);
+                    x.setAmount(giam);
+                    x.setStatus(2);
+                    orderDetailsRepository.save(x);
+                }
                 orderTotal.setNote("nhân viên " + staffID + " đã yêu cầu đặt cọc " + request.getDeposit().toString() + " vnđ");
                 orderTotalRepository.save(orderTotal);
                 changeTable(orderTotal);
-                orderDetailsRepository.saveAll(lst);
                 msg = " Mong quý khách để ý để đặt cọc bàn, số tiền  là" + request.getDeposit().toString();
+                tinhtongtien(orderTotal);
             }
             MailDto mailDto = new MailDto();
-            mailDto.setTo(orderTotal.getCustomer().getEmail());
+            mailDto.setTo(orderTotal.getCustomer().getName());
             mailDto.setBody("Chúng tôi đã xác nhận đặt bàn của quý khách." + msg + ". <br> Mọi thắc mắc xin liên hệ  hotline : 0978825572. xin cảm ơn");
             mailDto.setSubject("Xác nhận đơn hành thành công");
             mailDto.setFrom("admin@gmail.com");
@@ -603,9 +612,6 @@ public class OrderTotalService implements IOrderTotalService {
             return false;
         }
         for (OrderDetails x : lst) {
-            BigDecimal dis = x.getFoodDetalls().getAmount().multiply(x.getFoodDetalls().getDiscount()).divide(new BigDecimal("100"));
-            BigDecimal giam = x.getFoodDetalls().getAmount().subtract(dis);
-            x.setAmount(giam);
             x.setStatus(1);
         }
         orderDetailsRepository.saveAll(lst);

@@ -25,6 +25,10 @@ const TableAPI = {
         const url = `/api/tables/${id}`;
         return axiosClient.delete(url);
     },
+    getTableDetail: (id) => {
+        const url = `/api/tables/${id}`;
+        return axiosClient.get(url);
+    },
 };
 
 export default TableAPI;

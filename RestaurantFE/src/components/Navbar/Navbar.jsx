@@ -95,7 +95,7 @@ const Navbar = () => {
                   Lịch sử đặt bàn
                 </Link>
               </li>
-              {getKey("role") === "ROLE_ADMIN" ? (
+              {getKey("role") === "ROLE_ADMIN" || getKey("role") === "ROLE_STAFF" ? (
                 <>
                   <li className="py-[10px] ">
                     <Link to="/admin" className="w-full block">

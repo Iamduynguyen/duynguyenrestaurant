@@ -1,18 +1,34 @@
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import OrdersAPI from "../../../API/OrdersAPI";
 import { Row, Table, Button as message } from "antd";
 import ModalMessage from "../../../components/Modal/ModalMessage";
+import Modal from "react-modal";
 import Swal from "sweetalert2";
 
+const modalStyle = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    width: "600px",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
 export default function FoodsAdmin(props) {
-  const [loading, setLoading] = useState(true);
-  const [tableData, setTableData] = useState([]);
   const navigation = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [tableData, setTableData] = useState([]);
+  const [noteModal, setNoteModal] = useState("");
   let tempVoucherId = "";
 
   const [resetData, setResetData] = useState(false);
@@ -201,6 +217,10 @@ export default function FoodsAdmin(props) {
     navigation(`${data.orderId}/${data.tablesId}`);
   };
 
+  const onModalClose = () => {
+    setModalIsOpen(false);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const res = await OrdersAPI.getAllOrders();
@@ -260,11 +280,24 @@ export default function FoodsAdmin(props) {
           />
           <Table.Column
             title="Mã hoá đơn"
-            dataIndex="orderId"
+            // dataIndex="orderId"
             key="orderId"
             align="center"
             width={100}
             sorter={(a, b) => a.orderId - b.orderId}
+            render={(record) => {
+              return (
+                <Button
+                  style={{ textDecoration: "underline" }}
+                  color="primary"
+                  onClick={() => {
+                    setModalIsOpen(true), setNoteModal(record.note);
+                  }}
+                >
+                  {record.orderId}
+                </Button>
+              );
+            }}
           />
           <Table.Column
             title="Khách hàng"
@@ -430,6 +463,27 @@ export default function FoodsAdmin(props) {
           />
         </Table>
       </Row>
+
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={onModalClose}
+        style={modalStyle}
+        ariaHideApp={false}
+        contentLabel="Note"
+      >
+        <div className="header">
+          <h1>Chi tiết món ăn</h1>
+          <IconButton
+            aria-label="delete"
+            size="small"
+            style={{ width: "30px", height: "30px" }}
+            onClick={onModalClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </div>
+        <div>{noteModal}</div>
+      </Modal>
     </>
   );
 }

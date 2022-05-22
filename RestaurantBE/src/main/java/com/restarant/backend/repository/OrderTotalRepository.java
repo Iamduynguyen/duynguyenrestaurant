@@ -37,8 +37,13 @@ public interface OrderTotalRepository extends JpaRepository<OrderTotal, Long> {
     @Query("select o from OrderTotal o where o.vnpay_id=?1")
     OrderTotal findByVnpay_id(String vnpayId);
 
-    @Query("select o from OrderDetails o where o.tableOrder.orderTotal.id=:id group by o.foodDetalls")
-    List<OrderDetails> getFoodByOder(@Param("id")Long id);
+    @Query("SELECT o FROM OrderTotal o WHERE o.customer.id = :id")
+    List<OrderTotal> getAllOrderTotalByCustomerId(Long id);
+
+    @Query("select o from OrderDetails o where o.tableOrder.orderTotal.id=:id and o.status=2")
+    List<OrderDetails> getTinhtong(@Param("id")Long id);
+  
     @Query("select o from OrderTotal o where o.status>0 order by o.orderTime desc ")
     List<OrderTotal> getAllBysort();
+
 }

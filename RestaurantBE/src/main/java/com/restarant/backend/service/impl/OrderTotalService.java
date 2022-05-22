@@ -7,6 +7,7 @@ import com.restarant.backend.model.OrderTotalStatus;
 import com.restarant.backend.repository.*;
 import com.restarant.backend.service.IOrderTotalService;
 import com.restarant.backend.service.mapper.IConverterDto;
+import com.restarant.backend.service.utils.ConvertTime;
 import com.restarant.backend.service.utils.JwtServiceUtils;
 import com.restarant.backend.service.utils.MailDto;
 import com.restarant.backend.service.utils.MailUtils;
@@ -26,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -38,11 +41,16 @@ public class OrderTotalService implements IOrderTotalService {
     @Autowired
     private VoucherRepository voucherRepository;
     @Autowired
-    IConverterDto<Customer,CustomerDto> mapperCus;
+    IConverterDto<Customer, CustomerDto> mapperCus;
     @Autowired
     private MailUtils mailUtils;
+
+    @Autowired
+    private ConvertTime convertTime;
     @Autowired
     private JwtServiceUtils jwtServiceUtils;
+    @Autowired
+    ConvertTime convertTime;
     @Autowired
     TableService tableService;
     private final OrderTotalRepository orderTotalRepository;
@@ -74,6 +82,7 @@ public class OrderTotalService implements IOrderTotalService {
 
     @Override
     public OrderTotalDto update(Long id, OrderTotalDto dto) throws InvalidDataExeception {
+
         return null;
     }
 
@@ -99,18 +108,19 @@ public class OrderTotalService implements IOrderTotalService {
 
     @Override
     public String confirmCustomerGoRestaurant(Long id) throws InvalidDataExeception {
-        OrderTotal orderTotal =  orderTotalRepository.getById(id);
-        if(Objects.isNull(orderTotal)){
+        OrderTotal orderTotal = orderTotalRepository.getById(id);
+        if (Objects.isNull(orderTotal)) {
             throw new InvalidDataExeception("Vui lòng thử lại.");
         }
         orderTotal.setStatus(5);
-        try{
-           orderTotalRepository.save(orderTotal);
-        }catch (Exception e){
+        try {
+            orderTotalRepository.save(orderTotal);
+        } catch (Exception e) {
             return "FAIL";
         }
         return "SUCCESS";
     }
+
     @Override
     public List<GetAllToTalOrder> getAllOrderTotal() {
         Type type = new TypeToken<List<GetAllToTalOrder>>() {
@@ -160,65 +170,74 @@ public class OrderTotalService implements IOrderTotalService {
 
     @Override
     public String paymentVnpay(HttpServletRequest request, Long toTalOrderid) throws IOException {
-        OrderTotal orderTotal =orderTotalRepository.getById(toTalOrderid);
-        if(Objects.isNull(orderTotal.getId())){
+        OrderTotal orderTotal = orderTotalRepository.getById(toTalOrderid);
+        if (Objects.isNull(orderTotal.getId())) {
             return "FAIL";
         }
-        String vnpay_id= Config.getRandomNumber(8);
+        String vnpay_id = Config.getRandomNumber(8);
         orderTotal.setVnpay_id(vnpay_id);
-        try{
+        try {
             orderTotalRepository.save(orderTotal);
-        }catch (Exception e){
+        } catch (Exception e) {
             return "FAIL";
         }
-        return VNPAYService.payments(orderTotal.getDeposit().intValue(),vnpay_id,request);
+        return VNPAYService.payments(orderTotal.getDeposit().intValue(), vnpay_id, request);
     }
 
     @Override
-    public String checkOutVnpay(String bankStatus, String bankTransactionId){
-        OrderTotal orderTotal= orderTotalRepository.findByVnpay_id(bankTransactionId);
-        if(Objects.isNull(orderTotal)){
+    public String checkOutVnpay(String bankStatus, String bankTransactionId) {
+        OrderTotal orderTotal = orderTotalRepository.findByVnpay_id(bankTransactionId);
+        if (Objects.isNull(orderTotal)) {
             return "FAIL";
         }
         if (StringUtils.equalsIgnoreCase(bankStatus, "00")) {
             orderTotal.setStatus(4);
+            orderTotal.setAmountTotal(tinhtongtien(orderTotal));
             orderTotalRepository.save(orderTotal);
             return "SUCCESS";
-        }else {
+        } else {
             return "FAIL";
         }
 
     }
 
+    public BigDecimal tinhtongtien(OrderTotal x) {
+        List<OrderDetails> lst = orderTotalRepository.getTinhtong(x.getId());
+        BigDecimal tong = new BigDecimal("0");
+        for (OrderDetails j : lst) {
+            tong = tong.add(j.getAmount());
+        }
+        return tong;
+    }
 
 
-    public Boolean changeTable(OrderTotal orderTotal){
+    public Boolean changeTable(OrderTotal orderTotal) {
         System.out.println(orderTotal.toString1());
         List<Tables> tables = new ArrayList<>();
         List<TableOrder> tableOrders = new ArrayList<>();
-        for (TableOrder x:orderTotal.getTableOrders()){
+        for (TableOrder x : orderTotal.getTableOrders()) {
             tableOrders.add(x);
             tables.add(x.getTables());
         }
 
-        List<TableDto> tableDtos = tableService.getbytime(orderTotal.getOrderTime(),orderTotal.getEndTime());
-        System.out.println("solouongban"+tableDtos.size());
+        List<TableDto> tableDtos = tableService.getbytime(orderTotal.getOrderTime(), orderTotal.getEndTime());
+        System.out.println("solouongban" + tableDtos.size());
         List<Long> tbIdActive = new ArrayList<>();
-        for (TableDto x:tableDtos){
-            if (x.getStatus()==0){
+        for (TableDto x : tableDtos) {
+            if (x.getStatus() == 0) {
                 tbIdActive.add(x.getId());
-                System.out.println("ban trong "+x.getId());
+                System.out.println("ban trong " + x.getId());
             }
         }
-        int i= 0;
-        int j= 0;
-        for (TableDto t:tableDtos){
-            for (Tables q:tables){
-                if (t.getStatus()==1){
-                    System.out.println("ban k trong "+t.getId());
-                    if (q.getId()==t.getId()){
-                        System.out.println("loi ban "+t.getId());
-                        if (j>tbIdActive.size()){
+        int i = 0;
+        int j = 0;
+        for (TableDto t : tableDtos) {
+            for (Tables q : tables) {
+                if (t.getStatus() == 1) {
+                    System.out.println("ban k trong " + t.getId());
+                    if (q.getId() == t.getId()) {
+                        System.out.println("loi ban " + t.getId());
+                        if (j > tbIdActive.size()) {
                             System.out.println("fail");
                             return false;
                         }
@@ -226,8 +245,8 @@ public class OrderTotalService implements IOrderTotalService {
                         TableOrder k = tableOrders.get(i);
                         k.setTables(newTb);
                         tableOrderRepository.save(k);
-                        orderTotal.setNote("Tự động thay đổi số bàn "+t.getId()+" thành số bàn "+newTb.getId());
-                        System.out.println("Tự động thay đổi số bàn "+t.getId()+" thành số bàn "+newTb.getId());
+                        orderTotal.setNote("Tự động thay đổi số bàn " + t.getId() + " thành số bàn " + newTb.getId());
+                        System.out.println("Tự động thay đổi số bàn " + t.getId() + " thành số bàn " + newTb.getId());
                         orderTotalRepository.save(orderTotal);
                         j++;
                     }
@@ -242,8 +261,9 @@ public class OrderTotalService implements IOrderTotalService {
         try {
             Date now = new Date();
             OrderTotal orderTotal = new OrderTotal();
-            orderTotal.setCreatedAt(now.getTime());
-            orderTotal.setOrderTime(now.getTime());
+            orderTotal.setCreatedAt(convertTime.validate(System.currentTimeMillis()));
+            orderTotal.setOrderTime(convertTime.validate(System.currentTimeMillis()));
+            orderTotal.setEndTime(convertTime.addHour(orderTotal.getOrderTime(),3l));
             orderTotal.setStatus(5);
             // todo tạm bỏ
             orderTotal.setNote("Người tạo hóa đơn là : " + jwtServiceUtils.getUserName(request));
@@ -284,7 +304,7 @@ public class OrderTotalService implements IOrderTotalService {
             foodDetails = foodDetallsRepository.findById(foodCouter.getFoodId()).get();
             orderDetails.setFoodDetalls(foodDetails);
             orderDetails.setAmount(foodDetails.getAmount().subtract(foodDetails.getDiscount()));
-//                    orderDetails.setStatus(5);
+                    orderDetails.setStatus(2);
             orderDetailsList.add(orderDetails);
 //                    orderDetailsRepository.save(orderDetails);
         }
@@ -354,13 +374,13 @@ public class OrderTotalService implements IOrderTotalService {
             if (Objects.nonNull(orderTotal)) {
                 orderTotal.setStatus(2);
                 List<OrderDetails> lst = orderDetailsRepository.getByOrdertotalId(orderTotal.getId());
-                for (OrderDetails x:lst){
-                    if (x.getStatus()==1){
+                for (OrderDetails x : lst) {
+                    if (x.getStatus() == 1) {
                         x.setStatus(2);
                     }
                 }
                 orderDetailsRepository.saveAll(lst);
-                orderTotal.setNote("Người xác nhận đơn hàng :"+ jwtServiceUtils.getUserName(request));
+                orderTotal.setNote("Người xác nhận đơn hàng :" + jwtServiceUtils.getUserName(request));
                 orderTotalRepository.save(orderTotal);
                 MailDto mailDto = new MailDto();
                 mailDto.setTo(orderTotal.getCustomer().getEmail());
@@ -377,36 +397,36 @@ public class OrderTotalService implements IOrderTotalService {
     }
 
     @Override
-    public String confirmDepositOnline(ConfirmDepositOnline request,HttpServletRequest req) {
+    public String confirmDepositOnline(ConfirmDepositOnline request, HttpServletRequest req) {
         String staffID = jwtServiceUtils.getUserName(req);
         try {
             String msg = "";
             OrderTotal orderTotal = orderTotalRepository.getById(request.getId());
             orderTotal.setDeposit(request.getDeposit());
-            if(request.getDeposit().intValue()==0){
+            if (request.getDeposit().intValue() == 0) {
                 orderTotal.setStatus(4);
-                orderTotal.setNote("nhân viên "+staffID+" đã xác nhận đơn hàng không yêu cầu đặt cọc");
-                List<OrderDetails> lst1 = orderTotalRepository.getOrderdetailbyTotalAndStatus(orderTotal.getId(),1);
-                for (OrderDetails x:lst1){
+                orderTotal.setNote("nhân viên " + staffID + " đã xác nhận đơn hàng không yêu cầu đặt cọc");
+                List<OrderDetails> lst1 = orderTotalRepository.getOrderdetailbyTotalAndStatus(orderTotal.getId(), 1);
+                for (OrderDetails x : lst1) {
                     x.setStatus(2);
                     x.setAmount(x.getFoodDetalls().getAmount().subtract(x.getFoodDetalls().getDiscount()));
                 }
                 orderTotalRepository.save(orderTotal);
                 changeTable(orderTotal);
                 orderDetailsRepository.saveAll(lst1);
-            }else {
+            } else {
                 orderTotal.setStatus(2);
-                List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(orderTotal.getId(),1);
-                lst.forEach(o->o.setStatus(2));
-                orderTotal.setNote("nhân viên "+staffID+" đã yêu cầu đặt cọc "+request.getDeposit().toString()+" vnđ");
+                List<OrderDetails> lst = orderTotalRepository.getOrderdetailbyTotalAndStatus(orderTotal.getId(), 1);
+                lst.forEach(o -> o.setStatus(2));
+                orderTotal.setNote("nhân viên " + staffID + " đã yêu cầu đặt cọc " + request.getDeposit().toString() + " vnđ");
                 orderTotalRepository.save(orderTotal);
                 changeTable(orderTotal);
                 orderDetailsRepository.saveAll(lst);
-                msg=" Mong quý khách để ý để đặt cọc bàn, số tiền  là"+request.getDeposit().toString();
+                msg = " Mong quý khách để ý để đặt cọc bàn, số tiền  là" + request.getDeposit().toString();
             }
             MailDto mailDto = new MailDto();
             mailDto.setTo(orderTotal.getCustomer().getEmail());
-            mailDto.setBody("Chúng tôi đã xác nhận đặt bàn của quý khách."+msg+". <br> Mọi thắc mắc xin liên hệ  hotline : 0978825572. xin cảm ơn");
+            mailDto.setBody("Chúng tôi đã xác nhận đặt bàn của quý khách." + msg + ". <br> Mọi thắc mắc xin liên hệ  hotline : 0978825572. xin cảm ơn");
             mailDto.setSubject("Xác nhận đơn hành thành công");
             mailDto.setFrom("admin@gmail.com");
             mailUtils.send(mailDto);
@@ -517,6 +537,50 @@ public class OrderTotalService implements IOrderTotalService {
         return total;
     }
 
+    @Override
+    public List<OrderHistoryDto> getHistoryOrder(Long customerId) {
+        List<OrderHistoryDto> orderHistorys = new ArrayList<>();
+        List<OrderTotal> orderTotals = orderTotalRepository.getAllOrderTotalByCustomerId(customerId);
+        orderTotals.forEach(o -> {
+            OrderHistoryDto orderHistoryDto = new OrderHistoryDto();
+            StringBuilder orderTables = new StringBuilder();
+            LocalDateTime startTime = convertTime.convertToLocalDateTime(o.getOrderTime());
+            orderHistoryDto.setDate(startTime.getDayOfMonth() + "/" + startTime.getMonthValue() + "/" + startTime.getYear());
+            LocalDateTime endTime = convertTime.convertToLocalDateTime(o.getEndTime());
+            orderHistoryDto.setStartTime(startTime.getHour() + ":" + startTime.getMinute());
+            orderHistoryDto.setEndTime(endTime.getHour() + ":" + endTime.getMinute());
+            orderHistoryDto.setId(o.getId());
+            o.getTableOrders().forEach(t -> {
+                orderTables.append(t.getTables().getId() + ", ");
+            });
+            orderHistoryDto.setTables(orderTables.toString().substring(0, orderTables.length()-2));
+            orderHistoryDto.setAmountTotal(o.getAmountTotal().toString());
+            orderHistoryDto.setPaymentType(o.getVnpay_id() == null ? "Tiền mặt" : "Thanh toán thẻ");
+            orderHistoryDto.setId(o.getId());
+            orderHistorys.add(orderHistoryDto);
+        });
+        return orderHistorys;
+    }
+
+    @Override
+    public List<OrderHistoryDetailDto> getOrderDetailsByOrderId(Long orderId) {
+        List<OrderHistoryDetailDto> orderHistoryDetailDtos = new ArrayList<>();
+        List<TableOrder> tableOrders = tableOrderRepository.getAllByTotalId(orderId);
+        tableOrders.forEach(o -> {
+            List<OrderDetails> orderDetails = orderDetailsRepository.getByOrderTableId(o.getId());
+            orderDetails.forEach(a -> {
+                orderHistoryDetailDtos.add(OrderHistoryDetailDto.builder()
+                        .tableId(String.valueOf(o.getTables().getId()))
+                        .foodName(a.getFoodDetalls().getFood().getName())
+                        .foodImage(a.getFoodDetalls().getFoodMedias().get(0).getFoodurl())
+                        .quantity(a.getQuantity() == null ? "0" : a.getQuantity().toString())
+                        .amount(a.getAmount() == null ? "0" : a.getAmount().toString())
+                        .build());
+            });
+        });
+        return orderHistoryDetailDtos;
+    }
+
 
     public Boolean customerConfirm1(Long id) {
         OrderTotal orderTotal = orderTotalRepository.findById(id).get();
@@ -528,27 +592,33 @@ public class OrderTotalService implements IOrderTotalService {
         } else if (lst == null) {
             return false;
         }
-        List<Long> ids= new ArrayList<>();
-        if (orderTotal.getStatus()>3){
-            for (OrderDetails y:lst2){
+        List<Long> ids = new ArrayList<>();
+        if (orderTotal.getStatus() > 3) {
+            for (OrderDetails y : lst2) {
                 for (OrderDetails x : lst) {
                     x.setStatus(2);
                     x.setAmount(x.getFoodDetalls().getAmount().subtract(x.getFoodDetalls().getDiscount()));
-                    if (y.getFoodDetalls().getId()==x.getFoodDetalls().getId()){
-                        if (y.getAmount()==x.getAmount()){
-                            y.setQuantity(y.getQuantity()+x.getQuantity());
+                    if (y.getFoodDetalls().getId() == x.getFoodDetalls().getId()&&y.getAmount() == x.getAmount()) {
+                            y.setQuantity(y.getQuantity() + x.getQuantity());
                             ids.add(x.getId());
-                        }
+                    }else {
+                        BigDecimal dis = x.getFoodDetalls().getAmount().multiply(x.getFoodDetalls().getDiscount()).divide(new BigDecimal("100"));
+                        BigDecimal giam = x.getFoodDetalls().getAmount().subtract(dis);
+                        x.setAmount(giam);
+                        x.setStatus(2);
                     }
                 }
             }
-        }else {
+        } else {
             for (OrderDetails x : lst) {
+                BigDecimal dis = x.getFoodDetalls().getAmount().multiply(x.getFoodDetalls().getDiscount()).divide(new BigDecimal("100"));
+                BigDecimal giam = x.getFoodDetalls().getAmount().subtract(dis);
+                x.setAmount(giam);
                 x.setStatus(1);
             }
         }
         orderDetailsRepository.saveAll(lst);
-        for (Long x:ids){
+        for (Long x : ids) {
             orderTotalRepository.deleteById(x);
         }
         orderTotal.setStatus(1);
@@ -666,14 +736,14 @@ public class OrderTotalService implements IOrderTotalService {
         return true;
     }
 
-    public List<OrderTotalDto> getbystatus(Integer status){
+    public List<OrderTotalDto> getbystatus(Integer status) {
         System.out.println(status);
         List<OrderTotal> orderTotalList = orderTotalRepository.getBystaus(status);
-        if (orderTotalList==null){
+        if (orderTotalList == null) {
             return null;
         }
         List<OrderTotalDto> rs = new ArrayList<>();
-        for (OrderTotal x:orderTotalList){
+        for (OrderTotal x : orderTotalList) {
             OrderTotalDto a = new OrderTotalDto();
             a.setId(x.getId());
             a.setAmountTotal(x.getAmountTotal());
@@ -687,35 +757,35 @@ public class OrderTotalService implements IOrderTotalService {
         return rs;
     }
 
-    private String convert(Integer x){
+    private String convert(Integer x) {
         OrderDetails entity = new OrderDetails();
         entity.setStatus(x);
         OrderDetailsDto dto = new OrderDetailsDto();
-        if (entity.getStatus()==0){
+        if (entity.getStatus() == 0) {
             dto.setStatus("Vừa thêm vào");
         }
-        if (entity.getStatus()==1){
+        if (entity.getStatus() == 1) {
             dto.setStatus("chờ xác nhận");
         }
-        if (entity.getStatus()==2){
+        if (entity.getStatus() == 2) {
             dto.setStatus("Đã xác nhận");
         }
-        if (entity.getStatus()==3){
+        if (entity.getStatus() == 3) {
             dto.setStatus("chờ đặt cọc");
         }
-        if (entity.getStatus()==4){
+        if (entity.getStatus() == 4) {
             dto.setStatus("chờ xác nhận cọc tiền");
         }
-        if (entity.getStatus()==5){
+        if (entity.getStatus() == 5) {
             dto.setStatus("Sắp mang ra");
         }
-        if (entity.getStatus()==6){
+        if (entity.getStatus() == 6) {
             dto.setStatus("Đang ăn");
         }
-        if (entity.getStatus()==5){
+        if (entity.getStatus() == 5) {
             dto.setStatus("Đã thanh toán");
         }
-        if (entity.getStatus()==6){
+        if (entity.getStatus() == 6) {
             dto.setStatus("Nhà hàng hủy");
         }
         return dto.getStatus();

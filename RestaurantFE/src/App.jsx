@@ -29,6 +29,7 @@ import Staff from "./container/Admin/Staff";
 import NewStaff from "./container/Admin/Staff/NewStaff";
 import UpdateStaff from "./container/Admin/Staff/UpdateStaff";
 import NotFound404 from "./components/NotFound404";
+import History from "./container/History";
 import AddFood from "./container/Admin/OrderManagement/AddFood";
 
 const MuiTheme = createTheme({
@@ -59,6 +60,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/user-settings" element={<UserSettings />} />
+        <Route path="/history" element={<History />} />
         <Route path="/check-out/result/:status" element={<UserSettings />} />
       </Route>
       <Route path="/admin" element={<AdminLayout />}>

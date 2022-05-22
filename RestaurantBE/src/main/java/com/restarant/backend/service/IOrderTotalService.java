@@ -2,7 +2,9 @@ package com.restarant.backend.service;
 
 import com.restarant.backend.dto.*;
 import com.restarant.backend.entity.Customer;
+import com.restarant.backend.entity.OrderDetails;
 import com.restarant.backend.entity.OrderTotal;
+import com.restarant.backend.entity.TableOrder;
 import com.restarant.backend.service.validate.exception.InvalidDataExeception;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,4 +41,8 @@ public interface IOrderTotalService extends IServiceAdapter<OrderTotalDto> {
 
     OrderTotal createToCustomer(Customer customer);
     BigDecimal getRevenueBetweenTime(long fromTime, long toTime);
+
+    List<OrderHistoryDto> getHistoryOrder(Long customerId);
+
+    List<OrderHistoryDetailDto> getOrderDetailsByOrderId(Long orderId);
 }

@@ -1,4 +1,11 @@
-import { Button, IconButton,DialogContent,DialogTitle, Dialog,  DialogActions } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  DialogContent,
+  DialogTitle,
+  Dialog,
+  DialogActions,
+} from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
@@ -23,18 +30,6 @@ const modalStyle = {
     transform: "translate(-50%, -50%)",
   },
 };
-
-// const modalStyle = {
-//   content: {
-//     top: "50%",
-//     left: "50%",
-//     right: "auto",
-//     bottom: "auto",
-//     width: "600px",
-//     marginRight: "-50%",
-//     transform: "translate(-50%, -50%)",
-//   },
-// };
 
 export default function FoodsAdmin(props) {
   const navigation = useNavigate();
@@ -61,19 +56,20 @@ export default function FoodsAdmin(props) {
     setResetData(!resetData);
   };
 
-  const changeTime = async (id,startTime) => {
+  const changeTime = async (id, startTime) => {
     setStart(startTime);
     setIDd(id);
-      setmodalChangeTime(true);
+    setmodalChangeTime(true);
   };
 
   const confirmTime = async () => {
-    const startLong = new Date(datestart+" "+start+":00").getTime()/1000;
-    const endLong = new Date(datestart+" "+start+":00").setHours(new Date(datestart+" "+start+":00").getHours()+3)/1000;
-    
+    const startLong =
+      new Date(datestart + " " + start + ":00").getTime() / 1000;
+    const endLong =
+      new Date(datestart + " " + start + ":00").setHours(
+        new Date(datestart + " " + start + ":00").getHours() + 3
+      ) / 1000;
   };
-
-
 
   const xacsnhandennhahang = async (id) => {
     const res = await OrdersAPI.staffConfirmKhden(id);
@@ -261,6 +257,7 @@ export default function FoodsAdmin(props) {
   const onModalClose = () => {
     setModalIsOpen(false);
     setmodalChangeTime(false);
+    setNoteModal("");
   };
 
   useEffect(() => {
@@ -323,7 +320,6 @@ export default function FoodsAdmin(props) {
           />
           <Table.Column
             title="Mã hoá đơn"
-            // dataIndex="orderId"
             key="orderId"
             align="center"
             width={100}
@@ -344,16 +340,16 @@ export default function FoodsAdmin(props) {
           />
           <Table.Column
             title="Khách hàng"
-            // dataIndex="customerName"
             key="orderId"
             width={200}
             render={(record) => {
               return (
                 <Button
-                style={{fontSize:'small'}}
+                  style={{ fontSize: "small" }}
                   color="primary"
                   onClick={() => {
-                    setModalIsOpen(true), setNoteModal('STD:' + record.customer.phoneNumber);
+                    setModalIsOpen(true),
+                      setNoteModal("STD:" + record.customer.phoneNumber);
                   }}
                 >
                   {record.customerName}
@@ -369,20 +365,27 @@ export default function FoodsAdmin(props) {
             align="right"
             sorter={(a, b) => +a.price - +b.price}
             render={(text) =>
-              `${text.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`
+              `${
+                text
+                  ? text.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                  : "0"
+              } VNĐ`
             }
           />
           <Table.Column
             title="Thời gian dự kiến"
-            // dataIndex="orderTime"
             key="orderTime"
             render={(record) => {
               return (
                 <Button
-                style={{fontSize:'small'}}
+                  style={{ fontSize: "small" }}
                   color="primary"
                   onClick={() => {
-                    changeTime(record.orderId,record.orderTime,record.endTime);
+                    changeTime(
+                      record.orderId,
+                      record.orderTime,
+                      record.endTime
+                    );
                   }}
                 >
                   {record.orderTime}
@@ -469,7 +472,11 @@ export default function FoodsAdmin(props) {
                 );
               else if (record.status === 4)
                 return (
-                  <Button onClick={()=>xacsnhandennhahang(record.id)} variant="contained" color="warning">
+                  <Button
+                    onClick={() => xacsnhandennhahang(record.id)}
+                    variant="contained"
+                    color="warning"
+                  >
                     Chờ khách hàng
                     <br />
                     đến nhà hàng
@@ -541,7 +548,7 @@ export default function FoodsAdmin(props) {
         ariaHideApp={false}
         contentLabel="Note"
       >
-        <div  className="header">
+        <div className="header">
           <h1>Chi tiết </h1>
           <IconButton
             aria-label="delete"
@@ -552,52 +559,62 @@ export default function FoodsAdmin(props) {
             <CloseIcon fontSize="small" />
           </IconButton>
         </div>
-        <div style={{color:'blue',fontWeight:'bold'}}>{noteModal}</div>
+        <div style={{ color: "blue", fontWeight: "bold" }}>{noteModal}</div>
       </Modal>
       {changeTime && (
-        <Dialog open={modalChangeTime} onClose={() => setmodalChangeTime(false)}>
-          <DialogTitle sx={{ textAlign: "center",width : '550px',height: '270px', backgroundColor: 'LightYellow' }}>
+        <Dialog
+          open={modalChangeTime}
+          onClose={() => setmodalChangeTime(false)}
+        >
+          <DialogTitle
+            sx={{
+              textAlign: "center",
+              width: "550px",
+              height: "270px",
+              backgroundColor: "LightYellow",
+            }}
+          >
             <h2>Đổi thời gian hóa đơn</h2>
-          <div style={{ marginBottom: "5px", display: "flex", gap: 10 }}>
-            <input
-              type="date"
-              id="appt"
-              name="appt"
-              min="09:00"
-              max="22:30"
-              required
-              style={{
-                background: "#9c27b029",
-                border: "1px solid #9c27b029",
-                borderRadius: "5px",
-                padding: "5px",
-              }}
-              onChange={(event)=>setDateStart(event.target.value)}
-            />
-            <input
-              type="time"
-              id="appt"
-              name="appt"
-              min="09:00"
-              max="22:30"
-              required
-              onChange={(event)=>setStart(event.target.value)}
-              style={{
-                background: "#9c27b029",
-                border: "1px solid #9c27b029",
-                borderRadius: "5px",
-                padding: "5px",
-              }}
-            />
-            <Button
-              onClick={()=>confirmTime()}
-              variant="contained"
-              color="secondary"
-              startIcon={<EventAvailableIcon />}
-            >
-              OK
-            </Button>
-          </div>
+            <div style={{ marginBottom: "5px", display: "flex", gap: 10 }}>
+              <input
+                type="date"
+                id="appt"
+                name="appt"
+                min="09:00"
+                max="22:30"
+                required
+                style={{
+                  background: "#9c27b029",
+                  border: "1px solid #9c27b029",
+                  borderRadius: "5px",
+                  padding: "5px",
+                }}
+                onChange={(event) => setDateStart(event.target.value)}
+              />
+              <input
+                type="time"
+                id="appt"
+                name="appt"
+                min="09:00"
+                max="22:30"
+                required
+                onChange={(event) => setStart(event.target.value)}
+                style={{
+                  background: "#9c27b029",
+                  border: "1px solid #9c27b029",
+                  borderRadius: "5px",
+                  padding: "5px",
+                }}
+              />
+              <Button
+                onClick={() => confirmTime()}
+                variant="contained"
+                color="secondary"
+                startIcon={<EventAvailableIcon />}
+              >
+                OK
+              </Button>
+            </div>
           </DialogTitle>
         </Dialog>
       )}

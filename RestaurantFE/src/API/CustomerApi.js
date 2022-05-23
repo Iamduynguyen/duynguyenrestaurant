@@ -20,7 +20,11 @@ const CustomerApi = {
     openCustomer: (id) => {
         const url = "/api/customer/unlock/" + id;
         return axiosClient.put(url);
-    }
+    },
+    updateInfoCustomer: (data) => {
+        const url = "/api/customer";
+        return axiosClient.put(url, data);
+    },
 };
 
 export default CustomerApi;

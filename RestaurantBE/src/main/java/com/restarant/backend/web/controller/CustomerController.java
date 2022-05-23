@@ -172,6 +172,25 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
+    @PutMapping("/customer")
+    public ResponseEntity<?> updateCustomer(HttpServletRequest request, @RequestBody CustomerDto customerDto) {
+        try {
+            Customer customer = jwtServiceUtils.getCustomerByToken(request);
+            System.out.println(customerDto.toString());
+            if(customer == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            } else {
+                customer.setName(customerDto.getName());
+                customer.setPhoneNumber(customerDto.getPhoneNumber());
+                customerRepository.save(customer);
+            }
+            return ResponseEntity.ok(customer);
+        } catch (Exception e) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
     /**
      * {@code DELETE  /customers/:id} : delete the "id" customer.
      *

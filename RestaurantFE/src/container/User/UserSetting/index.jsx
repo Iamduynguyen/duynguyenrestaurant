@@ -19,6 +19,8 @@ import {
     useEffect(() => {
       const fetchData = async () => {
         const data = await CustomerApi.getInfoCustomer();
+
+    
         setUserData(data)
         document.getElementById('infoPhone').value = data.phoneNumber
         document.getElementById('infoFullName').value = data.name
@@ -42,7 +44,7 @@ import {
         }
 
         if(errors.length == 0){
-            CustomerApi.saveInfoCustomer(dataNew);
+            CustomerApi.updateInfoCustomer(dataNew);
             Swal.fire({title: 'Thành công!',
             text: 'Cập nhật thông tin thành công!',
             icon: 'success',

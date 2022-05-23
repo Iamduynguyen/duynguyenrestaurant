@@ -45,7 +45,7 @@ public class TableOrderController {
     OrderTotalRepository orderTotalRepository;
 
     @Autowired
-    TableOrderRepository tablesRepository;
+    TableOrderRepository tablesOderRepository;
 
     @Autowired
     OrderTotalService orderTotalService;
@@ -162,19 +162,17 @@ public class TableOrderController {
 //     */
     @DeleteMapping("/table-orders/{id}")
     public ResponseEntity<?> deleteTableOrder(@PathVariable Long id) {
-        TableOrder tableOrder = tablesRepository.findById(id).get();
+        TableOrder tableOrder = tablesOderRepository.findById(id).get();
         OrderTotal orderTotal = tableOrder.getOrderTotal();
         try {
-            if (tableOrderService.deleteById(id)) {
+                tablesOderRepository.deleteById(id);
                 List<OrderDetails> orderDetails = orderDetailsRepository.getByOrderTableId(id);
                 orderDetailsRepository.deleteAll(orderDetails);
                 orderTotalService.tinhtongtien(orderTotal);
-                return ResponseEntity.ok().body("Delete success!");
-            }
-        } catch (InvalidDataExeception e) {
+                return ResponseEntity.ok("SUCCESS");
+        } catch (Exception e) {
             log.error("Error when ddelete table", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.ok("FAIL");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 }

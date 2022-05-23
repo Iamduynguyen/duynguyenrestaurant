@@ -260,6 +260,9 @@ const CreateOrder = () => {
                     color={
                       selectedTables.indexOf(e.id) >= 0 ? "success" : "primary"
                     }
+                    disabled = {
+                      e.status == 1 ? true : false
+                    }
                     onClick={() => setChoosedTables(e.id)}
                   >
                     {e.id}

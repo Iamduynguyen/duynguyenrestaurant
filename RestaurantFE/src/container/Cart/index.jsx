@@ -8,6 +8,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useNavigate,useParams } from "react-router-dom";
 import ModalMessage from "../../components/Modal/ModalMessage";
 import Swal from 'sweetalert2'
+import CustomerApi from "../../API/CustomerApi";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -16,11 +17,13 @@ export default function Cart() {
   const [foodOrder, setFoodOrder] = useState([]);
   const [xacnhanBtn, setXacnhanBtn] = useState(false);
   const [datcocBtn, setDatcocBtn] = useState(false);
+  const [phone, setPhone] = useState(null);
   const [orderId, setOrderId] = useState("");
   const [sumPrice, setSumPrice] = useState("");
   const [Orderstatus, setOrderstatus] = useState("");
   const [payman, setpayman] = useState();
   const [sum, setSum] = useState(0);
+  const [sumTam, setSumTam] = useState(0);
   const [countPrice, setCountPrice] = useState([])
   const [statusPay, setstatusPay] = useState("");
   const [socketUrl, setSocketUrl] = useState("localhost:8787");
@@ -32,14 +35,25 @@ export default function Cart() {
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
   let { status } = useParams();
   const confirmOrder1 = async (id) => {
-    const res = await OrdersAPI.confirmOrder1(id);
-    if (res) {
-      ModalMessage.middleModal(
-        "success",
-        "Gửi đơn hàng thành công!",
-        "Nhà hàng đang xác nhận, Xin vui lòng đợi!"
-      ).then(() => window.location.reload());
+    console.log(phone);
+    if(phone&&phone==null){
+      const res = await OrdersAPI.confirmOrder1(id);
+      if (res) {
+        ModalMessage.middleModal(
+          "success",
+          "Gửi đơn hàng thành công!",
+          "Nhà hàng đang xác nhận, Xin vui lòng đợi!"
+        ).then(() => window.location.reload());
+      }
+    }else{
+      Swal.fire({
+        title: 'Lỗi!',
+        text: 'Vui long cập nhật số điện thoại',
+        icon: 'error',
+        confirmButtonText: 'Đóng'
+      })
     }
+    
   };
 
   const fetchpayment = async () => {
@@ -75,6 +89,8 @@ export default function Cart() {
   };
 
   const fetchData = async () => {
+    const cus = await CustomerApi.getInfoCustomer();
+    setPhone(cus.phoneNumber);
     const res = await BookTableAPI.getUserBookTable();
     const resOrder= await BookTableAPI.getInforOrder(res[0].orderTotalId)
     const resThanhtoan = await BookTableAPI.getInforThanhtoan(res[0].orderTotalId)
@@ -315,6 +331,13 @@ export default function Cart() {
                       </Button>
                     </Box>)}
                     <Divider />
+                    <p
+                      style={{ textAlign: "center", color: "#1059f5" }}
+                      className="p__cormorant"
+                    >
+                      Tạm tính:{" "}
+                      <span style={{ color: "#dcca87" }}>{sum} VND</span>
+                    </p>
                     <p
                       style={{ textAlign: "center", color: "#1059f5" }}
                       className="p__cormorant"

@@ -358,22 +358,6 @@ const OrderDetail = (props) => {
             }}
           />
           <Table.Column
-            title="Giảm giá"
-            dataIndex="discount"
-            key="discount"
-            align="right"
-            width={150}
-            render={(text) => {
-              if (text !== null && text !== undefined) {
-                return `${text
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} %`;
-              } else {
-                return `0 %`;
-              }
-            }}
-          />
-          <Table.Column
             title="Tổng tiền"
             key="amount"
             align="right"
@@ -381,10 +365,7 @@ const OrderDetail = (props) => {
             render={(record) => {
               if (record !== null && record.amount !== null) {
                 return `${(
-                  ((parseInt(record.amount, 10) *
-                    (100 - parseInt(record.discount, 10))) /
-                    100) *
-                  record.quantity
+                  record.amount*record.quantity
                 )
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;

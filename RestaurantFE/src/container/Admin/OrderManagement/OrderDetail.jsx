@@ -25,7 +25,7 @@ const OrderDetail = (props) => {
   const xacnhanOderdetail = async (id) => {
     const rs = await OrdersAPI.xacnhanOderdetail(id);
     if (rs === "success") {
-      ModalMessage.miniTopRightModal("success", `Thành công!`);
+      ModalMessage.miniTopRightModal("success", `Xác nhận thành công!`);
     } else {
       ModalMessage.miniTopRightModal("error", `Lỗi<br/>Vui lòng thử lại sau!`);
     }
@@ -364,9 +364,7 @@ const OrderDetail = (props) => {
             width={150}
             render={(record) => {
               if (record !== null && record.amount !== null) {
-                return `${(
-                  record.amount*record.quantity
-                )
+                return `${(record.amount * record.quantity)
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VNĐ`;
               } else {
@@ -376,29 +374,30 @@ const OrderDetail = (props) => {
           />
           <Table.Column
             title="Trạng thái"
-            width={150}
+            width={100}
             dataIndex="status"
-            key="note"
+            key="status"
+            align="center"
           />
           <Table.Column
-            title="Action"
-            dataIndex="note"
+            title="Hành động"
+            align="center"
+            key="action"
+            width={80}
             render={(record) => {
-              return (
-                <button
-                  onClick={() => xacnhanOderdetail(record.id)}
-                  style={{
-                    padding: "5px",
-                    backgroundColor: "blue",
-                    color: "white",
-                    borderRadius: "5px",
-                  }}
-                >
-                  Xác nhận
-                </button>
-              );
+              if (record.status === "Chưa xác nhận") {
+                return (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={() => xacnhanOderdetail(record.id)}
+                  >
+                    Xác nhận
+                  </Button>
+                );
+              }
             }}
-            key="note"
           />
         </Table>
       </Row>

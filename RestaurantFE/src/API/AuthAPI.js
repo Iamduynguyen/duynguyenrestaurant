@@ -5,8 +5,8 @@ const AuthAPI = {
     const url = '/service/signin';
     return axiosClient.post(url, user);
   },
-  register: (user) => {
-    const url = '/service/register';
+  register: (user, phone) => {
+    const url = `/service/register?phone=${phone}`;
     return axiosClient.post(url, user);
   },
   changePassword: (data) => {

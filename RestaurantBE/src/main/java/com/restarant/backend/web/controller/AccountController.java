@@ -11,6 +11,7 @@ import com.restarant.backend.service.IAccountService;
 import com.restarant.backend.dto.LoginRequest;
 import com.restarant.backend.service.utils.JwtServiceUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,6 +48,9 @@ public class AccountController {
     private final JwtServiceUtils jwtServiceUtils;
     private final PasswordEncoder encoder;
 
+    @Autowired
+    private HttpServletRequest request;
+
     public AccountController(IAccountService accountService,
                              AccountRepository accountRepository, AuthenticationManager authenticationManager,
                              JwtUtils jwtUtils,
@@ -79,13 +83,13 @@ public class AccountController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> createAccount(@RequestBody Account account) throws URISyntaxException {
+    public ResponseEntity<?> createAccount(@RequestBody Account account,@RequestParam("phone") String phone) throws URISyntaxException {
         account.setPassword(encoder.encode(account.getPassword()));
         account.setTimereset(LocalDate.now());
         account.setCecret(UUID.randomUUID().toString());
         account.setRole("ROLE_USER");
         account.setDeleteFlag(false);
-        Account result = accountService.createAccount(account);
+        Account result = accountService.createAccount(account, phone);
         return ResponseEntity.ok().body(result);
     }
 

@@ -176,7 +176,6 @@ public class CustomerController {
     public ResponseEntity<?> updateCustomer(HttpServletRequest request, @RequestBody CustomerDto customerDto) {
         try {
             Customer customer = jwtServiceUtils.getCustomerByToken(request);
-            System.out.println(customerDto.toString());
             if(customer == null){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             } else {

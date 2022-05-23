@@ -9,6 +9,7 @@ export default function Register() {
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
+  const [phone, setPhone] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [token, setToken] = React.useState("");
   const [validAPI, setValidAPI] = React.useState("");
@@ -17,33 +18,40 @@ export default function Register() {
     event.preventDefault();
     const data = {
       login: email,
-      password: password,
+      password: password
     };
-    const res = await AuthAPI.register(data);
-    // if(res == 'EMAIL_EXIT'){
-    //   setValidAPI("Địa chỉ email này đã được đăng kí!");
-    // } else
-    if (res.id !== undefined) {
-      Swal.fire("Đăng ký thành công!", "Nhấn OK để đăng nhập", "success").then(
-        async () => {
-          const resLogin = await AuthAPI.login(data);
-          if (!resLogin.status) {
-            sessionStorage.setItem("token", resLogin.token);
-            sessionStorage.setItem("name", resLogin.username);
-            sessionStorage.setItem("role", resLogin.role);
-            setToken(resLogin.token);
-            if (res.role === "ROLE_ADMIN") {
-              navigation("/admin");
-            } else {
-              navigation("/");
+
+    if(!/(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(phone.trim())){
+      setValidAPI("Số điện thoại không đúng định dạng!");
+    } else {
+      const res = await AuthAPI.register(data, phone);
+      console.log(res);
+      console.log(res == 'EMAIL_EXIST');
+      if(res == 'EMAIL_EXIST'){
+        setValidAPI("Địa chỉ email này đã được đăng kí");
+      } else 
+      if (res.id !== undefined) {
+        Swal.fire("Đăng ký thành công!", "Nhấn OK để đăng nhập", "success").then(
+          async () => {
+            const resLogin = await AuthAPI.login(data);
+            if (!resLogin.status) {
+              sessionStorage.setItem("token", resLogin.token);
+              sessionStorage.setItem("name", resLogin.username);
+              sessionStorage.setItem("role", resLogin.role);
+              setToken(resLogin.token);
+              if (res.role === "ROLE_ADMIN") {
+                navigation("/admin");
+              } else {
+                navigation("/");
+              }
             }
           }
-        }
-      );
-    } else if (res.status === 403) {
-      setValidAPI("Tài khoản hoặc mật khẩu không đúng");
-    } else {
-      setValidAPI("Lỗi hệ thống, vui lòng liên hệ quản trị viên");
+        );
+      } else if (res.status === 403) {
+        setValidAPI("Tài khoản hoặc mật khẩu không đúng");
+      } else {
+        setValidAPI("Lỗi hệ thống, vui lòng liên hệ quản trị viên");
+      }
     }
   };
   React.useEffect(() => {
@@ -147,7 +155,24 @@ export default function Register() {
                       for="floating_email"
                       class="absolute left-0 text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                     >
-                      Email address<span className="text-red-400"> *</span>
+                      Email<span className="text-red-400"> *</span>
+                    </label>
+                  </div>
+                  <div class="relative z-0 mb-6 w-full group">
+                    <input
+                      type="phone"
+                      id="phone"
+                      name="phone"
+                      onChange={(e) => setPhone(e.target.value)}
+                      class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                      placeholder=" "
+                      required
+                    />
+                    <label
+                      for="floating_email"
+                      class="absolute left-0 text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >
+                      Số điện thoại<span className="text-red-400"> *</span>
                     </label>
                   </div>
                   <div class="relative z-0 mb-6 w-full group">

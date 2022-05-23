@@ -19,13 +19,14 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public Account createAccount(Account account) {
+    public Account createAccount(Account account, String phone) {
         if(accountRepository.getByLogin(account.getLogin()) != null){
             return null;
         }
         Account result =accountRepository.save(account);
         Customer customer = new Customer();
         customer.setName(result.getLogin());
+        customer.setPhoneNumber(phone);
         customer.setAccount(result);
         Customer customer1 = customerRepository.save(customer);
         result.setCustomer(customer1);
